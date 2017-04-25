@@ -1,57 +1,54 @@
-import subprocess
-import json
-import os
+from collections import defaultdict
+from pprint import pprint
+import db_manager
 
 
 def main():
-    reduced_vts = get_aggregated_vt('/home/yogaub/projects/projects_data/vt')
-    create_avclass_input(reduced_vts)
+    db_path = '/home/yogaub/projects/projects_data/malrec/db'
+    md5_uuid = db_manager.acquire_md5_uuid(db_path)
+    label_uuid = get_inverted_labels(md5_uuid)
 
 
-def get_aggregated_vt(dir_vt):
+def get_inverted_labels(md5_uuid):
     """
-    Scans the VT reports in the folder and returns a list of reduced VT reports
+    Scans the label file produced by AVClass and generates the inverted dictionary of labels and md5s.
     
-    :param dir_vt: path to the VT reports
-    :return: list of reduced VT reports
-    """
-
-    required_fields = ['md5', 'sha1', 'sha256', 'scan_date']
-    reduced_vts = []
-    empty = []
-    singleton = []
-
-    for vt_report in sorted(os.listdir(dir_vt)):
-        reduced_vt = {}
-
-        with open(os.path.join(dir_vt, vt_report), 'r', encoding='utf-8', errors='replace') as vt_file:
-            json_report = json.loads(vt_file.read())
-
-            for field in required_fields:
-                reduced_vt[field] = json_report[field]
-
-            reduced_vt['av_labels'] = []
-
-            for av, scan in json_report['scans'].items():
-                if scan['detected']:
-                    reduced_vt['av_labels'].append([av, scan['result']])
-
-        reduced_vts.append(reduced_vt)
-
-    return reduced_vts
-
-
-def create_avclass_input(reduced_vts):
-    """
-    Creates the input file for AVClass labeling tool.
-    
-    :param reduced_vts: list of reduced VT reports
+    :param md5_uuid: md5 to uuid mapping
     :return: 
     """
 
-    with open('avc_input.json', 'w', encoding='utf-8', errors='replace') as avc:
-        for reduced_vt in reduced_vts:
-            avc.write(json.dumps(reduced_vt) + '\n')
+    inverted_labels = defaultdict(list)
+
+    with open('labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
+        for line in labels_file:
+            line = line.strip().split('\t')
+
+            if 'SINGLETON' in line[1]:
+                line[1] = line[1].split(':')[0]
+
+            md5 = line[0]
+            uuid = md5_uuid[md5]
+            inverted_labels[line[1]].append(uuid)
+
+    return inverted_labels
+
+
+def print_inverted_labels(inverted_labels):
+    """
+    Outputs the inverted labels dictionary to file.
+    
+    :param inverted_labels: 
+    :return: 
+    """
+
+    with open('inverted_labels.txt', 'w', encoding='utf-8', errors='replace') as inverted_file:
+        for family, md5s in sorted(inverted_labels.items()):
+            inverted_file.write(family + '\n')
+
+            for md5 in md5s:
+                inverted_file.write('\t' + md5 + '\n')
+
+            inverted_file.write('\n')
 
 
 if __name__ == '__main__':

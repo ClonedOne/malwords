@@ -141,3 +141,4 @@ ENV/
 .idea/
 avc_input.json
 labels.txt
+/inverted_labels.txt

@@ -2,7 +2,7 @@ from collections import Counter
 from pprint import pprint
 
 
-def main():
+def get_stats():
     stats_labels = get_labels_stats()
     print('Number of distinct samples:', stats_labels[0])
     print('Number of distinct families:', stats_labels[1])
@@ -30,9 +30,8 @@ def get_labels_stats():
 
             if 'SINGLETON' in line[1]:
                 # line[1] = line[1].split(':')[1]
-                # line[1] = line[1].split(':')[0]
+                line[1] = line[1].split(':')[0]
                 num_singleton += 1
-                continue
 
             fam_counter[line[1]] += 1
 
@@ -52,4 +51,4 @@ def get_labels_stats():
 
 
 if __name__ == '__main__':
-    main()
+    get_stats()
