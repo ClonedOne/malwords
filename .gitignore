@@ -142,3 +142,4 @@ ENV/
 avc_input.json
 labels.txt
 /inverted_labels.txt
+avc_input.verbose

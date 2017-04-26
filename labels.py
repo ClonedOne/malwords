@@ -7,6 +7,7 @@ def main():
     db_path = '/home/yogaub/projects/projects_data/malrec/db'
     md5_uuid = db_manager.acquire_md5_uuid(db_path)
     label_uuid = get_inverted_labels(md5_uuid)
+    print_inverted_labels(label_uuid)
 
 
 def get_inverted_labels(md5_uuid):
