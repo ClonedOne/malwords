@@ -48,7 +48,7 @@ def create_avclass_input(reduced_vts):
     :return: 
     """
 
-    with open('avc_input.json', 'w', encoding='utf-8', errors='replace') as avc:
+    with open('data/avc_input.json', 'w', encoding='utf-8', errors='replace') as avc:
         for reduced_vt in reduced_vts:
             avc.write(json.dumps(reduced_vt) + '\n')
 

@@ -22,7 +22,7 @@ def get_labels_stats():
     num_samples = 0
     num_singleton = 0
 
-    with open('labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
+    with open('data/labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
 
         for line in labels_file:
             line = line.strip().split('\t')

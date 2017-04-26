@@ -139,7 +139,7 @@ ENV/
 .ropeproject
 
 .idea/
-avc_input.json
-labels.txt
-/inverted_labels.txt
-avc_input.verbose
+data/avc_input.json
+data/labels.txt
+data/inverted_labels.txt
+data/avc_input.verbose

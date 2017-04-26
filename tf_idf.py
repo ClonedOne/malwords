@@ -10,7 +10,7 @@ dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/mini_malword
 dir_store = '/home/yogaub/projects/projects_data/malrec/malwords/store'
 
 
-def main():
+def get_tf_idf():
     total_documents = len(os.listdir(dir_malwords))
     dfs = compute_df()
     remove_useless_words(dfs, total_documents)
@@ -128,4 +128,4 @@ def compute_tf_idf(dfs, total_documents):
 
 
 if __name__ == '__main__':
-    main()
+    get_tf_idf()

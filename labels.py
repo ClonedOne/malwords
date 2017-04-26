@@ -1,9 +1,8 @@
 from collections import defaultdict
-from pprint import pprint
 import db_manager
 
 
-def main():
+def get_labels():
     db_path = '/home/yogaub/projects/projects_data/malrec/db'
     md5_uuid = db_manager.acquire_md5_uuid(db_path)
     label_uuid = get_inverted_labels(md5_uuid)
@@ -20,7 +19,7 @@ def get_inverted_labels(md5_uuid):
 
     inverted_labels = defaultdict(list)
 
-    with open('labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
+    with open('data/labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
         for line in labels_file:
             line = line.strip().split('\t')
 
@@ -42,7 +41,7 @@ def print_inverted_labels(inverted_labels):
     :return: 
     """
 
-    with open('inverted_labels.txt', 'w', encoding='utf-8', errors='replace') as inverted_file:
+    with open('data/inverted_labels.txt', 'w', encoding='utf-8', errors='replace') as inverted_file:
         for family, md5s in sorted(inverted_labels.items()):
             inverted_file.write(family + '\n')
 
@@ -53,4 +52,4 @@ def print_inverted_labels(inverted_labels):
 
 
 if __name__ == '__main__':
-    main()
+    get_labels()
