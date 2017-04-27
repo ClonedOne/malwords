@@ -58,6 +58,8 @@ def remove_useless_words(dfs, total_documents):
     for word in to_remove:
         dfs.pop(word, None)
 
+    json.dump(sorted(list(dfs.keys())), open('data/words.json', 'w'), indent=2)
+
 
 def compute_tf(dfs):
     """
