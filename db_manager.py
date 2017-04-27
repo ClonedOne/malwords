@@ -79,6 +79,7 @@ def acquire_md5_uuid(dir_database_path):
 
     conn.close()
 
+    # Remove collisions
     for md5 in md5s:
         if md5s[md5] > 1:
             md5_uuid_dict.pop(md5, None)

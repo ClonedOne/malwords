@@ -1,4 +1,5 @@
 from sklearn.metrics.pairwise import cosine_distances
+from sklearn.metrics import f1_score
 from scipy.sparse import *
 from sklearn.cluster import KMeans
 import numpy as np
@@ -23,9 +24,9 @@ def main():
     data = lil_matrix((rows, cols))
 
     uuids = sorted(os.listdir(dir_store))
-    row = 0
 
     # Generates sparse matrix from tf-idf vector files
+    row = 0
     for uuid in uuids:
         print('Adding: ' + uuid)
 
@@ -35,7 +36,22 @@ def main():
         row += 1
 
     # Convert to sparse matrix format usable by k-menas
+    print('Converting the sparse matrix')
     data = data.tocsc()
+
+    # apply k-means clustering
+    print('Apply KMeans clustering')
+    k_means.fit(data)
+
+    print(k_means.labels_)
+
+    # Retrieve base labels
+    base_labels = get_base_labels(uuids)
+    base_labels = np.asarray(base_labels)
+    print(base_labels)
+
+    # Evaluate clustering
+    print(f1_score(base_labels, k_means.labels_))
 
 
 def extract_tf_idf(tf_idf_file, words):
@@ -71,5 +87,23 @@ def get_word_index(words):
 
     return word_index
 
+
+def get_base_labels(uuids):
+    """
+    Returns the ordered list of base labels from AVClass output
+    
+    :return: ordered list of labels
+    """
+
+    base_labels = []
+    uuid_label = json.load(open('data/labels.json'))
+
+    for uuid in uuids:
+        base_labels.append(1 if uuid_label[uuid] == 'mydoom' else 0)
+
+    return base_labels
+
+
 if __name__ == '__main__':
     main()
+
