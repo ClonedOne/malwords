@@ -7,6 +7,7 @@ import gzip
 import os
 
 dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/mini_malwords'
+# dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/test'
 dir_store = '/home/yogaub/projects/projects_data/malrec/malwords/store'
 
 

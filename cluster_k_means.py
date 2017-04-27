@@ -2,6 +2,7 @@ from sklearn import metrics
 from scipy.sparse import *
 from sklearn.cluster import KMeans
 import numpy as np
+import pickle
 import json
 import os
 
@@ -11,7 +12,7 @@ num_clusters = 2
 
 
 def main():
-    k_means = KMeans(n_clusters=num_clusters)
+    k_means = KMeans(n_clusters=num_clusters, n_jobs=-1)
 
     words = json.load(open('data/words.json', 'r'))
     cols = len(words)
@@ -19,24 +20,10 @@ def main():
     words = get_word_index(words)
 
     rows = len(os.listdir(dir_store))
-
-    data = lil_matrix((rows, cols))
-
     uuids = sorted(os.listdir(dir_store))
 
-    # Generates sparse matrix from tf-idf vector files
-    row = 0
-    for uuid in uuids:
-        print('Adding: ' + uuid)
-
-        for (col, tf_idf) in extract_tf_idf(os.path.join(dir_store, uuid), words):
-            data[row, col] = tf_idf
-
-        row += 1
-
-    # Convert to sparse matrix format usable by k-menas
-    print('Converting the sparse matrix')
-    data = data.tocsc()
+    # Retrieve sparese data matrix
+    data = get_data_matrix(rows, cols, uuids, words)
 
     # apply k-means clustering
     print('Apply KMeans clustering')
@@ -56,7 +43,6 @@ def main():
     print('Fowlkes-Mallows:', metrics.fowlkes_mallows_score(base_labels, computed_labels))
     print('Homogeneity:', metrics.homogeneity_score(base_labels, computed_labels))
     print('Completeness:', metrics.completeness_score(base_labels, computed_labels))
-    print('Silhouette Coefficient:', metrics.silhouette_samples(data, computed_labels, ))
 
 
 def extract_tf_idf(tf_idf_file, words):
@@ -107,6 +93,67 @@ def get_base_labels(uuids):
         base_labels.append(1 if uuid_label[uuid] == 'mydoom' else 0)
 
     return base_labels
+
+
+def get_data_matrix(rows, cols, uuids, words):
+    """
+    Computes the sparse matrix used as input for the KMeans algorithm.
+    
+    :param rows: number of rows
+    :param cols: number of columns
+    :param uuids: list of uuids
+    :param words: dictionary of words and their positional index
+    :return: sparse tf-idf matrix
+    """
+
+    data_matrix_path = 'data/matrix.npz'
+    if os.path.isfile(data_matrix_path):
+        data = load_sparse_csr(data_matrix_path)
+        return data
+
+    data = lil_matrix((rows, cols))
+
+    # Generates sparse matrix from tf-idf vector files
+    row = 0
+    for uuid in uuids:
+        print('Adding: ' + uuid)
+
+        for (col, tf_idf) in extract_tf_idf(os.path.join(dir_store, uuid), words):
+            data[row, col] = tf_idf
+
+        row += 1
+
+    # Convert to sparse matrix format usable by k-menas
+    data = data.tocsr()
+    save_sparse_csr(data_matrix_path, data)
+
+    return data
+
+
+def save_sparse_csr(filename, array):
+    """
+    Save sparse matrix to file
+    
+    :param filename: name of the data matrix file
+    :param array: sparse matrix
+    :return: 
+    """
+
+    print('Saving matrix to file')
+    np.savez(filename, data=array.data, indices=array.indices, indptr=array.indptr, shape=array.shape)
+
+
+def load_sparse_csr(filename):
+    """
+    Loads sparse matrix from file 
+    
+    :param filename: name of the data matrix file
+    :return: 
+    """
+
+    print('Loading matrix from file')
+    loader = np.load(filename)
+    return csr_matrix((loader['data'], loader['indices'], loader['indptr']), shape = loader['shape'])
 
 
 if __name__ == '__main__':
