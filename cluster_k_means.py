@@ -1,5 +1,4 @@
-from sklearn.metrics.pairwise import cosine_distances
-from sklearn.metrics import f1_score
+from sklearn import metrics
 from scipy.sparse import *
 from sklearn.cluster import KMeans
 import numpy as np
@@ -43,7 +42,8 @@ def main():
     print('Apply KMeans clustering')
     k_means.fit(data)
 
-    print(k_means.labels_)
+    computed_labels = k_means.labels_
+    print(computed_labels)
 
     # Retrieve base labels
     base_labels = get_base_labels(uuids)
@@ -51,7 +51,12 @@ def main():
     print(base_labels)
 
     # Evaluate clustering
-    print(f1_score(base_labels, k_means.labels_))
+    print('Adjusted Rand index:', metrics.adjusted_rand_score(base_labels, computed_labels))
+    print('Adjusted Mutual Information:', metrics.adjusted_mutual_info_score(base_labels, computed_labels))
+    print('Fowlkes-Mallows:', metrics.fowlkes_mallows_score(base_labels, computed_labels))
+    print('Homogeneity:', metrics.homogeneity_score(base_labels, computed_labels))
+    print('Completeness:', metrics.completeness_score(base_labels, computed_labels))
+    print('Silhouette Coefficient:', metrics.silhouette_samples(data, computed_labels, ))
 
 
 def extract_tf_idf(tf_idf_file, words):
