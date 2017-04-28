@@ -43,7 +43,7 @@ def compute_df():
 
 def remove_useless_words(dfs, total_documents):
     """
-    Remove words which would end up with tf-idf = 0
+    Remove words which would end up with tf-idf = 0, and words which appear just once in all the documents.
     
     :param dfs: document frequency of each word
     :param total_documents: number of documents
@@ -53,11 +53,13 @@ def remove_useless_words(dfs, total_documents):
     to_remove = set()
 
     for word in dfs:
-        if dfs[word] == total_documents:
+        if dfs[word] == total_documents or dfs[word] == 1:
             to_remove.add(word)
 
     for word in to_remove:
         dfs.pop(word, None)
+
+    print('Features size:', len(dfs))
 
     json.dump(sorted(list(dfs.keys())), open('data/words.json', 'w'), indent=2)
 

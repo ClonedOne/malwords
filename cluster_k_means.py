@@ -22,6 +22,8 @@ def main():
     rows = len(os.listdir(dir_store))
     uuids = sorted(os.listdir(dir_store))
 
+    print('Matrix dimensions: ', rows, cols)
+
     # Retrieve sparese data matrix
     data = get_data_matrix(rows, cols, uuids, words)
 
@@ -43,6 +45,8 @@ def main():
     print('Fowlkes-Mallows:', metrics.fowlkes_mallows_score(base_labels, computed_labels))
     print('Homogeneity:', metrics.homogeneity_score(base_labels, computed_labels))
     print('Completeness:', metrics.completeness_score(base_labels, computed_labels))
+
+    result_to_visualize(uuids, base_labels, computed_labels)
 
 
 def extract_tf_idf(tf_idf_file, words):
@@ -153,7 +157,34 @@ def load_sparse_csr(filename):
 
     print('Loading matrix from file')
     loader = np.load(filename)
-    return csr_matrix((loader['data'], loader['indices'], loader['indptr']), shape = loader['shape'])
+    return csr_matrix((loader['data'], loader['indices'], loader['indptr']), shape=loader['shape'])
+
+
+def result_to_visualize(uuids, base_labels, computed_labels):
+    """
+    Generate a json file structured so it can be used for visualization 
+    
+    :param uuids: list of uuids
+    :param base_labels: base truth labels
+    :param computed_labels: clustering results 
+    :return: 
+    """
+
+    out_dict = {'name': 'clustering', 'children': []}
+
+    for i in range(num_clusters):
+        child_dict = {'name': str(i), 'children': []}
+
+        for j in range(len(computed_labels)):
+            label = int(computed_labels[j])
+            if label == i:
+                true_label = int(base_labels[j])
+                child_inner = {'name': uuids[j], 'color': true_label}
+                child_dict['children'].append(child_inner)
+
+        out_dict['children'].append(child_dict)
+
+    json.dump(out_dict, open('visualize/graph1.json', 'w'))
 
 
 if __name__ == '__main__':
