@@ -1,32 +1,27 @@
 from collections import Counter
-from pprint import pprint
-import pickle
 import json
 import math
-import gzip
 import os
 
-dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/mini_malwords'
-# dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/test'
+# dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/mini_malwords'
+dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/test'
 dir_store = '/home/yogaub/projects/projects_data/malrec/malwords/store'
 
 
 def get_tf_idf():
-    total_documents = len(os.listdir(dir_malwords))
+    total_documents = float(len(os.listdir(dir_malwords)))
     print('Acquiring document frequencies')
     dfs = compute_df()
     print('Lowering features dimensionality')
-    remove_useless_words(dfs, total_documents, 0.6)
-    print('Computing term frequencies')
-    compute_tf(dfs)
+    remove_useless_words(dfs, total_documents, 0.75)
     print('Computing Tf-Idf values')
-    compute_tf_idf(dfs, total_documents)
+    compute_tf(dfs, total_documents)
 
 
 def compute_df():
     """
     Scans the bag-of-words documents and computes the document frequency of each word.
-    
+
     :return: Counter containing the document frequency of each word
     """
 
@@ -34,7 +29,7 @@ def compute_df():
 
     for sample in sorted(os.listdir(dir_malwords)):
 
-        with gzip.open(os.path.join(dir_malwords, sample), 'r') as words_file:
+        with open(os.path.join(dir_malwords, sample), 'rb') as words_file:
 
             for line in words_file:
                 line = line.strip().split()
@@ -51,7 +46,7 @@ def remove_useless_words(dfs, total_documents, filter_factor):
      * they appear in all documents (would end up with tf-idf = 0)
      * they appear just once in all the documents
      * their document frequency is above a threshold (simulate stopwords elimination)
-    
+
     :param dfs: document frequency of each word
     :param total_documents: number of documents
     :param filter_factor: filtering factor
@@ -72,14 +67,17 @@ def remove_useless_words(dfs, total_documents, filter_factor):
 
     print('Features size:', len(dfs))
 
-    json.dump(sorted(list(dfs.keys())), open('data/words.json', 'w'), indent=2)
+    # Create a dictionary mapping each (sorted) word with a numerical index
+    words = dict(zip(sorted(list(dfs.keys())), list(range(len(dfs)))))
+
+    json.dump(words, open('data/words.json', 'w'), indent=2)
 
 
-def compute_tf(dfs):
+def compute_tf(dfs, total_documents):
     """
     Scans the bag-of-words documents and computes the term frequency value of each word.
     During the process computes the document frequency of each word.
-    
+
     :return:  
     """
 
@@ -91,7 +89,7 @@ def compute_tf(dfs):
         document_length = 0
 
         # Scan once the bag of words files and memorize the words in a temporary per-file dictionary
-        with gzip.open(os.path.join(dir_malwords, sample), 'r') as words_file:
+        with open(os.path.join(dir_malwords, sample), 'rb') as words_file:
             for line in words_file:
                 line = line.strip().split()
 
@@ -107,7 +105,7 @@ def compute_tf(dfs):
                 total_words += 1
 
         uuid = sample[:-10]
-        tfs = {}
+        tf_idf = {}
 
         # find the most frequent word
         most_freq = max(list(words.values()))
@@ -115,32 +113,11 @@ def compute_tf(dfs):
         # Compute the term frequency of a word using double normalization
         for word in words:
             tf = norm_factor + ((1 - norm_factor) * (float(words[word]) / float(most_freq)))
-            tfs[word] = tf
+            idf = math.log(total_documents / float(dfs[word]))
+            tf_idf[word] = tf * idf
 
-        pickle.dump(tfs, open(os.path.join(dir_store, uuid), "wb"))
+        json.dump(tf_idf, open(os.path.join(dir_store, uuid), "w"), indent=2)
         print(uuid, total_words, document_length)
-
-
-def compute_tf_idf(dfs, total_documents):
-    """
-    Scans the pickled files and computes the tf-idf value of each word.
-    
-    :param dfs: Counter containing the document frequency of each word
-    :param total_documents: number of documents
-    :return: 
-    """
-
-    for uuid in sorted(os.listdir(dir_store)):
-        word_tf_idf = {}
-        tfs = pickle.load(open(os.path.join(dir_store, uuid), 'rb'))
-
-        for word in tfs:
-
-            idf = math.log(float(total_documents) / float(dfs[word]))
-            tf_idf = tfs[word] * idf
-            word_tf_idf[word] = tf_idf
-
-        json.dump(word_tf_idf, open(os.path.join(dir_store, uuid), "w"), indent=2)
 
 
 if __name__ == '__main__':

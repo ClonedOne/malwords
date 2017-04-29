@@ -1,6 +1,7 @@
-from collections import defaultdict
-import db_manager
 import json
+from collections import defaultdict
+
+from utilities import db_manager
 
 
 def get_labels():
