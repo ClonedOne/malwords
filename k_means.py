@@ -3,15 +3,14 @@ from multiprocessing import Pool
 from sklearn import metrics
 from utilities import utils
 from scipy.sparse import *
-from pprint import pprint
 import numpy as np
 import random
 import json
 import os
 
 dir_store = '/home/yogaub/projects/projects_data/malrec/malwords/store'
-num_clusters = 2
-mini_batch_size = 100
+num_clusters = 5
+mini_batch_size = 200
 core_num = 4
 
 
@@ -145,11 +144,7 @@ def apply_k_means(k_means, clustered, rows, cols, uuids, words):
         print('Apply KMeans on mini batch')
         batch_computed_labels = k_means.predict(data)
 
-        pprint(batch_computed_labels)
-
         computed_labels = np.append(computed_labels, batch_computed_labels)
-
-        pprint(computed_labels)
 
     return computed_labels
 
@@ -182,7 +177,8 @@ def get_base_labels(uuids):
     families = {'mydoom': 0,
                 'neobar': 1,
                 'gepys': 2,
-                'lamer': 3
+                'lamer': 3,
+                'neshta': 4
                 }
 
     for uuid in uuids:
@@ -248,7 +244,8 @@ def result_to_visualize(uuids, base_labels, computed_labels):
     colors = {0: 'blue',
               1: 'yellow',
               2: 'red',
-              3: 'green'
+              3: 'green',
+              4: 'orange'
               }
 
     for i in range(num_clusters):
