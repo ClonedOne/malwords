@@ -1,21 +1,34 @@
 from collections import defaultdict
 
 
-def divide_workload(item_list, core_num):
+def divide_workload(item_list, core_num, ordered=False):
     """
     Given a list of items and the number of CPU cores available, computes equal sized lists of items for each core. 
 
     :param item_list: list of items to split
     :param core_num: number of available CPU cores (workers)
+    :param ordered: flag if set result should be ordered as the incoming list
     :return: defaultdict containing lists of elements divided equally
     """
 
     j = 0
+    c = 0
     item_sublists = defaultdict(list)
 
-    for item in item_list:
-        item_sublists[j].append(item)
-        j = (j + 1) % core_num
+    if not ordered:
+        for item in item_list:
+            item_sublists[j].append(item)
+            j = (j + 1) % core_num
+    else:
+        per_core = int(len(item_list) / core_num)
+        extra = len(item_list) % core_num
+
+        for c in range(core_num):
+            item_sublists[c] = (item_list[j:(j + per_core)])
+            j += per_core
+
+        if extra:
+            item_sublists[c] += (item_list[j:])
 
     if len(item_list) < core_num:
         while j < core_num:

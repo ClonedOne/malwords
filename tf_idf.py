@@ -24,6 +24,7 @@ def get_tf_idf():
     dfs = Counter()
     for sub_dfs in results:
         dfs += sub_dfs
+    json.dump(dfs, open('data/dfs.json', 'w'), indent=2)
 
     print('Lowering features dimensionality')
     remove_useless_words(dfs, total_documents, 0.75)
@@ -101,7 +102,7 @@ def compute_tf_idf(data_pack):
     """
 
     file_name_list = data_pack[1]
-    dfs= data_pack[2]
+    dfs = data_pack[2]
     total_documents = data_pack[3]
 
     norm_factor = 0.4
