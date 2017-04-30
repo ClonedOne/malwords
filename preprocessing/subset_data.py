@@ -402,7 +402,8 @@ def main():
         "5763f778-35d6-4fde-98bc-53d7f9d3c63f"
     ]
 
-    datasets = [mydoom, neobar, gepys, lamer]
+    # datasets = [mydoom, neobar, gepys, lamer]
+    datasets = [mydoom, gepys]
 
     for dataset in datasets:
         for f_name in dataset:

@@ -1,33 +1,52 @@
+from multiprocessing import Pool
 from collections import Counter
+from utilities import utils
 import json
 import math
 import os
 
-# dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/mini_malwords'
-dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/test'
+dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/mini_malwords'
+# dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/test'
 dir_store = '/home/yogaub/projects/projects_data/malrec/malwords/store'
+core_num = 4
 
 
 def get_tf_idf():
     total_documents = float(len(os.listdir(dir_malwords)))
+
     print('Acquiring document frequencies')
-    dfs = compute_df()
+    file_name_lists = utils.divide_workload(sorted(os.listdir(dir_malwords)), core_num)
+    formatted_input = utils.format_worker_input(core_num, file_name_lists, (total_documents, ))
+    pool = Pool(processes=core_num)
+    results = pool.map(compute_df, formatted_input)
+    pool.close()
+    pool.join()
+    dfs = Counter()
+    for sub_dfs in results:
+        dfs += sub_dfs
+
     print('Lowering features dimensionality')
     remove_useless_words(dfs, total_documents, 0.75)
+
     print('Computing Tf-Idf values')
-    compute_tf(dfs, total_documents)
+    formatted_input = utils.format_worker_input(core_num, file_name_lists, (dfs, total_documents))
+    pool = Pool(processes=core_num)
+    pool.map(compute_tf_idf, formatted_input)
+    pool.close()
+    pool.join()
 
 
-def compute_df():
+def compute_df(data_pack):
     """
     Scans the bag-of-words documents and computes the document frequency of each word.
 
     :return: Counter containing the document frequency of each word
     """
 
+    file_name_list = data_pack[1]
     dfs = Counter()
 
-    for sample in sorted(os.listdir(dir_malwords)):
+    for sample in sorted(file_name_list):
 
         with open(os.path.join(dir_malwords, sample), 'rb') as words_file:
 
@@ -73,7 +92,7 @@ def remove_useless_words(dfs, total_documents, filter_factor):
     json.dump(words, open('data/words.json', 'w'), indent=2)
 
 
-def compute_tf(dfs, total_documents):
+def compute_tf_idf(data_pack):
     """
     Scans the bag-of-words documents and computes the term frequency value of each word.
     During the process computes the document frequency of each word.
@@ -81,9 +100,13 @@ def compute_tf(dfs, total_documents):
     :return:  
     """
 
+    file_name_list = data_pack[1]
+    dfs= data_pack[2]
+    total_documents = data_pack[3]
+
     norm_factor = 0.4
 
-    for sample in sorted(os.listdir(dir_malwords)):
+    for sample in sorted(file_name_list):
         words = Counter()
         total_words = 0
         document_length = 0
@@ -104,7 +127,7 @@ def compute_tf(dfs, total_documents):
                 document_length += count
                 total_words += 1
 
-        uuid = sample[:-10]
+        uuid = sample[:-7]
         tf_idf = {}
 
         # find the most frequent word
