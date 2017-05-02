@@ -67,18 +67,13 @@ def get_base_labels(uuids):
     """
 
     base_labels = []
+    inverted_label = json.load(open('data/inverted_labels.json'))
     uuid_label = json.load(open('data/labels.json'))
-    families = {'mydoom': 0,
-                'neobar': 1,
-                'gepys': 2,
-                'lamer': 3,
-                'neshta': 4,
-                'bladabindi': 5,
-                'flystudio': 6
-                }
+    sorted_families = sorted(list(inverted_label.keys()))
+    families_index = {sorted_families[index]: index for index in range(len(sorted_families))}
 
     for uuid in uuids:
-        base_labels.append(families[uuid_label[uuid]])
+        base_labels.append(families_index[uuid_label[uuid]])
 
     return base_labels
 
