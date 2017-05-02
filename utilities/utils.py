@@ -1,5 +1,6 @@
-import json
 from collections import defaultdict
+import random
+import json
 
 
 def divide_workload(item_list, core_num, ordered=False):
@@ -85,18 +86,11 @@ def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):
     :param uuids: list of uuids
     :param base_labels: base truth labels
     :param computed_labels: clustering results 
+    :param num_clusters: number of clusters created
     :return: 
     """
 
     out_dict = {'name': 'clustering', 'children': []}
-    colors = {0: 'blue',
-              1: 'yellow',
-              2: 'red',
-              3: 'green',
-              4: 'orange',
-              5: 'brown',
-              6: 'violet'
-              }
 
     for i in range(num_clusters):
         child_dict = {'name': str(i), 'children': []}
@@ -105,7 +99,7 @@ def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):
             label = int(computed_labels[j])
             if label == i:
                 true_label = int(base_labels[j])
-                child_inner = {'name': uuids[j], 'color': colors[true_label]}
+                child_inner = {'name': uuids[j], 'color': true_label}
                 child_dict['children'].append(child_inner)
 
         out_dict['children'].append(child_dict)

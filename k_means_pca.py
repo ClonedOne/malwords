@@ -1,11 +1,13 @@
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+import plotly.graph_objs as go
+from utilities import utils
+from sklearn import metrics
+import plotly.plotly as py
+import numpy as np
 import json
 import os
 
-import numpy as np
-from sklearn import metrics
-from sklearn.cluster import KMeans
-
-from utilities import utils
 
 dir_store = ''
 num_clusters_max = 51
@@ -48,7 +50,28 @@ def cluster():
     print('Silhouette', metrics.silhouette_score(data, computed_labels, metric='euclidean'))
     print('-'*80)
 
+    # For visualization
+    reduced_data = PCA(n_components=2).fit_transform(data)
+
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters)
+
+
+def visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters):
+    trace = go.Scattergl(
+        x=reduced_data[0],
+        y=reduced_data[1],
+        mode='markers',
+        marker=dict(
+            size='16',
+            color=np.random.randn(500),  # set color equal to a variable
+            colorscale='Viridis',
+            showscale=True
+        )
+    )
+    data = [trace]
+
+    py.plot(data, filename='test_color')
 
 
 def test_kmeans_clusters(data, base_labels):
