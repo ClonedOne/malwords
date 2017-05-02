@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
-from sklearn import metrics
+from utilities import utils
 import numpy as np
 import json
 import os
@@ -10,7 +10,7 @@ dir_store = ''
 core_num = 4
 
 
-def cluster():
+def classify():
     """
     Cluster the documents using out of core Mini Batch KMeans. 
 
@@ -26,7 +26,7 @@ def cluster():
     data = np.loadtxt(matrix_file)
 
     # Retrieve base labels
-    base_labels = get_base_labels(uuids)
+    base_labels = utils.get_base_labels(uuids)
     base_labels = np.asarray(base_labels)
     print('Base labels')
     print(base_labels)
@@ -47,28 +47,5 @@ def cluster():
     print('Linear SVC score:', lin_svc_score)
 
 
-def get_base_labels(uuids):
-    """
-    Returns the ordered list of base labels from AVClass output
-
-    :return: ordered list of labels
-    """
-
-    base_labels = []
-    uuid_label = json.load(open('data/labels.json'))
-    families = {'mydoom': 0,
-                'neobar': 1,
-                'gepys': 2,
-                'lamer': 3,
-                'neshta': 4,
-                'bladabindi': 5
-                }
-
-    for uuid in uuids:
-        base_labels.append(families[uuid_label[uuid]])
-
-    return base_labels
-
-
 if __name__ == '__main__':
-    cluster()
+    classify()
