@@ -9,7 +9,7 @@ import json
 import os
 
 dir_store = ''
-num_clusters = 6
+num_clusters = 7
 mini_batch_size = 300
 core_num = 4
 

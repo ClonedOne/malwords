@@ -8,8 +8,8 @@ import os
 
 
 dir_store = ''
-components = 250
-mini_batch_size = 250
+components = 200
+mini_batch_size = 200
 core_num = 4
 
 

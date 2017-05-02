@@ -9,7 +9,7 @@ from utilities import utils
 
 dir_store = ''
 num_clusters_max = 51
-num_clusters = 5
+num_clusters = 7
 core_num = 4
 max_iter = 1000
 
