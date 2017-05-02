@@ -8,8 +8,8 @@ import os
 
 
 dir_store = ''
-components = 10000
-mini_batch_size = 40
+components = 250
+mini_batch_size = 250
 core_num = 4
 
 
@@ -31,9 +31,12 @@ def get_pca():
 
     cols = len(words)
     rows = len(uuids)
-    decomposed = 0
 
+    decomposed = 0
     train_pca(i_pca, decomposed, rows, cols, rand_uuids, words)
+
+    decomposed = 0
+    transform_vectors(i_pca, decomposed, rows, cols, uuids, words)
 
 
 def train_pca(i_pca, decomposed, rows, cols, rand_uuids, words):
@@ -71,6 +74,44 @@ def train_pca(i_pca, decomposed, rows, cols, rand_uuids, words):
         decomposed += mini_batch_size
 
         i_pca.partial_fit(data)
+
+
+def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
+    """
+    Train the PCA algorithm incrementally using mini batches of data.    
+
+    :return: 
+    """
+
+    # Divide the docuements in mini batches of fixed size and apply Incremental PCA on them
+    while decomposed < rows:
+
+        print('Processing documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
+        # starting from the decomposed-th element of the uuids list
+        file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
+        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words))
+        pool = Pool(processes=core_num)
+        results = pool.map(get_data_matrix, formatted_input)
+        pool.close()
+        pool.join()
+
+        # sort results
+        acc = []
+        # Each worker will receive a list of size (mini_batch_size / core_num)
+        for i in range(core_num):
+            for res in results:
+                if res[0] == i:
+                    acc.append(res[1])
+        data = np.concatenate(acc)
+
+        print(data.shape)
+
+        del results
+        del acc
+        decomposed += mini_batch_size
+
+        new_data = i_pca.transform(data)
+        np.savetxt(open("data/matrix.txt", "ab"), new_data)
 
 
 def extract_tf_idf(tf_idf_file, words):
