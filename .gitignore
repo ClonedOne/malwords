@@ -141,3 +141,4 @@ ENV/
 .idea/
 data/
 visualize/
+config.json

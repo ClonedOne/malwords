@@ -7,7 +7,7 @@ import json
 import os
 
 
-dir_store = '/home/yogaub/projects/projects_data/malrec/malwords/store'
+dir_store = ''
 components = 10000
 mini_batch_size = 40
 core_num = 4
@@ -19,6 +19,10 @@ def get_pca():
     
     :return: 
     """
+
+    global dir_store
+    config = json.load(open('config.json'))
+    dir_store = config['dir_store']
 
     i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))

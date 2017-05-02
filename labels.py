@@ -5,8 +5,8 @@ from utilities import db_manager
 
 
 def get_labels():
-    db_path = '/home/yogaub/projects/projects_data/malrec/db'
-    md5_uuid = db_manager.acquire_md5_uuid(db_path)
+    config = json.load(open('config.json'))
+    md5_uuid = db_manager.acquire_md5_uuid(config['dir_db'])
     uuid_label = get_uuid_labels(md5_uuid)
     label_uuid = get_inverted_labels(md5_uuid)
     dump_labels(uuid_label, 'labels.json')

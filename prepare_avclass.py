@@ -3,7 +3,8 @@ import os
 
 
 def prepare_vt():
-    reduced_vts = get_aggregated_vt('/home/yogaub/projects/projects_data/malrec/vt')
+    config = json.load(open('config.json'))
+    reduced_vts = get_aggregated_vt(config['dir_vt'])
     create_avclass_input(reduced_vts)
 
 
@@ -17,8 +18,6 @@ def get_aggregated_vt(dir_vt):
 
     required_fields = ['md5', 'sha1', 'sha256', 'scan_date']
     reduced_vts = []
-    empty = []
-    singleton = []
 
     for vt_report in sorted(os.listdir(dir_vt)):
         reduced_vt = {}

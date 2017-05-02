@@ -8,9 +8,9 @@ import random
 import json
 import os
 
-dir_store = '/home/yogaub/projects/projects_data/malrec/malwords/store'
-num_clusters = 5
-mini_batch_size = 200
+dir_store = ''
+num_clusters = 6
+mini_batch_size = 300
 core_num = 4
 
 
@@ -21,6 +21,9 @@ def cluster():
     :return: 
     """
 
+    global dir_store
+    config = json.load(open('config.json'))
+    dir_store = config['dir_store']
     k_means = MiniBatchKMeans(n_clusters=num_clusters, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
@@ -178,7 +181,8 @@ def get_base_labels(uuids):
                 'neobar': 1,
                 'gepys': 2,
                 'lamer': 3,
-                'neshta': 4
+                'neshta': 4,
+                'bladabindi': 5
                 }
 
     for uuid in uuids:
@@ -245,7 +249,8 @@ def result_to_visualize(uuids, base_labels, computed_labels):
               1: 'yellow',
               2: 'red',
               3: 'green',
-              4: 'orange'
+              4: 'orange',
+              5: 'brown'
               }
 
     for i in range(num_clusters):

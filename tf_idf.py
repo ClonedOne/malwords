@@ -5,13 +5,21 @@ import json
 import math
 import os
 
-dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/mini_malwords'
-# dir_malwords = '/home/yogaub/projects/projects_data/malrec/malwords/test'
-dir_store = '/home/yogaub/projects/projects_data/malrec/malwords/store'
+dir_malwords = ''
+dir_store = ''
 core_num = 4
 
 
 def get_tf_idf():
+    """
+    Compute the tf-idf value of each word of each document
+    
+    :return: 
+    """
+    global dir_malwords, dir_store
+    config = json.load(open('config.json'))
+    dir_malwords = config['dir_mini']
+    dir_store = config['dir_store']
     total_documents = float(len(os.listdir(dir_malwords)))
 
     print('Acquiring document frequencies')
