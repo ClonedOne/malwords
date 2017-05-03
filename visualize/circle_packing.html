@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+circle {
+  fill: rgb(255, 255, 255);
+  stroke: rgb(31, 119, 180);
+  stroke-width: 1px;
+  stroke-opacity: 0.3;
+  margin: 5px;
+}
+
+text {
+  font: 8px sans-serif;
+  text-anchor: middle;
+}
+
+</style>
+<svg width="960" height="960"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var nodeSize = 5;
+var paddingSize = 5;
+
+var svg = d3.select("svg"),
+    diameter = +svg.attr("width"),
+    g = svg.append("g").attr("transform", "translate(2,2)"),
+    format = d3.format(",d");
+
+var pack = d3.pack()
+    .size([diameter - 4, diameter - 4])
+    .padding(paddingSize);
+
+d3.json("graph1.json", function(error, root) {
+  if (error) throw error;
+
+  root = d3.hierarchy(root)
+      .sum(function(d) { return nodeSize; })
+      .sort(function(a, b) { return b.value - a.value; });
+
+  var size = parseFloat(root.children.length);
+  console.log(size);
+
+  var node = g.selectAll(".node")
+    .data(pack(root).descendants())
+    .enter().append("g")
+      .attr("class", function(d) { return d.children ? "node" : "leaf node"; })
+      .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+  node.append("title")
+      .text(function(d) { return d.data.name; });
+
+  // Append circle elements specifying variable colors
+  node.append("circle")
+      .attr("r", function(d) { return d.r; })
+      .style("fill", function(d) {if (!d.children) return d3.interpolateRainbow(d.data.color/size); else return d3.rgb("white");});
+
+  node.filter(function(d) { return !d.children; }).append("text")
+      .attr("dy", "0.3em")
+      .text(function(d) { return d.data.color; });
+});
+
+</script>

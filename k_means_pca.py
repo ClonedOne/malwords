@@ -22,22 +22,21 @@ def cluster():
     global dir_store, core_num
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
-    core_num = core_num['core_num']
+    core_num = config['core_num']
 
-    if not sys.argv[1]:
+    if len(sys.argv) < 2:
         print('Missing number of clusters')
         exit()
-    num_clusters = sys.argv[1]
+    num_clusters = int(sys.argv[1])
 
     uuids = sorted(os.listdir(dir_store))
     matrix_file = open('data/matrix.txt', 'r')
     data = np.loadtxt(matrix_file)
 
     # Retrieve base labels
+    print('Acquire base labels')
     base_labels = utils.get_base_labels(uuids)
     base_labels = np.asarray(base_labels)
-    print('Base labels')
-    print(base_labels)
 
     k_means = KMeans(n_clusters=num_clusters, n_jobs=core_num, max_iter=max_iter)
     computed_labels = k_means.fit_predict(data)
@@ -48,7 +47,6 @@ def cluster():
     reduced_data = PCA(n_components=2).fit_transform(data)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
-    utils.visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters)
 
 
 def test_kmeans_clusters(data, base_labels, num_clusters_min, num_clusters_max):

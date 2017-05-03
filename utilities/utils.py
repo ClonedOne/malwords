@@ -2,6 +2,7 @@ from collections import defaultdict
 import plotly.graph_objs as go
 from sklearn import metrics
 import plotly.plotly as py
+import numpy as np
 import random
 import json
 
@@ -97,7 +98,7 @@ def evaluate_clustering(base_labels, computed_labels, data=None):
     print('Fowlkes-Mallows:', metrics.fowlkes_mallows_score(base_labels, computed_labels))
     print('Homogeneity:', metrics.homogeneity_score(base_labels, computed_labels))
     print('Completeness:', metrics.completeness_score(base_labels, computed_labels))
-    if data:
+    if data is not None:
         print('Silhouette', metrics.silhouette_score(data, computed_labels, metric='euclidean'))
     print('-' * 80)
 

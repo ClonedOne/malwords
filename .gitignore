@@ -140,5 +140,5 @@ ENV/
 
 .idea/
 data/*
-visualize/*
+visualize/*.json
 config.json
