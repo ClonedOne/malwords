@@ -7,7 +7,7 @@ import os
 
 dir_malwords = ''
 dir_store = ''
-core_num = 4
+core_num = 1
 
 
 def get_tf_idf():
@@ -16,10 +16,14 @@ def get_tf_idf():
     
     :return: 
     """
-    global dir_malwords, dir_store
+
+    global dir_malwords, dir_store, core_num
+
     config = json.load(open('config.json'))
     dir_malwords = config['dir_mini']
     dir_store = config['dir_store']
+    core_num = config['core_num']
+
     total_documents = float(len(os.listdir(dir_malwords)))
 
     print('Acquiring document frequencies')

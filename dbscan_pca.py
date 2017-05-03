@@ -6,9 +6,8 @@ import json
 import os
 
 dir_store = ''
-core_num = 4
+core_num = 1
 max_iter = 1000
-num_clusters = 0
 
 
 def cluster():
@@ -18,9 +17,10 @@ def cluster():
     :return: 
     """
 
-    global dir_store, num_clusters
+    global dir_store, core_num
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
+    core_num = config['core_num']
     uuids = sorted(os.listdir(dir_store))
 
     matrix_file = open('data/matrix.txt', 'r')

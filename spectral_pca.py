@@ -3,11 +3,11 @@ from utilities import utils
 from sklearn import metrics
 import numpy as np
 import json
+import sys
 import os
 
 dir_store = ''
-num_clusters = 5
-core_num = 4
+core_num = 1
 
 
 def cluster():
@@ -17,10 +17,16 @@ def cluster():
     :return: 
     """
 
-    global dir_store
+    global dir_store, core_num
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
+    core_num = config['core_num']
     uuids = sorted(os.listdir(dir_store))
+
+    if not sys.argv[1]:
+        print('Missing number of clusters')
+        exit()
+    num_clusters = sys.argv[1]
 
     matrix_file = open('data/matrix.txt', 'r')
     data = np.loadtxt(matrix_file)

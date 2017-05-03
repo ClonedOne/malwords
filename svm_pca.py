@@ -7,7 +7,7 @@ import json
 import os
 
 dir_store = ''
-core_num = 4
+core_num = 1
 
 
 def classify():
@@ -17,9 +17,11 @@ def classify():
     :return: 
     """
 
-    global dir_store
+    global dir_store, core_num
+
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
+    core_num = core_num['core_num']
     uuids = sorted(os.listdir(dir_store))
 
     matrix_file = open('data/matrix.txt', 'r')

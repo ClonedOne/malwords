@@ -8,9 +8,9 @@ import os
 
 
 dir_store = ''
-components = 350
-mini_batch_size = 350
-core_num = 4
+components = 1000
+mini_batch_size = 1000
+core_num = 1
 
 
 def get_pca():
@@ -20,9 +20,10 @@ def get_pca():
     :return: 
     """
 
-    global dir_store
+    global dir_store, core_num
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
+    core_num = config['core_num']
 
     i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
