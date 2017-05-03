@@ -1,4 +1,7 @@
 from collections import defaultdict
+import plotly.graph_objs as go
+from sklearn import metrics
+import plotly.plotly as py
 import random
 import json
 
@@ -79,6 +82,26 @@ def get_base_labels(uuids):
     return base_labels
 
 
+def evaluate_clustering(base_labels, computed_labels, data=None):
+    """
+    Print evaluation values for the clustering results
+    
+    :return: 
+    """
+
+    print('Clustering evaluation')
+    print('Number of clusters', len(set(computed_labels)))
+    print('Number of distinct families', len(set(base_labels)))
+    print('Adjusted Rand index:', metrics.adjusted_rand_score(base_labels, computed_labels))
+    print('Adjusted Mutual Information:', metrics.adjusted_mutual_info_score(base_labels, computed_labels))
+    print('Fowlkes-Mallows:', metrics.fowlkes_mallows_score(base_labels, computed_labels))
+    print('Homogeneity:', metrics.homogeneity_score(base_labels, computed_labels))
+    print('Completeness:', metrics.completeness_score(base_labels, computed_labels))
+    if data:
+        print('Silhouette', metrics.silhouette_score(data, computed_labels, metric='euclidean'))
+    print('-' * 80)
+
+
 def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):
     """
     Generate a json file structured so it can be used for visualization 
@@ -106,3 +129,30 @@ def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):
 
     graph_path = 'visualize/graph1.json'
     json.dump(out_dict, open(graph_path, 'w'), indent=2)
+
+
+def visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters):
+    """
+    Experiment
+    
+    :param uuids: list of uuids
+    :param reduced_data: 
+    :param base_labels: base truth labels
+    :param computed_labels: clustering results 
+    :param num_clusters: number of clusters created
+    :return: 
+    """
+    trace = go.Scattergl(
+        x=reduced_data[0],
+        y=reduced_data[1],
+        mode='markers',
+        marker=dict(
+            size='16',
+            color=np.random.randn(500),  # set color equal to a variable
+            colorscale='Viridis',
+            showscale=True
+        )
+    )
+    data = [trace]
+
+    py.plot(data, filename='test_color')

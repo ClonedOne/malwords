@@ -1,19 +1,15 @@
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
-import plotly.graph_objs as go
 from utilities import utils
 from sklearn import metrics
-import plotly.plotly as py
 import numpy as np
 import json
+import sys
 import os
 
-
 dir_store = ''
-num_clusters_max = 51
-num_clusters = 7
-core_num = 4
-max_iter = 1000
+core_num = 1
+max_iter = 5000
 
 
 def cluster():
@@ -23,11 +19,17 @@ def cluster():
     :return: 
     """
 
-    global dir_store
+    global dir_store, core_num
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
-    uuids = sorted(os.listdir(dir_store))
+    core_num = core_num['core_num']
 
+    if not sys.argv[1]:
+        print('Missing number of clusters')
+        exit()
+    num_clusters = sys.argv[1]
+
+    uuids = sorted(os.listdir(dir_store))
     matrix_file = open('data/matrix.txt', 'r')
     data = np.loadtxt(matrix_file)
 
@@ -40,55 +42,30 @@ def cluster():
     k_means = KMeans(n_clusters=num_clusters, n_jobs=core_num, max_iter=max_iter)
     computed_labels = k_means.fit_predict(data)
 
-    # Evaluate clustering
-    print('Clustering evaluation:', num_clusters)
-    print('Adjusted Rand index:', metrics.adjusted_rand_score(base_labels, computed_labels))
-    print('Adjusted Mutual Information:', metrics.adjusted_mutual_info_score(base_labels, computed_labels))
-    print('Fowlkes-Mallows:', metrics.fowlkes_mallows_score(base_labels, computed_labels))
-    print('Homogeneity:', metrics.homogeneity_score(base_labels, computed_labels))
-    print('Completeness:', metrics.completeness_score(base_labels, computed_labels))
-    print('Silhouette', metrics.silhouette_score(data, computed_labels, metric='euclidean'))
-    print('-'*80)
+    utils.evaluate_clustering(base_labels, computed_labels, data=data)
 
     # For visualization
     reduced_data = PCA(n_components=2).fit_transform(data)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
-    visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters)
+    utils.visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters)
 
 
-def visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters):
-    trace = go.Scattergl(
-        x=reduced_data[0],
-        y=reduced_data[1],
-        mode='markers',
-        marker=dict(
-            size='16',
-            color=np.random.randn(500),  # set color equal to a variable
-            colorscale='Viridis',
-            showscale=True
-        )
-    )
-    data = [trace]
-
-    py.plot(data, filename='test_color')
-
-
-def test_kmeans_clusters(data, base_labels):
-
-    for cur_num_clusters in range(2, num_clusters_max):
+def test_kmeans_clusters(data, base_labels, num_clusters_min, num_clusters_max):
+    """
+    Test several values for the number of clusters 
+    
+    :param data: data matrix to cluster
+    :param base_labels: base labels from AVClass
+    :param num_clusters_min: minimum number of clusters to try
+    :param num_clusters_max: maximum number of clusters to try
+    :return: 
+    """
+    for cur_num_clusters in range(num_clusters_min, num_clusters_max):
         k_means = KMeans(n_clusters=cur_num_clusters, n_jobs=core_num, max_iter=max_iter)
         computed_labels = k_means.fit_predict(data)
 
-        # Evaluate clustering
-        print('Clustering evaluation:', cur_num_clusters)
-        print('Adjusted Rand index:', metrics.adjusted_rand_score(base_labels, computed_labels))
-        print('Adjusted Mutual Information:', metrics.adjusted_mutual_info_score(base_labels, computed_labels))
-        print('Fowlkes-Mallows:', metrics.fowlkes_mallows_score(base_labels, computed_labels))
-        print('Homogeneity:', metrics.homogeneity_score(base_labels, computed_labels))
-        print('Completeness:', metrics.completeness_score(base_labels, computed_labels))
-        print('Silhouette', metrics.silhouette_score(data, computed_labels, metric='euclidean'))
-        print('-'*80)
+        utils.evaluate_clustering(base_labels, computed_labels, data=data)
 
 
 if __name__ == '__main__':

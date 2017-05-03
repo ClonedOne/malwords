@@ -1,17 +1,16 @@
 from sklearn.cluster import MiniBatchKMeans
 from multiprocessing import Pool
-from sklearn import metrics
 from utilities import utils
 from scipy.sparse import *
 import numpy as np
 import random
 import json
+import sys
 import os
 
 dir_store = ''
-num_clusters = 7
-mini_batch_size = 300
-core_num = 4
+mini_batch_size = 1000
+core_num = 1
 
 
 def cluster():
@@ -21,9 +20,16 @@ def cluster():
     :return: 
     """
 
-    global dir_store
+    global dir_store, core_num
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
+    core_num = config['core_num']
+
+    if not sys.argv[1]:
+        print('Missing number of clusters')
+        exit()
+    num_clusters = sys.argv[1]
+
     k_means = MiniBatchKMeans(n_clusters=num_clusters, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
@@ -47,15 +53,8 @@ def cluster():
 
     print('\nPredicting values')
     computed_labels = apply_k_means(k_means, clustered, rows, cols, uuids, words)
-    print(computed_labels.tolist())
 
-    # Evaluate clustering
-    print('Clustering evaluation')
-    print('Adjusted Rand index:', metrics.adjusted_rand_score(base_labels, computed_labels))
-    print('Adjusted Mutual Information:', metrics.adjusted_mutual_info_score(base_labels, computed_labels))
-    print('Fowlkes-Mallows:', metrics.fowlkes_mallows_score(base_labels, computed_labels))
-    print('Homogeneity:', metrics.homogeneity_score(base_labels, computed_labels))
-    print('Completeness:', metrics.completeness_score(base_labels, computed_labels))
+    utils.evaluate_clustering(base_labels, computed_labels)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
