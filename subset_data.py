@@ -5,6 +5,31 @@ import os
 
 def main():
     config = json.load(open('config.json'))
+    get_labeled(config)
+
+
+def get_labeled(config):
+    labels = json.load(open('data/labels.json'))
+    print('Total labeled:', len(labels))
+    not_labeled = []
+
+    for file_name in sorted(os.listdir(config['dir_malwords'])):
+        uuid = file_name.split('.')[0][:-3]
+
+        if uuid not in labels:
+            not_labeled.append(file_name)
+
+    print('Not labeled:', len(not_labeled))
+
+    for file_name in sorted(os.listdir(config['dir_malwords'])):
+        if file_name not in not_labeled:
+            copyfile(
+                os.path.join(config['dir_malwords'], file_name),
+                os.path.join(config['dir_mini'], file_name)
+            )
+
+
+def load_samples(config):
     f_ext = '_ss.txt.gz'
 
     mydoom = [
