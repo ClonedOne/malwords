@@ -25,10 +25,10 @@ def cluster():
     dir_store = config['dir_store']
     core_num = config['core_num']
 
-    if not sys.argv[1]:
+    if len(sys.argv) < 2:
         print('Missing number of clusters')
         exit()
-    num_clusters = sys.argv[1]
+    num_clusters = int(sys.argv[1])
 
     k_means = MiniBatchKMeans(n_clusters=num_clusters, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
