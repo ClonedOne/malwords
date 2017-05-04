@@ -9,7 +9,7 @@ import sys
 import os
 
 dir_store = ''
-mini_batch_size = 1000
+mini_batch_size = 2500
 core_num = 1
 
 
