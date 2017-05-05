@@ -9,7 +9,7 @@ import sys
 import os
 
 dir_store = ''
-mini_batch_size = 2500
+mini_batch_size = 0
 core_num = 1
 
 
@@ -20,10 +20,11 @@ def cluster():
     :return: 
     """
 
-    global dir_store, core_num
+    global dir_store, core_num, mini_batch_size
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
+    mini_batch_size = config['batch_size']
 
     if len(sys.argv) < 2:
         print('Missing number of clusters')

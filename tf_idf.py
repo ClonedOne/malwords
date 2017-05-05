@@ -39,7 +39,7 @@ def get_tf_idf():
     json.dump(dfs, open('data/dfs.json', 'w'), indent=2)
 
     print('Lowering features dimensionality')
-    remove_useless_words(dfs, total_documents, 0.75)
+    remove_useless_words(dfs, total_documents, 0.5)
 
     print('Computing Tf-Idf values')
     formatted_input = utils.format_worker_input(core_num, file_name_lists, (dfs, total_documents))
@@ -87,17 +87,26 @@ def remove_useless_words(dfs, total_documents, filter_factor):
 
     to_remove = set()
     threshold = filter_factor * total_documents
+    singleton_words = 0
+    frequent_words = 0
 
-    print('Initial features size:', len(dfs))
+    print('Initial features number:', len(dfs))
+    print('Document frequency threshold:', threshold)
 
     for word in dfs:
-        if dfs[word] == total_documents or dfs[word] == 1 or dfs[word] >= threshold:
+        if dfs[word] == 1:
             to_remove.add(word)
+            singleton_words += 1
+        if dfs[word] >= threshold:
+            to_remove.add(word)
+            frequent_words += 1
 
     for word in to_remove:
         dfs.pop(word, None)
 
-    print('Features size:', len(dfs))
+    print('Features number:', len(dfs))
+    print('Words appearing only once:', singleton_words)
+    print('Words with over threshold frequency:', frequent_words)
 
     # Create a dictionary mapping each (sorted) word with a numerical index
     words = dict(zip(sorted(list(dfs.keys())), list(range(len(dfs)))))
@@ -132,7 +141,7 @@ def compute_tf_idf(data_pack):
                 word = line[0].decode('utf-8')
                 count = int(line[1])
 
-                # avoid words which would end up with tf-idf = 0
+                # avoid excluded words
                 if word not in dfs:
                     continue
 

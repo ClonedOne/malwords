@@ -8,8 +8,7 @@ import os
 
 
 dir_store = ''
-components = 1000
-mini_batch_size = 1000
+mini_batch_size = 0
 core_num = 1
 
 
@@ -20,12 +19,13 @@ def get_pca():
     :return: 
     """
 
-    global dir_store, core_num
+    global dir_store, core_num, mini_batch_size
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
+    mini_batch_size = config['batch_size']
 
-    i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
+    i_pca = IncrementalPCA(n_components=50, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
     rand_uuids = random.sample(uuids, len(uuids))
@@ -87,7 +87,7 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
     # Divide the docuements in mini batches of fixed size and apply Incremental PCA on them
     while decomposed < rows:
 
-        print('Processing documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
+        print('Transforming documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
         # starting from the decomposed-th element of the uuids list
         file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
         formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words))
@@ -169,18 +169,3 @@ def get_data_matrix(data_pack):
 
 if __name__ == '__main__':
     get_pca()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
