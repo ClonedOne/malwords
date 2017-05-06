@@ -1,6 +1,5 @@
 from sklearn.cluster import SpectralClustering
 from utilities import utils
-from sklearn import metrics
 import numpy as np
 import json
 import sys

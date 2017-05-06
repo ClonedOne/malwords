@@ -1,7 +1,9 @@
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
 from operator import itemgetter
 from utilities import utils
+import seaborn as sns
 import numpy as np
 import json
 import sys
@@ -56,6 +58,18 @@ def cluster():
     computed_labels = k_means.fit_predict(data)
 
     utils.evaluate_clustering(base_labels, computed_labels, data=data)
+
+    matrix_file2d = open('data/matrix2d.txt', 'r')
+    data_red = np.loadtxt(matrix_file2d)
+
+    color_palette = sns.color_palette('deep', num_clusters)
+    cluster_colors = [color_palette[x] if x >= 0
+                      else (0.5, 0.5, 0.5)
+                      for x in computed_labels]
+    cluster_member_colors = [sns.desaturate(x, p) for x, p in
+                             zip(cluster_colors, hdbs.probabilities_)]
+    plt.scatter(*data_red.T, s=50, linewidth=0, c=cluster_member_colors, alpha=0.25)
+    plt.show()
 
     # For visualization
     reduced_data = PCA(n_components=2).fit_transform(data)
