@@ -67,7 +67,7 @@ def train_pca(i_pca, decomposed, rows, cols, rand_uuids, words):
 
         # sort results
         acc = []
-        # Each worker will receive a list of size (mini_batch_size / core_num)
+        # Each worker will return a list of size (mini_batch_size / core_num)
         for i in range(core_num):
             for res in results:
                 if res[0] == i:
@@ -104,7 +104,7 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
 
         # sort results
         acc = []
-        # Each worker will receive a list of size (mini_batch_size / core_num)
+        # Each worker will return a list of size (mini_batch_size / core_num)
         for i in range(core_num):
             for res in results:
                 if res[0] == i:
