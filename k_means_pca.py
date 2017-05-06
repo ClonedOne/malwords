@@ -62,17 +62,17 @@ def cluster():
     matrix_file2d = open('data/matrix2d.txt', 'r')
     data_red = np.loadtxt(matrix_file2d)
 
-    color_palette = sns.color_palette('deep', num_clusters)
-    cluster_colors = [color_palette[x] if x >= 0
-                      else (0.5, 0.5, 0.5)
-                      for x in computed_labels]
-    cluster_member_colors = [sns.desaturate(x, p) for x, p in
-                             zip(cluster_colors, hdbs.probabilities_)]
-    plt.scatter(*data_red.T, s=50, linewidth=0, c=cluster_member_colors, alpha=0.25)
-    plt.show()
-
-    # For visualization
-    reduced_data = PCA(n_components=2).fit_transform(data)
+    # color_palette = sns.color_palette('deep', num_clusters)
+    # cluster_colors = [color_palette[x] if x >= 0
+    #                   else (0.5, 0.5, 0.5)
+    #                   for x in computed_labels]
+    # cluster_member_colors = [sns.desaturate(x, p) for x, p in
+    #                          zip(cluster_colors, hdbs.probabilities_)]
+    # plt.scatter(*data_red.T, s=50, linewidth=0, c=cluster_member_colors, alpha=0.25)
+    # plt.show()
+    #
+    # # For visualization
+    # reduced_data = PCA(n_components=2).fit_transform(data)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 

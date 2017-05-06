@@ -4,6 +4,7 @@ from utilities import utils
 import numpy as np
 import random
 import json
+import sys
 import os
 
 
@@ -25,7 +26,12 @@ def get_pca():
     core_num = config['core_num']
     mini_batch_size = config['batch_size']
 
-    i_pca = IncrementalPCA(n_components=50, batch_size=mini_batch_size)
+    if len(sys.argv) < 2:
+        print('Missing number of clusters')
+        exit()
+    components = int(sys.argv[1])
+
+    i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
     rand_uuids = random.sample(uuids, len(uuids))
