@@ -1,95 +1,52 @@
-from sklearn.decomposition import IncrementalPCA
+from sklearn.decomposition import TruncatedSVD
 from multiprocessing import Pool
 from utilities import utils
+from scipy.sparse import *
 import numpy as np
-import random
 import json
 import sys
 import os
 
-
 dir_store = ''
 mini_batch_size = 0
 core_num = 1
+components = 0
 
 
-def get_pca():
+def get_svd():
     """
     Apply Incremental Principal Components Analysis to the tf-idf vectors.
-    
+
     :return: 
     """
 
-    global dir_store, core_num, mini_batch_size
+    global dir_store, core_num, mini_batch_size, components
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
-    mini_batch_size = config['batch_size']
 
     if len(sys.argv) < 2:
-        print('Missing number of clusters')
+        print('Missing number of components')
         exit()
     components = int(sys.argv[1])
 
-    i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
+    svd = TruncatedSVD(n_components=components, random_state=42)
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
-    rand_uuids = random.sample(uuids, len(uuids))
+
+    # Force loading of full dataset in RAM (may be a problem with low memory!)
+    mini_batch_size = len(uuids)
 
     cols = len(words)
     rows = len(uuids)
 
     decomposed = 0
-    train_pca(i_pca, decomposed, rows, cols, rand_uuids, words)
-
-    print('Explained Variance Ratio')
-    print(i_pca.explained_variance_ratio_)
-    print(sum(i_pca.explained_variance_ratio_))
-
-    decomposed = 0
-    # transform_vectors(i_pca, decomposed, rows, cols, uuids, words)
+    transform_vectors(svd, decomposed, rows, cols, uuids, words)
 
 
-def train_pca(i_pca, decomposed, rows, cols, rand_uuids, words):
+def transform_vectors(svd, decomposed, rows, cols, uuids, words):
     """
-    Train the PCA algorithm incrementally using mini batches of data.    
-    
-    :return: 
-    """
-
-    # Divide the docuements in mini batches of fixed size and apply Incremental PCA on them
-    while decomposed < rows:
-
-        print('Processing documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
-        # starting from the decomposed-th element of the uuids list
-        file_name_lists = utils.divide_workload(rand_uuids[decomposed:][:mini_batch_size], core_num)
-        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words))
-        pool = Pool(processes=core_num)
-        results = pool.map(get_data_matrix, formatted_input)
-        pool.close()
-        pool.join()
-
-        # sort results
-        acc = []
-        # Each worker will return a list of size (mini_batch_size / core_num)
-        for i in range(core_num):
-            for res in results:
-                if res[0] == i:
-                    acc.append(res[1])
-        data = np.concatenate(acc)
-
-        print(data.shape)
-
-        del results
-        del acc
-        decomposed += mini_batch_size
-
-        i_pca.partial_fit(data)
-
-
-def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
-    """
-    Train the PCA algorithm incrementally using mini batches of data.    
+    Transform vectors using tSNE    
 
     :return: 
     """
@@ -108,12 +65,11 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
 
         # sort results
         acc = []
-        # Each worker will return a list of size (mini_batch_size / core_num)
         for i in range(core_num):
             for res in results:
                 if res[0] == i:
                     acc.append(res[1])
-        data = np.concatenate(acc)
+        data = vstack(acc)
 
         print(data.shape)
 
@@ -121,8 +77,14 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
         del acc
         decomposed += mini_batch_size
 
-        new_data = i_pca.transform(data)
-        np.savetxt(open("data/matrix.txt", "ab"), new_data)
+        new_data = svd.fit_transform(data)
+
+        print('Explained Variance Ratio')
+        print(svd.explained_variance_ratio_)
+        print(sum(svd.explained_variance_ratio_))
+
+        matrix_file = "data/matrix_svd_{}.txt".format(components)
+        np.savetxt(open(matrix_file, "ab"), new_data)
 
 
 def extract_tf_idf(tf_idf_file, words):
@@ -143,7 +105,7 @@ def extract_tf_idf(tf_idf_file, words):
 
 def get_data_matrix(data_pack):
     """
-    Computes the dense matrix used as input for the Incremental PCA algorithm.
+    Computes the sparse matrix used as input for algorithm.
     The data pack contains:
 
      * number of rows
@@ -152,7 +114,7 @@ def get_data_matrix(data_pack):
      * dictionary of words and their positional index
 
     :param data_pack: input data for the worker process
-    :return: dense tf-idf matrix
+    :return: sparse tf-idf matrix
     """
 
     # Unpacking data from main process
@@ -164,9 +126,9 @@ def get_data_matrix(data_pack):
 
     # print(len(uuids), rows, cols, len(words))
 
-    data = np.zeros((rows, cols))
+    data = lil_matrix((rows, cols))
 
-    # Generates dense matrix from tf-idf vector files
+    # Generates sparse matrix from tf-idf vector files
     row = 0
     for uuid in uuids:
         for (col, tf_idf) in extract_tf_idf(os.path.join(dir_store, uuid), words):
@@ -174,9 +136,11 @@ def get_data_matrix(data_pack):
 
         row += 1
 
-    print(sys.getsizeof(data))
+    # Convert to coo sparse matrix format
+    data = data.tocoo()
+    print('{} - {} - {}'.format(process_id, data.count_nonzero(), data.data.nbytes))
     return process_id, data
 
 
 if __name__ == '__main__':
-    get_pca()
+    get_svd()

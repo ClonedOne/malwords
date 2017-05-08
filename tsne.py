@@ -45,7 +45,7 @@ def get_tsne():
 
 def transform_vectors(tsne, decomposed, rows, cols, uuids, words):
     """
-    Train the PCA algorithm incrementally using mini batches of data.    
+    Transform vectors using tSNE    
 
     :return: 
     """
@@ -98,7 +98,7 @@ def extract_tf_idf(tf_idf_file, words):
 
 def get_data_matrix(data_pack):
     """
-    Computes the sparse matrix used as input for the Incremental PCA algorithm.
+    Computes the sparse matrix used as input for algorithm.
     The data pack contains:
 
      * number of rows
