@@ -1,6 +1,5 @@
 from sklearn.cluster import DBSCAN
 from utilities import utils
-from sklearn import metrics
 import numpy as np
 import json
 import os
@@ -12,7 +11,7 @@ max_iter = 1000
 
 def cluster():
     """
-    Cluster the documents using out of core Mini Batch KMeans. 
+    Cluster the documents using DBScan. 
 
     :return: 
     """
@@ -32,7 +31,7 @@ def cluster():
     base_labels = np.asarray(base_labels)
 
     print('Perform DBSCAN')
-    dbscan = DBSCAN(n_jobs=core_num, metric='jaccard')
+    dbscan = DBSCAN(n_jobs=core_num, metric='cosine', algorithm='brute')
     computed_labels = dbscan.fit_predict(data)
     num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)
 
