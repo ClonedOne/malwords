@@ -148,7 +148,7 @@ def get_data_matrix(data_pack):
      * dictionary of words and their positional index
 
     :param data_pack: input data for the worker process
-    :return: sparse tf-idf matrix
+    :return: dense tf-idf matrix
     """
 
     # Unpacking data from main process
@@ -170,6 +170,7 @@ def get_data_matrix(data_pack):
 
         row += 1
 
+    print(sys.getsizeof(data))
     return process_id, data
 
 

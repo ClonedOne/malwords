@@ -41,7 +41,7 @@ def cluster():
     base_labels = np.asarray(base_labels)
 
     # num_clusters, silhouette = test_kmeans_clusters(data, base_labels, 2, num_clusters_max)
-    test_kmeans_clusters(data, base_labels, 2, num_clusters_max)
+    test_kmeans_clusters(data, base_labels, num_clusters_max)
 
     num_clusters = 0
     while num_clusters == 0:
@@ -77,7 +77,7 @@ def cluster():
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
 
-def test_kmeans_clusters(data, base_labels, num_clusters_min, num_clusters_max):
+def test_kmeans_clusters(data, base_labels, num_clusters_max):
     """
     Test several values for the number of clusters 
     
@@ -89,25 +89,19 @@ def test_kmeans_clusters(data, base_labels, num_clusters_min, num_clusters_max):
     """
 
     silhouettes = {}
+    mult = 0.1
 
-    for cur_num_clusters in range(num_clusters_min, num_clusters_max):
+    while mult * num_clusters_max <= num_clusters_max:
+        cur_num_clusters = int(mult * num_clusters_max)
         k_means = KMeans(n_clusters=cur_num_clusters, n_jobs=core_num, max_iter=max_iter, random_state=42)
         computed_labels = k_means.fit_predict(data)
 
         ars, ami, fm, h, c, sh = utils.evaluate_clustering(base_labels, computed_labels, data=data)
         silhouettes[cur_num_clusters] = sh
+        mult += 0.1
 
     for sh in sorted(silhouettes.items(), key=itemgetter(1), reverse=True):
         print('Clusters {} Silhouette {}'.format(sh[0], sh[1]))
-
-    # best_sh = (num_clusters_min, silhouettes[num_clusters_min])
-    # for k in sorted(list(silhouettes.keys())):
-    #     print('Clusters {} Silhouette {}'.format(k, silhouettes[k]))
-        # if silhouettes[k] > best_sh[1]:
-        #     best_sh = [k, silhouettes[k]]
-        #     best_sh = [k, silhouettes[k]]
-
-    # return best_sh
 
 
 if __name__ == '__main__':

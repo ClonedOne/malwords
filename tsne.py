@@ -1,6 +1,7 @@
 from sklearn.manifold import TSNE
 from multiprocessing import Pool
 from utilities import utils
+from scipy.sparse import *
 import numpy as np
 import json
 import sys
@@ -24,11 +25,11 @@ def get_tsne():
     core_num = config['core_num']
 
     if len(sys.argv) < 2:
-        print('Missing number of clusters')
+        print('Missing number of components')
         exit()
     components = int(sys.argv[1])
 
-    tsne = TSNE(n_components=components, random_state=42)
+    tsne = TSNE(n_components=components, random_state=42, method='exact')
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
 
@@ -63,12 +64,11 @@ def transform_vectors(tsne, decomposed, rows, cols, uuids, words):
 
         # sort results
         acc = []
-        # Each worker will return a list of size (mini_batch_size / core_num)
         for i in range(core_num):
             for res in results:
                 if res[0] == i:
                     acc.append(res[1])
-        data = np.concatenate(acc)
+        data = vstack(acc)
 
         print(data.shape)
 
@@ -98,7 +98,7 @@ def extract_tf_idf(tf_idf_file, words):
 
 def get_data_matrix(data_pack):
     """
-    Computes the dense matrix used as input for the Incremental PCA algorithm.
+    Computes the sparse matrix used as input for the Incremental PCA algorithm.
     The data pack contains:
 
      * number of rows
@@ -119,9 +119,9 @@ def get_data_matrix(data_pack):
 
     # print(len(uuids), rows, cols, len(words))
 
-    data = np.zeros((rows, cols))
+    data = lil_matrix((rows, cols))
 
-    # Generates dense matrix from tf-idf vector files
+    # Generates sparse matrix from tf-idf vector files
     row = 0
     for uuid in uuids:
         for (col, tf_idf) in extract_tf_idf(os.path.join(dir_store, uuid), words):
@@ -129,6 +129,9 @@ def get_data_matrix(data_pack):
 
         row += 1
 
+    # Convert to coo sparse matrix format
+    data = data.tocoo()
+    print('{} - {} - {}'.format(process_id, data.count_nonzero(), data.data.nbytes))
     return process_id, data
 
 

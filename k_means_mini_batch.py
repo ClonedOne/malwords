@@ -201,7 +201,7 @@ def get_data_matrix(data_pack):
 
         row += 1
 
-    # Convert to sparse matrix format usable by k-menas
+    # Convert to coo sparse matrix format
     data = data.tocoo()
     print('{} - {}'.format(process_id, data.count_nonzero()))
     return process_id, data
