@@ -1,4 +1,4 @@
-from sklearn.decomposition import IncrementalPCA
+from sklearn.decomposition import LatentDirichletAllocation
 from multiprocessing import Pool
 from workers import wk_dense
 from utilities import utils
@@ -8,17 +8,16 @@ import json
 import sys
 import os
 
-
 dir_store = ''
 mini_batch_size = 0
 core_num = 1
 components = 0
 
 
-def get_pca():
+def get_lda():
     """
     Apply Incremental Principal Components Analysis to the tf-idf vectors.
-    
+
     :return: 
     """
 
@@ -33,7 +32,6 @@ def get_pca():
         exit()
     components = int(sys.argv[1])
 
-    i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
     rand_uuids = random.sample(uuids, len(uuids))
@@ -41,20 +39,20 @@ def get_pca():
     cols = len(words)
     rows = len(uuids)
 
-    decomposed = 0
-    train_pca(i_pca, decomposed, rows, cols, rand_uuids, words)
-
-    print('Explained Variance Ratio')
-    print(sum(i_pca.explained_variance_ratio_))
+    lda = LatentDirichletAllocation(batch_size=mini_batch_size, n_jobs=core_num, n_topics=components, max_iter=50,
+                                    total_samples=len(uuids), random_state=42)
 
     decomposed = 0
-    transform_vectors(i_pca, decomposed, rows, cols, uuids, words)
+    train_lda(lda, decomposed, rows, cols, rand_uuids, words)
+
+    decomposed = 0
+    transform_vectors(lda, decomposed, rows, cols, uuids, words)
 
 
-def train_pca(i_pca, decomposed, rows, cols, rand_uuids, words):
+def train_lda(lda, decomposed, rows, cols, rand_uuids, words):
     """
-    Train the PCA algorithm incrementally using mini batches of data.    
-    
+    Train the LDA algorithm incrementally using mini batches of data.    
+
     :return: 
     """
 
@@ -84,12 +82,12 @@ def train_pca(i_pca, decomposed, rows, cols, rand_uuids, words):
         del acc
         decomposed += mini_batch_size
 
-        i_pca.partial_fit(data)
+        lda.partial_fit(data)
 
 
 def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
     """
-    Transorm the data vectors in mini batches.  
+    Transorm the data vectors in mini batches.   
 
     :return: 
     """
@@ -122,9 +120,9 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
 
         new_data = i_pca.transform(data)
 
-        matrix_file = "data/matrix_pca_{}.txt".format(components)
+        matrix_file = "data/matrix_lda_{}.txt".format(components)
         np.savetxt(open(matrix_file, "ab"), new_data)
 
 
 if __name__ == '__main__':
-    get_pca()
+    get_lda()
