@@ -1,5 +1,6 @@
 from sklearn.decomposition import TruncatedSVD
 from multiprocessing import Pool
+from workers import wk_sparse
 from utilities import utils
 from scipy.sparse import *
 import numpy as np
@@ -15,7 +16,7 @@ components = 0
 
 def get_svd():
     """
-    Apply Incremental Principal Components Analysis to the tf-idf vectors.
+    Lower dimensionality of data vectors using SVD.
 
     :return: 
     """
@@ -26,7 +27,7 @@ def get_svd():
     core_num = config['core_num']
 
     if len(sys.argv) < 2:
-        print('Missing number of components')
+        print('Specify number of components')
         exit()
     components = int(sys.argv[1])
 
@@ -34,7 +35,7 @@ def get_svd():
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
 
-    # Force loading of full dataset in RAM (may be a problem with low memory!)
+    # Force loading of full dataset in RAM (may result in MEMORY ERROR!)
     mini_batch_size = len(uuids)
 
     cols = len(words)
@@ -42,6 +43,9 @@ def get_svd():
 
     decomposed = 0
     transform_vectors(svd, decomposed, rows, cols, uuids, words)
+
+    print('Explained Variance Ratio')
+    print(sum(svd.explained_variance_ratio_))
 
 
 def transform_vectors(svd, decomposed, rows, cols, uuids, words):
@@ -57,9 +61,9 @@ def transform_vectors(svd, decomposed, rows, cols, uuids, words):
         print('Transforming documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
         # starting from the decomposed-th element of the uuids list
         file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
-        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words))
+        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store))
         pool = Pool(processes=core_num)
-        results = pool.map(get_data_matrix, formatted_input)
+        results = pool.map(wk_sparse.get_data_matrix, formatted_input)
         pool.close()
         pool.join()
 
@@ -79,67 +83,8 @@ def transform_vectors(svd, decomposed, rows, cols, uuids, words):
 
         new_data = svd.fit_transform(data)
 
-        print('Explained Variance Ratio')
-        print(svd.explained_variance_ratio_)
-        print(sum(svd.explained_variance_ratio_))
-
         matrix_file = "data/matrix_svd_{}.txt".format(components)
         np.savetxt(open(matrix_file, "ab"), new_data)
-
-
-def extract_tf_idf(tf_idf_file, words):
-    """
-    Construct an iterator over non zero tf-idf values for each word in the words list
-
-    :param tf_idf_file: path to the file containing the bag of words with tf-idf 
-    :param words: ordered list of words
-    :return: iterator over non zero tf-idf values
-    """
-
-    tf_idf_json = json.load(open(tf_idf_file, 'r'))
-    for word in tf_idf_json:
-        word_index = words[word]
-        tf_idf = tf_idf_json[word]
-        yield (word_index, tf_idf)
-
-
-def get_data_matrix(data_pack):
-    """
-    Computes the sparse matrix used as input for algorithm.
-    The data pack contains:
-
-     * number of rows
-     * number of columns
-     * list of uuids
-     * dictionary of words and their positional index
-
-    :param data_pack: input data for the worker process
-    :return: sparse tf-idf matrix
-    """
-
-    # Unpacking data from main process
-    process_id = data_pack[0]
-    uuids = data_pack[1]
-    rows = len(uuids)
-    cols = data_pack[2]
-    words = data_pack[3]
-
-    # print(len(uuids), rows, cols, len(words))
-
-    data = lil_matrix((rows, cols))
-
-    # Generates sparse matrix from tf-idf vector files
-    row = 0
-    for uuid in uuids:
-        for (col, tf_idf) in extract_tf_idf(os.path.join(dir_store, uuid), words):
-            data[row, col] = tf_idf
-
-        row += 1
-
-    # Convert to coo sparse matrix format
-    data = data.tocoo()
-    print('{} - {} - {}'.format(process_id, data.count_nonzero(), data.data.nbytes))
-    return process_id, data
 
 
 if __name__ == '__main__':

@@ -63,7 +63,7 @@ def cluster():
 def test_kmeans_clusters(data, base_labels, num_clusters_max):
     """
     Test several values for the number of clusters. 
-    Tries 10 different clusterings increasing by 10% the current clusters number up to the maximum specified value.
+    Tries 10 different clusterings increasing by 10% of the maximum specified value.
     
     :param data: data matrix to cluster
     :param base_labels: base labels from AVClass

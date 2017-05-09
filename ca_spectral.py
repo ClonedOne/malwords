@@ -20,20 +20,21 @@ def cluster():
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
+
+    if len(sys.argv) < 3:
+        print('Please provide the data matrix file and the desired number of clusters')
+        exit()
+
+    matrix_file = sys.argv[1]
+    num_clusters = int(sys.argv[2])
+
+    data = np.loadtxt(matrix_file)
     uuids = sorted(os.listdir(dir_store))
 
-    if not sys.argv[1]:
-        print('Missing number of clusters')
-        exit()
-    num_clusters = sys.argv[1]
-
-    matrix_file = open('data/matrix.txt', 'r')
-    data = np.loadtxt(matrix_file)
-
     # Retrieve base labels
-    print('Acquire base labels')
-    base_labels = utils.get_base_labels_old(uuids)
-    base_labels = np.asarray(base_labels)
+    print('Acquiring base labels')
+    base_labels_dict = utils.get_base_labels()
+    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     print('Perform clustering')
     spectral = SpectralClustering(n_clusters=num_clusters, n_jobs=core_num)

@@ -29,9 +29,9 @@ def plot_data():
     data = np.loadtxt(matrix_file)
 
     # Retrieve base labels
-    print('Acquire base labels')
-    base_labels = utils.get_base_labels_old(uuids)
-    base_labels = np.asarray(base_labels)
+    print('Acquiring base labels')
+    base_labels_dict = utils.get_base_labels()
+    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     print('Number of labels:', len(set(base_labels)))
 

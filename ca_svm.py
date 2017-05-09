@@ -4,6 +4,7 @@ from sklearn.svm import SVC
 from utilities import utils
 import numpy as np
 import json
+import sys
 import os
 
 dir_store = ''
@@ -12,7 +13,7 @@ core_num = 1
 
 def classify():
     """
-    Cluster the documents using out of core Mini Batch KMeans. 
+    Classify the documents using SVM and the AVClass labels as base truth.
 
     :return: 
     """
@@ -22,15 +23,19 @@ def classify():
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = core_num['core_num']
+
+    if len(sys.argv) < 2:
+        print('Please provide the data matrix file')
+        exit()
+    matrix_file = sys.argv[1]
+
+    data = np.loadtxt(matrix_file)
     uuids = sorted(os.listdir(dir_store))
 
-    matrix_file = open('data/matrix.txt', 'r')
-    data = np.loadtxt(matrix_file)
-
     # Retrieve base labels
-    print('Acquire base labels')
-    base_labels = utils.get_base_labels_old(uuids)
-    base_labels = np.asarray(base_labels)
+    print('Acquiring base labels')
+    base_labels_dict = utils.get_base_labels()
+    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     print('Split training and testing data')
     x_train, x_test, y_train, y_test = train_test_split(data, base_labels, test_size=0.2, random_state=42)

@@ -43,10 +43,9 @@ def cluster():
     print('Matrix dimensions: ', rows, cols)
 
     # Retrieve base labels
-    base_labels = utils.get_base_labels_old(uuids)
-    base_labels = np.asarray(base_labels)
-    print('Base labels')
-    print(base_labels)
+    print('Acquiring base labels')
+    base_labels_dict = utils.get_base_labels()
+    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     print('\nTraining KMeans')
     train_k_means(k_means, clustered, rows, cols, rand_uuids, words)

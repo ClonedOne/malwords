@@ -2,11 +2,12 @@ from sklearn.cluster import DBSCAN
 from utilities import utils
 import numpy as np
 import json
+import sys
 import os
 
 dir_store = ''
 core_num = 1
-max_iter = 1000
+max_iter = 5000
 
 
 def cluster():
@@ -20,15 +21,19 @@ def cluster():
     config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
+
+    if len(sys.argv) < 2:
+        print('Please provide the data matrix file')
+        exit()
+    matrix_file = sys.argv[1]
+
+    data = np.loadtxt(matrix_file)
     uuids = sorted(os.listdir(dir_store))
 
-    matrix_file = open('data/matrix.txt', 'r')
-    data = np.loadtxt(matrix_file)
-
     # Retrieve base labels
-    print('Acquire base labels')
-    base_labels = utils.get_base_labels_old(uuids)
-    base_labels = np.asarray(base_labels)
+    print('Acquiring base labels')
+    base_labels_dict = utils.get_base_labels()
+    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     print('Perform DBSCAN')
     dbscan = DBSCAN(n_jobs=core_num, metric='cosine', algorithm='brute')
