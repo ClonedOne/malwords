@@ -43,7 +43,7 @@ def cluster():
     print('Matrix dimensions: ', rows, cols)
 
     # Retrieve base labels
-    base_labels = utils.get_base_labels(uuids)
+    base_labels = utils.get_base_labels_old(uuids)
     base_labels = np.asarray(base_labels)
     print('Base labels')
     print(base_labels)

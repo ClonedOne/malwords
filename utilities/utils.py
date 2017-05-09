@@ -64,21 +64,21 @@ def format_worker_input(core_num, item_sublists, fixed_params):
     return formatted_input
 
 
-def get_base_labels(uuids):
+def get_base_labels():
     """
-    Returns the ordered list of base labels from AVClass output
-
+    Returns a dictionary mapping uuids to its malware family expressed as numerical index. 
+    
     :return: ordered list of labels
     """
 
-    base_labels = []
+    base_labels = {}
     inverted_label = json.load(open('data/inverted_labels.json'))
     uuid_label = json.load(open('data/labels.json'))
     sorted_families = sorted(list(inverted_label.keys()))
     families_index = {sorted_families[index]: index for index in range(len(sorted_families))}
 
-    for uuid in uuids:
-        base_labels.append(families_index[uuid_label[uuid]])
+    for uuid in uuid_label:
+        base_labels[uuid] = families_index[uuid_label[uuid]]
 
     return base_labels
 

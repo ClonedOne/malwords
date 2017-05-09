@@ -30,7 +30,7 @@ def plot_data():
 
     # Retrieve base labels
     print('Acquire base labels')
-    base_labels = utils.get_base_labels(uuids)
+    base_labels = utils.get_base_labels_old(uuids)
     base_labels = np.asarray(base_labels)
 
     print('Number of labels:', len(set(base_labels)))
