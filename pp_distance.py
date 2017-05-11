@@ -4,7 +4,6 @@ from workers import wk_dense
 from utilities import utils
 import numpy as np
 import json
-import sys
 import os
 
 
@@ -16,10 +15,8 @@ def compute_distances():
     """
 
     config = json.load(open('config.json'))
-    dir_malwords = config['dir_mini']
     dir_store = config['dir_store']
     core_num = config['core_num']
-    dir_base = config['dir_base']
 
     base_labels = utils.get_base_labels()
     uuids = sorted(os.listdir(dir_store))
@@ -29,7 +26,6 @@ def compute_distances():
         print(uuid, base_labels[uuid])
 
     cols = len(words)
-    rows = len(uuids)
 
     # Force loading of full dataset in RAM (may be a problem with low memory!)
     mini_batch_size = len(uuids)
@@ -53,16 +49,12 @@ def compute_distances():
 
     print(data.shape)
 
-    metrics = ['cosine', 'euclidean', 'jaccard', 'correlation', 'braycurtis',
-               'canberra', 'chebyshev', 'correlation', 'dice', 'kulsinski', 'mahalanobis',
-               'matching', 'minkowski', 'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath',
-               'sqeuclidean', 'yule']
+    metrics = ['cosine', 'euclidean', 'jaccard']
     for metric in metrics:
         try:
-            distances = pairwise_distances(data, metric=metric, n_jobs=core_num)
-            print(metric, distances.shape)
-            matrix_file = "data/distances_{}.txt".format(metric)
-            np.savetxt(open(matrix_file, "ab"), distances)
+            with open("data/distances.txt", "ab") as matrix_file:
+                distances = pairwise_distances(data, metric=metric, n_jobs=core_num)
+                np.savetxt(matrix_file, distances)
         except:
             print('Exception with ', metric)
 
