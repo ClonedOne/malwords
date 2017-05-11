@@ -1,9 +1,9 @@
-from collections import defaultdict
-import plotly.graph_objs as go
-from sklearn import metrics
-import plotly.plotly as py
-import numpy as np
 import json
+from collections import defaultdict
+
+import numpy as np
+import plotly.graph_objs as go
+import plotly.plotly as py
 
 
 def divide_workload(item_list, core_num, ordered=False):
@@ -80,43 +80,6 @@ def get_base_labels():
         base_labels[uuid] = families_index[uuid_label[uuid]]
 
     return base_labels
-
-
-def evaluate_clustering(base_labels, computed_labels, data=None):
-    """
-    Print evaluation values for the clustering results
-    
-    :return: 
-    """
-
-    ars = metrics.adjusted_rand_score(base_labels, computed_labels)
-    ami = metrics.adjusted_mutual_info_score(base_labels, computed_labels)
-    fm = metrics.fowlkes_mallows_score(base_labels, computed_labels)
-    h = metrics.homogeneity_score(base_labels, computed_labels)
-    c = metrics.completeness_score(base_labels, computed_labels)
-    # p, r, fs, sup = metrics.precision_recall_fscore_support(base_labels, computed_labels, average='binary')
-    # f1 = metrics.f1_score(base_labels, computed_labels, average='micro')
-
-    print('-' * 80)
-    print('Clustering evaluation')
-    print('Number of clusters', len(set(computed_labels)))
-    print('Number of distinct families', len(set(base_labels)))
-    print('Adjusted Rand index:', ars)
-    print('Adjusted Mutual Information:', ami)
-    print('Fowlkes-Mallows:', fm)
-    print('Homogeneity:', h)
-    print('Completeness:', c)
-    # print('Precision:', p)
-    # print('Recall:', r)
-    # print('FScore:', fs)
-    # print('F1Score:', f1)
-
-    if data is not None:
-        sh = metrics.silhouette_score(data, computed_labels, metric='euclidean')
-        print('Silhouette', sh)
-        return ars, ami, fm, h, c
-
-    return ars, ami, fm, h, c
 
 
 def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):

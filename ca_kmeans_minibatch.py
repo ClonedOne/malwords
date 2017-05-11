@@ -1,5 +1,7 @@
 from sklearn.cluster import MiniBatchKMeans
 from multiprocessing import Pool
+
+import utilities.evaluation
 from utilities import utils
 from scipy.sparse import *
 import numpy as np
@@ -54,7 +56,7 @@ def cluster():
     print('\nPredicting values')
     computed_labels = apply_k_means(k_means, clustered, rows, cols, uuids, words)
 
-    utils.evaluate_clustering(base_labels, computed_labels)
+    utilities.evaluation.evaluate_clustering(base_labels, computed_labels)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 

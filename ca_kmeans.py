@@ -1,5 +1,7 @@
 from sklearn.cluster import KMeans
 from operator import itemgetter
+
+import utilities.evaluation
 from utilities import utils
 import numpy as np
 import json
@@ -55,7 +57,7 @@ def cluster():
     k_means = KMeans(n_clusters=num_clusters, n_jobs=core_num, max_iter=max_iter, random_state=42)
     computed_labels = k_means.fit_predict(data)
 
-    utils.evaluate_clustering(base_labels, computed_labels, data=data)
+    utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
@@ -81,7 +83,7 @@ def test_kmeans_clusters(data, base_labels, num_clusters_max):
             k_means = KMeans(n_clusters=cur_num_clusters, n_jobs=core_num, max_iter=max_iter, random_state=42)
             computed_labels = k_means.fit_predict(data)
 
-            ars, ami, fm, h, c, p, r, fs, sh = utils.evaluate_clustering(base_labels, computed_labels, data=data)
+            ars, ami, fm, h, c, p, r, fs, sh = utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
             silhouettes[cur_num_clusters] = sh
 
     print('-' * 80)

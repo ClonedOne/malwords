@@ -1,5 +1,7 @@
 from sklearn.metrics import pairwise_distances
 import matplotlib.pyplot as plt
+
+import utilities.evaluation
 from utilities import utils
 import seaborn as sns
 import numpy as np
@@ -63,7 +65,7 @@ def euclidean(data, uuids, base_labels, min_cluster_size):
     computed_labels = hdbs.labels_
     num_clusters = len(set(computed_labels))
 
-    utils.evaluate_clustering(base_labels, computed_labels, data=data)
+    utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
@@ -90,7 +92,7 @@ def cosine(data, uuids, base_labels, min_cluster_size):
     computed_labels = hdbs.labels_
     num_clusters = len(set(computed_labels))
 
-    utils.evaluate_clustering(base_labels, computed_labels, data=data)
+    utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 

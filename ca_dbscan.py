@@ -1,4 +1,6 @@
 from sklearn.cluster import DBSCAN
+
+import utilities.evaluation
 from utilities import utils
 import numpy as np
 import json
@@ -40,7 +42,7 @@ def cluster():
     computed_labels = dbscan.fit_predict(data)
     num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)
 
-    utils.evaluate_clustering(base_labels, computed_labels, data=data)
+    utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
