@@ -14,10 +14,6 @@ def evaluate_clustering(base_labels, computed_labels, data=None):
     computed_dict = {k: {v} for k, v in dict(enumerate(computed_labels)).items()}
 
     print('-' * 80)
-    print(base_labels)
-    print(computed_labels)
-    print(base_dict)
-    print(computed_dict)
 
     ars = metrics.adjusted_rand_score(base_labels, computed_labels)
     ami = metrics.adjusted_mutual_info_score(base_labels, computed_labels)
