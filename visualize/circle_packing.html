@@ -20,7 +20,7 @@ text {
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
-var nodeSize = 5;
+var nodeSize = 10;
 var paddingSize = 5;
 
 var svg = d3.select("svg"),
@@ -57,9 +57,9 @@ d3.json("graph1.json", function(error, root) {
       .attr("r", function(d) { return d.r; })
       .style("fill", function(d) {if (!d.children) return d3.interpolateRainbow(parseFloat(d.data.color)/size); else return d3.rgb("white");});
 
-  node.filter(function(d) { return !d.children; }).append("text")
-      .attr("dy", "0.3em")
-      .text(function(d) { return d.data.color; });
+//  node.filter(function(d) { return !d.children; }).append("text")
+//      .attr("dy", "0.3em")
+//      .text(function(d) { return d.data.color; });
 });
 
 </script>

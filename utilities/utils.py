@@ -94,8 +94,8 @@ def evaluate_clustering(base_labels, computed_labels, data=None):
     fm = metrics.fowlkes_mallows_score(base_labels, computed_labels)
     h = metrics.homogeneity_score(base_labels, computed_labels)
     c = metrics.completeness_score(base_labels, computed_labels)
-    p, r, fs, sup = metrics.precision_recall_fscore_support(base_labels, computed_labels, average='binary')
-    f1 = metrics.f1_score(base_labels, computed_labels, average='micro')
+    # p, r, fs, sup = metrics.precision_recall_fscore_support(base_labels, computed_labels, average='binary')
+    # f1 = metrics.f1_score(base_labels, computed_labels, average='micro')
 
     print('-' * 80)
     print('Clustering evaluation')
@@ -106,17 +106,17 @@ def evaluate_clustering(base_labels, computed_labels, data=None):
     print('Fowlkes-Mallows:', fm)
     print('Homogeneity:', h)
     print('Completeness:', c)
-    print('Precision:', p)
-    print('Recall:', r)
-    print('FScore:', fs)
-    print('F1Score:', f1)
+    # print('Precision:', p)
+    # print('Recall:', r)
+    # print('FScore:', fs)
+    # print('F1Score:', f1)
 
     if data is not None:
         sh = metrics.silhouette_score(data, computed_labels, metric='euclidean')
         print('Silhouette', sh)
-        return ars, ami, fm, h, c, p, r, fs, sh
+        return ars, ami, fm, h, c
 
-    return ars, ami, fm, h, c, p, r, fs
+    return ars, ami, fm, h, c
 
 
 def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):
