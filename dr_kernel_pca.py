@@ -31,7 +31,7 @@ def get_kern_pca():
         exit()
     components = int(sys.argv[1])
 
-    kernel_pca = KernelPCA(n_components=components, random_state=42, n_jobs=core_num, kernel='cosine', remove_zero_eig=True, copy_X=False)
+    kernel_pca = KernelPCA(n_components=components, random_state=42, n_jobs=core_num, kernel='poly', remove_zero_eig=True, copy_X=False)
     words = json.load(open('data/words.json', 'r'))
     uuids = sorted(os.listdir(dir_store))
 

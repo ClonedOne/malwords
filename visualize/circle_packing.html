@@ -39,7 +39,8 @@ d3.json("graph1.json", function(error, root) {
       .sum(function(d) { return nodeSize; })
       .sort(function(a, b) { return b.value - a.value; });
 
-  var size = parseFloat(root.children.length);
+  //var size = parseFloat(root.children.length);
+  var size = parseFloat(1343);
   console.log(size);
 
   var node = g.selectAll(".node")
@@ -54,7 +55,7 @@ d3.json("graph1.json", function(error, root) {
   // Append circle elements specifying variable colors
   node.append("circle")
       .attr("r", function(d) { return d.r; })
-      .style("fill", function(d) {if (!d.children) return d3.interpolateRainbow(d.data.color/size); else return d3.rgb("white");});
+      .style("fill", function(d) {if (!d.children) return d3.interpolateRainbow(parseFloat(d.data.color)/size); else return d3.rgb("white");});
 
   node.filter(function(d) { return !d.children; }).append("text")
       .attr("dy", "0.3em")

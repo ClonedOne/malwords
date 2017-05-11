@@ -57,8 +57,8 @@ def euclidean(data, uuids, base_labels, min_cluster_size):
     :return: 
     """
 
-    print('Perform clustering')
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, gen_min_span_tree=True)
+    print('Perform clustering with euclidean distance')
+    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric='euclidean', gen_min_span_tree=True, match_reference_implementation=True)
     hdbs.fit(data)
     computed_labels = hdbs.labels_
     num_clusters = len(set(computed_labels))
@@ -81,7 +81,7 @@ def cosine(data, uuids, base_labels, min_cluster_size):
     :return: 
     """
 
-    print('Perform clustering')
+    print('Perform clustering with cosine distance')
     distance = pairwise_distances(data, metric='cosine')
     print(distance.shape)
 
