@@ -8,7 +8,28 @@ def get_stats():
     print('Number of distinct families:', stats_labels[1])
     print('Number of singletons:', stats_labels[2])
     print('Average size of families:', stats_labels[3])
-    pprint(stats_labels[4].most_common())
+    pprint(stats_labels[4].most_common(10))
+    threshold_high = 800
+    threshold_low = 200
+    print('Thresholds:', threshold_low, threshold_high)
+    inside_threshold = set()
+    cumulative = 0
+    for fam, count in stats_labels[4].items():
+        if fam == 'SINGLETON':
+            continue
+
+        if count < threshold_low:
+            continue
+
+        inside_threshold.add(fam)
+        if count >= threshold_high:
+            cumulative += threshold_high
+        elif count >= threshold_low:
+            cumulative += count
+
+    print('Inside thresholds:', len(inside_threshold))
+    print('Cumulative count:', cumulative)
+    print('New average size:', cumulative/len(inside_threshold))
 
 
 def get_labels_stats():
