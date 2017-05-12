@@ -1,12 +1,8 @@
 from gensim import corpora
-import numpy as np
 import json
 import os
 
 dir_malwords = ''
-dir_store = ''
-dir_base = ''
-core_num = 1
 words = {}
 dictionary = None
 
@@ -41,13 +37,10 @@ def prepare_corpus():
     :return: 
     """
 
-    global dir_malwords, dir_store, dir_base, core_num, words, dictionary
+    global dir_malwords, words, dictionary
 
     config = json.load(open('config.json'))
     dir_malwords = config['dir_mini']
-    dir_store = config['dir_store']
-    core_num = config['core_num']
-    dir_base = config['dir_base']
 
     words = json.load(open('data/words.json', 'r'))
 
@@ -61,8 +54,6 @@ def prepare_corpus():
 
     print(type(new_corpus))
     print(type(dictionary))
-
-    print(dictionary[19881])
 
 
 if __name__ == '__main__':
