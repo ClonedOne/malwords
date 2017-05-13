@@ -1,12 +1,33 @@
 from shutil import copyfile
 import json
+import sys
 import os
+
+f_ext = '_ss.txt.gz'
+err_msg = 'Please choose the subset of data to extract:\n' \
+          'l for labeled samples\n' \
+          'k for 987 samples of families mydoom, neobar, gepys, lamer, neshta, bladabindi, flystudio\n' \
+          's for 8 samples of families mydoom gepys, bladabindi, flystudio\n' \
+          'j for json list of uuids'
 
 
 def main():
     config = json.load(open('config.json'))
-    # get_labeled(config)
-    load_samples(config)
+
+    if len(sys.argv) < 2:
+        print(err_msg)
+        exit()
+
+    if sys.argv[1] == 'l':
+        get_labeled(config)
+    elif sys.argv[1] == 'k':
+        load_samples(config)
+    elif sys.argv[1] == 's':
+        load_samples(config, small=True)
+    elif sys.argv[1] == 'j':
+        pass
+    else:
+        print(err_msg)
 
 
 def get_labeled(config):
@@ -30,8 +51,7 @@ def get_labeled(config):
             )
 
 
-def load_samples(config):
-    f_ext = '_ss.txt.gz'
+def load_samples(config, small=False):
 
     mydoom = [
         "4905aa5a-9062-4d1d-9c72-96f1bd80bf3f",
@@ -1052,8 +1072,10 @@ def load_samples(config):
         "ecc1e3df-bdf2-43c6-962e-ad2bc2de971a"
     ]
 
-    # datasets = [mydoom, neobar, gepys, lamer, neshta, bladabindi, flystudio]
-    datasets = [small_subset, ]
+    if small:
+        datasets = [small_subset, ]
+    else:
+        datasets = [mydoom, neobar, gepys, lamer, neshta, bladabindi, flystudio]
 
     for dataset in datasets:
         for f_name in dataset:
@@ -1061,6 +1083,15 @@ def load_samples(config):
                 os.path.join(config['dir_malwords'], f_name + f_ext),
                 os.path.join(config['dir_mini'], f_name + f_ext)
             )
+
+
+def from_json(config, file_name):
+    uuids = json.load(open(file_name))
+    for uuid in uuids:
+        copyfile(
+            os.path.join(config['dir_malwords'], uuid + f_ext),
+            os.path.join(config['dir_mini'], uuid + f_ext)
+        )
 
 
 if __name__ == '__main__':

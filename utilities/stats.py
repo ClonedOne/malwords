@@ -29,20 +29,12 @@ def inside_thresholds(stats_labels, threshold_low, threshold_high, fam_uuids):
     families = 0
 
     for fam, count in stats_labels[4].items():
-        if fam == 'SINGLETON':
-            continue
-
-        if count < threshold_low:
+        if fam == 'SINGLETON' or count < threshold_low:
             continue
 
         families += 1
 
-        if count >= threshold_high:
-            for i in fam_uuids[fam][:threshold_high]:
-                inside.append(i)
-
-        elif count >= threshold_low:
-            for i in fam_uuids[fam]:
+        for i in fam_uuids[fam][:threshold_high]:
                 inside.append(i)
 
     print('Inside thresholds:', families)
