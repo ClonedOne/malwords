@@ -56,22 +56,15 @@ def get_labels_stats():
     num_singleton = 0
     fam_uuids = defaultdict(list)
 
-    with open('data/labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
+    labels = json.load(open('data/labels.json'))
+    for uuid, fam in labels.items():
+        num_samples += 1
 
-        for line in labels_file:
-            line = line.strip().split('\t')
-            num_samples += 1
+        if fam == 'SINGLETON':
+            num_singleton += 1
 
-            uuid = line[0].strip()
-            fam = line[1].strip()
-
-            if 'SINGLETON' in fam:
-                # line[1] = line[1].split(':')[1]
-                fam = line[1].split(':')[0]
-                num_singleton += 1
-
-            fam_counter[fam] += 1
-            fam_uuids[fam].append(uuid)
+        fam_counter[fam] += 1
+        fam_uuids[fam].append(uuid)
 
     num_fam = len(fam_counter)
 
