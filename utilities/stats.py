@@ -1,5 +1,7 @@
+from collections import defaultdict
 from collections import Counter
 from pprint import pprint
+import json
 
 
 def get_stats():
@@ -11,9 +13,21 @@ def get_stats():
     pprint(stats_labels[4].most_common(10))
     threshold_high = 800
     threshold_low = 200
+    uuids = inside_thresholds(stats_labels, threshold_low, threshold_high, stats_labels[5])
+    json.dump(uuids, open('data/uuids.json', 'w'), indent=2)
+
+
+def inside_thresholds(stats_labels, threshold_low, threshold_high, fam_uuids):
+    """
+    Poduce a list of uuids belonging to malware families whose population is inside the thresholds
+    
+    :return: 
+    """
+
     print('Thresholds:', threshold_low, threshold_high)
-    inside_threshold = set()
-    cumulative = 0
+    inside = []
+    families = 0
+
     for fam, count in stats_labels[4].items():
         if fam == 'SINGLETON':
             continue
@@ -21,15 +35,21 @@ def get_stats():
         if count < threshold_low:
             continue
 
-        inside_threshold.add(fam)
-        if count >= threshold_high:
-            cumulative += threshold_high
-        elif count >= threshold_low:
-            cumulative += count
+        families += 1
 
-    print('Inside thresholds:', len(inside_threshold))
-    print('Cumulative count:', cumulative)
-    print('New average size:', cumulative/len(inside_threshold))
+        if count >= threshold_high:
+            for i in fam_uuids[fam][:threshold_high]:
+                inside.append(i)
+
+        elif count >= threshold_low:
+            for i in fam_uuids[fam]:
+                inside.append(i)
+
+    print('Inside thresholds:', families)
+    print('Cumulative count:', len(inside))
+    print('New average size:', len(inside)/families)
+
+    return inside
 
 
 def get_labels_stats():
@@ -42,6 +62,7 @@ def get_labels_stats():
     fam_counter = Counter()
     num_samples = 0
     num_singleton = 0
+    fam_uuids = defaultdict(list)
 
     with open('data/labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
 
@@ -49,12 +70,16 @@ def get_labels_stats():
             line = line.strip().split('\t')
             num_samples += 1
 
-            if 'SINGLETON' in line[1]:
+            uuid = line[0].strip()
+            fam = line[1].strip()
+
+            if 'SINGLETON' in fam:
                 # line[1] = line[1].split(':')[1]
-                line[1] = line[1].split(':')[0]
+                fam = line[1].split(':')[0]
                 num_singleton += 1
 
-            fam_counter[line[1]] += 1
+            fam_counter[fam] += 1
+            fam_uuids[fam].append(uuid)
 
     num_fam = len(fam_counter)
 
@@ -68,7 +93,7 @@ def get_labels_stats():
 
     avg_fam_size = avg_fam_size / num_fam
 
-    return num_samples, num_fam, num_singleton, avg_fam_size, fam_counter
+    return num_samples, num_fam, num_singleton, avg_fam_size, fam_counter, fam_uuids
 
 
 if __name__ == '__main__':
