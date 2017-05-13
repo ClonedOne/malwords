@@ -20,12 +20,20 @@ def main():
 
     if sys.argv[1] == 'l':
         get_labeled(config)
+
     elif sys.argv[1] == 'k':
         load_samples(config)
+
     elif sys.argv[1] == 's':
         load_samples(config, small=True)
+
     elif sys.argv[1] == 'j':
-        pass
+        if len(sys.argv) < 3 or not os.path.isfile(sys.argv[2]):
+            print(err_msg)
+            exit()
+
+        from_json(config, sys.argv[2])
+
     else:
         print(err_msg)
 
