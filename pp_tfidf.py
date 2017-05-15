@@ -42,7 +42,7 @@ def get_tf_idf():
     json.dump(dfs, open('data/dfs.json', 'w'), indent=2)
 
     print('Lowering features dimensionality')
-    remove_useless_words(dfs, total_documents, 0.5, 0.01)
+    remove_useless_words(dfs, total_documents, 0.5, 0.005)
 
     print('Computing Tf-Idf values')
     formatted_input = utils.format_worker_input(core_num, file_name_lists,

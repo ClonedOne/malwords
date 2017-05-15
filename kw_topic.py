@@ -1,4 +1,3 @@
-from gensim.models import LdaMulticore
 from gensim import corpora, models
 import json
 
@@ -34,28 +33,40 @@ def get_topics():
     tfidf = models.TfidfModel(malw_corpus)
     tfidf_corpus = tfidf[malw_corpus]
 
-    n_topics = 7
-    lsi = models.LsiModel(tfidf_corpus, id2word=dictionary, num_topics=n_topics)
-    # lsi_corpus = lsi[tfidf_corpus]
+    # n_topics = 7
+    # lsi = models.LsiModel(tfidf_corpus, id2word=dictionary, num_topics=n_topics)
+    # # lsi_corpus = lsi[tfidf_corpus]
+    #
+    # print('LSI')
+    # for topic in lsi.print_topics(n_topics):
+    #     print(topic)
+    # print('\n')
+    #
+    # del lsi
+    #
+    # print('LDA')
+    #
+    # lda = models.LdaModel(tfidf_corpus, id2word=dictionary, num_topics=n_topics)
+    #
+    # for topic in lda.print_topics(n_topics):
+    #     print(topic)
+    # print('\n')
+    #
+    # del lda
+    #
+    # lda = models.LdaMulticore(tfidf_corpus, id2word=dictionary, num_topics=n_topics, workers=core_num)
+    #
+    # for topic in lda.print_topics(n_topics):
+    #     print(topic)
+    # print('\n')
+    #
+    # del lda
+    #
+    # print('HDP')
+    #
+    hdp = models.HdpModel(tfidf_corpus, id2word=dictionary)
 
-    print('LSI')
-    for topic in lsi.print_topics(n_topics):
-        print(topic)
-    print('\n')
-
-    del lsi
-
-    lsi = models.LsiModel(tfidf_corpus, id2word=dictionary, num_topics=n_topics)
-
-    for topic in lsi.print_topics(n_topics):
-        print(topic)
-    print('\n')
-
-    del lsi
-
-    lda = LdaMulticore(tfidf_corpus, id2word=dictionary, num_topics=n_topics)
-
-    for topic in lda.print_topics(n_topics):
+    for topic in hdp.print_topics():
         print(topic)
     print('\n')
 
