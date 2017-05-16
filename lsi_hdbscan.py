@@ -40,31 +40,38 @@ def cluster():
     inv_words = {v: k for k, v in words.items()}
     dictionary = corpora.Dictionary.from_corpus(malw_corpus, id2word=inv_words)
 
+    print(len(dictionary.keys()))
+    base_words = utils.get_base_words(dir_base)
+    dictionary.filter_tokens(good_ids=list(words.keys()))
+    dictionary.compactify()
+    print(len(dictionary.keys()))
+
     print('Computing Tf-Idf')
     tfidf = models.TfidfModel(malw_corpus)
     tfidf_corpus = tfidf[malw_corpus]
     print(len(tfidf_corpus))
 
-    print('Computing LSI')
-    n_topics = 400
-    lsi = models.LsiModel(tfidf_corpus, id2word=dictionary, num_topics=n_topics)
-    lsi_corpus = lsi[tfidf_corpus]
-    print(len(lsi_corpus))
+    # print('Computing LSI')
+    # n_topics = 400
+    # lsi = models.LsiModel(tfidf_corpus, id2word=dictionary, num_topics=n_topics)
+    # lsi_corpus = lsi[tfidf_corpus]
+    # print(len(lsi_corpus))
 
-    data = matutils.corpus2dense(lsi_corpus, num_terms=n_topics, num_docs=len(uuids)).T
-    print(data.shape)
-
-    print('Perform clustering with euclidean distance')
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=50, metric='euclidean', match_reference_implementation=True)
-    hdbs.fit(data)
-    computed_labels = hdbs.labels_
-    num_clusters = len(set(computed_labels))
-
-    evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
-
-    utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
-
-    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'euclidean', 'hdbscan')
+    # data = matutils.corpus2dense(lsi_corpus, num_terms=n_topics, num_docs=len(uuids)).T
+    # data = matutils.corpus2csc(corpus=tfidf_corpus).T
+    # print(data.shape)
+    #
+    # print('Perform clustering with euclidean distance')
+    # hdbs = hdbscan.HDBSCAN(min_cluster_size=50, metric='euclidean', match_reference_implementation=True)
+    # hdbs.fit(data)
+    # computed_labels = hdbs.labels_
+    # num_clusters = len(set(computed_labels))
+    #
+    # evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
+    #
+    # utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    #
+    # output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'euclidean', 'hdbscan')
 
 
 if __name__ == '__main__':

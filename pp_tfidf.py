@@ -46,7 +46,7 @@ def get_tf_idf():
 
     print('Computing Tf-Idf values')
     formatted_input = utils.format_worker_input(core_num, file_name_lists,
-                                                (dfs, total_documents, dir_malwords, dir_store))
+                                                (dfs, total_documents, dir_malwords, dir_store, True))
     pool = Pool(processes=core_num)
     pool.map(wk_tfidf.compute_tf_idf, formatted_input)
     pool.close()
@@ -79,12 +79,7 @@ def remove_useless_words(dfs, total_documents, filter_high, filter_low):
     print('Initial features number:', len(dfs))
     print('Document frequency thresholds: {} {}'.format(threshold_low, threshold_high))
 
-    base_words = set()
-    base_file = os.path.join(dir_base, 'base.txt')
-    if os.path.isfile(base_file):
-        with open(base_file, 'rb') as base_in:
-            for line in base_in:
-                base_words.add(line.strip().split()[0].decode('utf-8'))
+    base_words = utils.get_base_words(dir_base)
 
     for word in dfs:
 

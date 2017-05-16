@@ -1,6 +1,6 @@
 import json
 from collections import defaultdict
-
+import os
 import numpy as np
 import plotly.graph_objs as go
 import plotly.plotly as py
@@ -80,6 +80,24 @@ def get_base_labels():
         base_labels[uuid] = families_index[uuid_label[uuid]]
 
     return base_labels
+
+
+def get_base_words(dir_base):
+    """
+    Returns a set containing the words recorded with a clean Malrec session
+    
+    :return: set of words
+    """
+
+    base_file = os.path.join(dir_base, 'base.txt')
+    base_words = set()
+
+    if os.path.isfile(base_file):
+        with open(base_file, 'rb') as base_in:
+            for line in base_in:
+                base_words.add(line.strip().split()[0].decode('utf-8'))
+
+    return base_words
 
 
 def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):

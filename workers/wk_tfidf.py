@@ -17,6 +17,7 @@ def compute_tf_idf(data_pack):
     total_documents = data_pack[3]
     dir_malwords = data_pack[4]
     dir_store = data_pack[5]
+    multiplier = data_pack[6]
 
     norm_factor = 0.4
 
@@ -50,6 +51,8 @@ def compute_tf_idf(data_pack):
         # Compute the term frequency of a word using double normalization
         for word in words:
             tf = norm_factor + ((1 - norm_factor) * (float(words[word]) / float(most_freq)))
+            if multiplier:
+                tf = tf * len(word)
             idf = math.log(total_documents / float(dfs[word]))
             tf_idf[word] = tf * idf
 
