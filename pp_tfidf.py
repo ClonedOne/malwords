@@ -75,6 +75,7 @@ def remove_useless_words(dfs, total_documents, filter_high, filter_low):
     frequent_words = 0
     rare_words = 0
     in_base = 0
+    digits = 0
 
     print('Initial features number:', len(dfs))
     print('Document frequency thresholds: {} {}'.format(threshold_low, threshold_high))
@@ -83,7 +84,11 @@ def remove_useless_words(dfs, total_documents, filter_high, filter_low):
 
     for word in dfs:
 
-        if dfs[word] == 1:
+        if word.isdigit():
+            to_remove.add(word)
+            digits += 1
+
+        elif dfs[word] == 1:
             to_remove.add(word)
             singleton_words += 1
 
@@ -103,6 +108,7 @@ def remove_useless_words(dfs, total_documents, filter_high, filter_low):
         dfs.pop(word, None)
 
     print('Features number:', len(dfs))
+    print('Words containing only digits:', digits)
     print('Words appearing only once:', singleton_words)
     print('Words over threshold_high frequency:', frequent_words)
     print('Words under threshold_low frequency:', rare_words)
