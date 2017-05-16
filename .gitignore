@@ -139,6 +139,8 @@ ENV/
 .ropeproject
 
 .idea/
-data/*
 visualize/*.json
 config.json
+clustering/
+data/
+gensim/

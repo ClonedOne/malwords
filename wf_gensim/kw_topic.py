@@ -26,8 +26,10 @@ def get_topics():
     words = json.load(open('data/words.json', 'r'))
 
     malw_corpus = corpora.MmCorpus('gensim/corpus.mm')
+
     inv_words = {v: k for k, v in words.items()}
     dictionary = corpora.Dictionary.from_corpus(malw_corpus, id2word=inv_words)
+
     print(dictionary)
 
     tfidf = models.TfidfModel(malw_corpus)

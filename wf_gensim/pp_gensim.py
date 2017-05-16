@@ -9,9 +9,20 @@ dictionary = None
 
 class MyCorpus(object):
 
+    def __init__(self, uuids=None):
+        if uuids:
+            self.uuids = uuids
+        else:
+            self.uuids = None
+
     def __iter__(self):
 
-        for bow_file in sorted(os.listdir(dir_malwords)):
+        if not self.uuids:
+            self.uuids = sorted(os.listdir(dir_malwords))
+        else:
+            self.uuids = sorted([uuid + '_ss.txt' for uuid in self.uuids])
+
+        for bow_file in self.uuids:
 
             word_vec = []
 
@@ -30,10 +41,11 @@ class MyCorpus(object):
             yield word_vec
 
 
-def prepare_corpus():
+def prepare_corpus(uuids=None):
     """
     Generates a gensim corpus object from the bag of words.
     
+    :param uuids: List of uuids
     :return: 
     """
 
@@ -41,14 +53,18 @@ def prepare_corpus():
 
     config = json.load(open('config.json'))
     dir_malwords = config['dir_mini']
-
     words = json.load(open('data/words.json', 'r'))
 
-    corpus = MyCorpus()
+    corpus_dir = 'data_gensim'
 
-    corpora.MmCorpus.serialize('gensim/corpus.mm', corpus)
+    if not os.path.exists(corpus_dir):
+        os.mkdir(corpus_dir)
 
-    new_corpus = corpora.MmCorpus('gensim/corpus.mm')
+    corpus = MyCorpus(uuids)
+
+    corpora.MmCorpus.serialize(os.path.join(corpus_dir, 'corpus.mm'), corpus)
+
+    new_corpus = corpora.MmCorpus(os.path.join(corpus_dir, 'corpus.mm'))
     inv_words = {v: k for k, v in words.items()}
     dictionary = corpora.Dictionary.from_corpus(new_corpus, id2word=inv_words)
 
