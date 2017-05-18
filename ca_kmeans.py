@@ -1,6 +1,6 @@
 from sklearn.cluster import KMeans
 from operator import itemgetter
-
+from utilities import output
 import utilities.evaluation
 from utilities import utils
 import numpy as np
@@ -54,10 +54,12 @@ def cluster():
             num_clusters = 0
             print('Please insert a valid number of clusters\n')
 
-    k_means = KMeans(n_clusters=num_clusters, n_jobs=core_num, max_iter=max_iter, random_state=42)
+    k_means = KMeans(n_clusters=num_clusters, n_jobs=core_num, max_iter=max_iter)
     computed_labels = k_means.fit_predict(data)
 
     utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
+
+    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'euclidean', 'kmeans')
 
     utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
