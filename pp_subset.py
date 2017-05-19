@@ -93,10 +93,11 @@ def load_samples(config, small=False):
 def from_json(config, file_name):
     uuids = json.load(open(file_name))
     for uuid in uuids:
-        copyfile(
-            os.path.join(config['dir_malwords'], uuid + f_ext),
-            os.path.join(config['dir_mini'], uuid + f_ext)
-        )
+        if os.path.isfile(os.path.join(config['dir_malwords'], uuid + f_ext)):
+            copyfile(
+                os.path.join(config['dir_malwords'], uuid + f_ext),
+                os.path.join(config['dir_mini'], uuid + f_ext)
+            )
 
 
 if __name__ == '__main__':
