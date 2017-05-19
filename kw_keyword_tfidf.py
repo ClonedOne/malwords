@@ -6,10 +6,7 @@ import os
 
 def extract_keywords():
     config = json.load(open('config.json'))
-    dir_malwords = config['dir_mini']
     dir_store = config['dir_store']
-    core_num = config['core_num']
-    dir_base = config['dir_base']
 
     if len(sys.argv) < 2:
         print('Specify the clustering result to process')

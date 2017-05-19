@@ -71,6 +71,8 @@ def prepare_corpus(uuids=None):
     print(type(new_corpus))
     print(type(dictionary))
 
+    return new_corpus
+
 
 if __name__ == '__main__':
     prepare_corpus()
