@@ -82,7 +82,7 @@ def test_kmeans_clusters(data, base_labels, num_clusters_max):
         cur_num_clusters = int(mult * num_clusters_max)
 
         if cur_num_clusters >= 2:
-            k_means = KMeans(n_clusters=cur_num_clusters, n_jobs=core_num, max_iter=max_iter, random_state=42)
+            k_means = KMeans(n_clusters=cur_num_clusters, n_jobs=core_num, max_iter=max_iter)
             computed_labels = k_means.fit_predict(data)
 
             ars, ami, fm, h, c, p, r, fs, sh = utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)

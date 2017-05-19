@@ -57,7 +57,7 @@ def compute_tf_idf(data_pack):
             tf_idf[word] = tf * idf
 
         json.dump(tf_idf, open(os.path.join(dir_store, uuid), "w"), indent=2)
-        json.dump(sorted(tf_idf.items(), key=lambda x: x[1], reverse=True), open(os.path.join('temp', uuid), "w"), indent=2)
+        # json.dump(sorted(tf_idf.items(), key=lambda x: x[1], reverse=True), open(os.path.join('temp', uuid), "w"), indent=2)
         # print(uuid, total_words, document_length)
 
 

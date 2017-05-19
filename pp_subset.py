@@ -8,6 +8,7 @@ err_msg = 'Please choose the subset of data to extract:\n' \
           'l for labeled samples\n' \
           'k for 987 samples of families mydoom, neobar, gepys, lamer, neshta, bladabindi, flystudio\n' \
           's for 8 samples of families mydoom gepys, bladabindi, flystudio\n' \
+          'f for a single family' \
           'j for json list of uuids'
 
 
@@ -23,6 +24,9 @@ def main():
 
     elif sys.argv[1] == 'k':
         load_samples(config)
+
+    elif sys.argv[1] == 'f':
+        get_family(config)
 
     elif sys.argv[1] == 's':
         load_samples(config, small=True)
@@ -93,6 +97,21 @@ def load_samples(config, small=False):
 def from_json(config, file_name):
     uuids = json.load(open(file_name))
     for uuid in uuids:
+        if os.path.isfile(os.path.join(config['dir_malwords'], uuid + f_ext)):
+            copyfile(
+                os.path.join(config['dir_malwords'], uuid + f_ext),
+                os.path.join(config['dir_mini'], uuid + f_ext)
+            )
+
+
+def get_family(config):
+    if len(sys.argv) < 3:
+        print('Specify malware family name')
+        exit()
+    family = sys.argv[2]
+
+    inv_labels = json.load(open('data/inverted_labels.json'))
+    for uuid in inv_labels[family]:
         if os.path.isfile(os.path.join(config['dir_malwords'], uuid + f_ext)):
             copyfile(
                 os.path.join(config['dir_malwords'], uuid + f_ext),

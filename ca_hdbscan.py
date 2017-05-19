@@ -63,7 +63,11 @@ def euclidean(data, uuids, base_labels, min_cluster_size):
     hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric='euclidean', gen_min_span_tree=True, match_reference_implementation=True)
     hdbs.fit(data)
     computed_labels = hdbs.labels_
-    num_clusters = len(set(computed_labels))
+
+    num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)
+
+    if num_clusters == 1:
+        data = None
 
     utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
@@ -92,7 +96,11 @@ def cosine(data, uuids, base_labels, min_cluster_size):
     hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric='precomputed')
     hdbs.fit(distance)
     computed_labels = hdbs.labels_
-    num_clusters = len(set(computed_labels))
+
+    num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)
+
+    if num_clusters == 1:
+        data = None
 
     utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
