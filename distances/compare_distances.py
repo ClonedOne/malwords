@@ -1,5 +1,6 @@
 from sklearn.metrics.pairwise import *
 from multiprocessing import Pool
+from utilities import constants
 from workers import wk_dense
 from utilities import utils
 import numpy as np
@@ -7,14 +8,13 @@ import json
 import os
 
 
-def compute_distances():
+def compute_distances(config):
     """
     Compute pairwise distances of documents as feature vectors.
     
     :return: 
     """
 
-    config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
 
@@ -52,11 +52,9 @@ def compute_distances():
     metrics = ['cosine', 'euclidean', 'jaccard']
     for metric in metrics:
         try:
-            with open("data/distances.txt", "ab") as matrix_file:
+            file_name = os.path.join(constants.dir_d, 'distances.txt')
+            with open(file_name, "ab") as matrix_file:
                 distances = pairwise_distances(data, metric=metric, n_jobs=core_num)
                 np.savetxt(matrix_file, distances)
         except:
             print('Exception with ', metric)
-
-if __name__ == '__main__':
-    compute_distances()
