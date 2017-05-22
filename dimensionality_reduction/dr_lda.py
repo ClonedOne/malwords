@@ -16,7 +16,7 @@ components = 0
 
 def get_lda():
     """
-    Apply Incremental Principal Components Analysis to the tf-idf vectors.
+    Apply Latent Dirichlet Allocation to the tf-idf vectors.
 
     :return: 
     """
