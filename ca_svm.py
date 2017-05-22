@@ -34,8 +34,8 @@ def classify():
 
     print('Split training and testing data')
     x_train, x_test, y_train, y_test = train_test_split(data, base_labels, test_size=0.2)
-    print(x_train)
-    print(x_test)
+    # print(x_train)
+    # print(x_test)
     print(len(x_train), len(x_test), len(y_train), len(y_test))
 
     print('Traing SVMs')
@@ -48,14 +48,14 @@ def classify():
     svc_pred = svc.predict(x_test)
     lin_svc_pred = lin_svc.predict(x_test)
 
-    # print('Base test labels')
-    # print(y_test)
-    #
-    # print('SVC prediction')
-    # print(svc_pred)
-    #
-    # print('LinearSVC prediction')
-    # print(lin_svc_pred)
+    print('Base test labels')
+    print(y_test)
+
+    print('SVC prediction')
+    print(svc_pred)
+
+    print('LinearSVC prediction')
+    print(lin_svc_pred)
 
     print('Evaluation')
     svc_score = svc.score(x_test, y_test)
