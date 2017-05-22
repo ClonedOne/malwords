@@ -1,4 +1,5 @@
 from collections import Counter
+from utilities import constants
 import json
 import math
 import os
@@ -18,6 +19,7 @@ def compute_tf_idf(data_pack):
     dir_malwords = data_pack[4]
     dir_store = data_pack[5]
     multiplier = data_pack[6]
+    selected_words = data_pack[7]
 
     norm_factor = 0.4
 
@@ -35,7 +37,7 @@ def compute_tf_idf(data_pack):
                 count = int(line[1])
 
                 # avoid excluded words
-                if word not in dfs:
+                if word not in selected_words:
                     continue
 
                 words[word] = count
@@ -57,7 +59,11 @@ def compute_tf_idf(data_pack):
             tf_idf[word] = tf * idf
 
         json.dump(tf_idf, open(os.path.join(dir_store, uuid), "w"), indent=2)
-        # json.dump(sorted(tf_idf.items(), key=lambda x: x[1], reverse=True), open(os.path.join('temp', uuid), "w"), indent=2)
+        json.dump(
+            sorted(tf_idf.items(), key=lambda x: x[1], reverse=True),
+            open(os.path.join(constants.dir_d, constants.dir_dt, uuid), "w"),
+            indent=2
+        )
         # print(uuid, total_words, document_length)
 
 

@@ -1,9 +1,18 @@
+from utilities import constants
 import json
 import os
 
 
-def prepare_vt():
-    config = json.load(open('config.json'))
+def prepare_vt(config):
+    """
+    Prepares a formatted input file for the AVClass tool.
+    
+    :param config: 
+    :return: 
+    """
+
+    print('Preparing AVClass input file.')
+
     reduced_vts = get_aggregated_vt(config['dir_vt'])
     create_avclass_input(reduced_vts)
 
@@ -47,10 +56,6 @@ def create_avclass_input(reduced_vts):
     :return: 
     """
 
-    with open('data/avc_input.json', 'w', encoding='utf-8', errors='replace') as avc:
+    with open(os.path.join(constants.dir_d, constants.json_avc_input), 'w', encoding='utf-8', errors='replace') as avc:
         for reduced_vt in reduced_vts:
             avc.write(json.dumps(reduced_vt) + '\n')
-
-
-if __name__ == '__main__':
-    prepare_vt()

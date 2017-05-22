@@ -6,43 +6,66 @@ import os
 f_ext = '_ss.txt.gz'
 err_msg = 'Please choose the subset of data to extract:\n' \
           'l for labeled samples\n' \
-          'k for 987 samples of families mydoom, neobar, gepys, lamer, neshta, bladabindi, flystudio\n' \
-          's for 8 samples of families mydoom gepys, bladabindi, flystudio\n' \
-          'f for a single family' \
-          'j for json list of uuids'
+          'k for samples of families mydoom, neobar, gepys, lamer, neshta, bladabindi, flystudio\n' \
+          's for 8 samples of families mydoom, gepys, bladabindi, flystudio\n' \
+          'f for a single family\n' \
+          'j for json list of uuids\n' \
+          'q to quit\n'
+json_msg = 'Please specify the json file\n'
+family_msg = 'Specify malware family name\n'
 
 
-def main():
-    config = json.load(open('config.json'))
+def subset(config):
+    """
+    Subset the data-set for analysis.
+    
+    :param config: 
+    :return: 
+    """
 
-    if len(sys.argv) < 2:
-        print(err_msg)
-        exit()
+    subset_type = ""
 
-    if sys.argv[1] == 'l':
-        get_labeled(config)
+    while subset_type == "":
+        subset_type = input(err_msg)
 
-    elif sys.argv[1] == 'k':
-        load_samples(config)
+        if subset_type == 'l':
+            get_labeled(config)
 
-    elif sys.argv[1] == 'f':
-        get_family(config)
+        elif subset_type == 'k':
+            load_samples(config)
 
-    elif sys.argv[1] == 's':
-        load_samples(config, small=True)
+        elif subset_type == 'f':
+            family = input(family_msg)
+            get_family(config, family)
 
-    elif sys.argv[1] == 'j':
-        if len(sys.argv) < 3 or not os.path.isfile(sys.argv[2]):
-            print(err_msg)
+        elif subset_type == 's':
+            load_samples(config, small=True)
+
+        elif subset_type == 'j':
+            json_file = input(json_msg)
+
+            if not os.path.isfile(json_file):
+                print('json file not found')
+                exit()
+
+            from_json(config, json_file)
+
+        elif subset_type == 'q':
             exit()
 
-        from_json(config, sys.argv[2])
-
-    else:
-        print(err_msg)
+        else:
+            subset_type = ""
+            print(err_msg)
 
 
 def get_labeled(config):
+    """
+    Take oly samples for which there is a known malware family label.
+    
+    :param config: 
+    :return: 
+    """
+
     labels = json.load(open('data/labels.json'))
     print('Total labeled:', len(labels))
     not_labeled = []
@@ -65,6 +88,14 @@ def get_labeled(config):
 
 
 def load_samples(config, small=False):
+    """
+    Take samples of 7 specific families or a very small subset for testing. 
+    
+    :param config: 
+    :param small: 
+    :return: 
+    """
+
     inv_labels = json.load(open('data/inverted_labels.json'))
     print('Number of malware families', len(inv_labels))
 
@@ -95,6 +126,14 @@ def load_samples(config, small=False):
 
 
 def from_json(config, file_name):
+    """
+    Get samples specified in a json file.
+    
+    :param config: 
+    :param file_name: 
+    :return: 
+    """
+
     uuids = json.load(open(file_name))
     for uuid in uuids:
         if os.path.isfile(os.path.join(config['dir_malwords'], uuid + f_ext)):
@@ -104,20 +143,24 @@ def from_json(config, file_name):
             )
 
 
-def get_family(config):
-    if len(sys.argv) < 3:
-        print('Specify malware family name')
-        exit()
-    family = sys.argv[2]
+def get_family(config, family):
+    """
+    Get all samples of a specified family.
+    
+    :param config: 
+    :param family: 
+    :return: 
+    """
 
     inv_labels = json.load(open('data/inverted_labels.json'))
+
+    if family not in inv_labels:
+        print('Malware family not found')
+        exit()
+
     for uuid in inv_labels[family]:
         if os.path.isfile(os.path.join(config['dir_malwords'], uuid + f_ext)):
             copyfile(
                 os.path.join(config['dir_malwords'], uuid + f_ext),
                 os.path.join(config['dir_mini'], uuid + f_ext)
             )
-
-
-if __name__ == '__main__':
-    main()

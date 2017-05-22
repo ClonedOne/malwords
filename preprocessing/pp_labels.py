@@ -1,16 +1,25 @@
-import json
 from collections import defaultdict
-
 from utilities import db_manager
+from utilities import constants
+import json
+import os
 
 
-def get_labels():
-    config = json.load(open('config.json'))
+def get_labels(config):
+    """
+    Generates json files mapping uuids to malware families.
+    
+    :param config: 
+    :return: 
+    """
+
+    print('Reading labels from AVClass output')
+
     md5_uuid = db_manager.acquire_md5_uuid(config['dir_db'])
     uuid_label = get_uuid_labels(md5_uuid)
     label_uuid = get_inverted_labels(md5_uuid)
-    dump_labels(uuid_label, 'labels.json')
-    dump_labels(label_uuid, 'inverted_labels.json')
+    dump_labels(uuid_label, constants.json_labels)
+    dump_labels(label_uuid, constants.json_inverted_labels)
 
 
 def get_uuid_labels(md5_uuid):
@@ -22,8 +31,9 @@ def get_uuid_labels(md5_uuid):
     """
 
     uuid_labels = {}
+    file_name = os.path.join(constants.dir_d, constants.file_labels)
 
-    with open('data/labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
+    with open(file_name, 'r', encoding='utf-8', errors='replace') as labels_file:
         for line in labels_file:
             line = line.strip().split('\t')
 
@@ -46,8 +56,9 @@ def get_inverted_labels(md5_uuid):
     """
 
     inverted_labels = defaultdict(list)
+    file_name = os.path.join(constants.dir_d, constants.file_labels)
 
-    with open('data/labels.txt', 'r', encoding='utf-8', errors='replace') as labels_file:
+    with open(file_name, 'r', encoding='utf-8', errors='replace') as labels_file:
         for line in labels_file:
             line = line.strip().split('\t')
 
@@ -70,11 +81,7 @@ def dump_labels(labels, out_file_name):
     :return: 
     """
 
-    out_path = 'data/' + out_file_name
+    out_path = os.path.join(constants.dir_d, out_file_name)
 
     with open(out_path, 'w', encoding='utf-8', errors='replace') as out_file:
         json.dump(labels, out_file, indent=2)
-
-
-if __name__ == '__main__':
-    get_labels()
