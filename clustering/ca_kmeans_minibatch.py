@@ -7,7 +7,6 @@ from scipy.sparse import *
 import numpy as np
 import random
 import json
-import sys
 import os
 
 dir_store = ''
@@ -15,7 +14,7 @@ mini_batch_size = 0
 core_num = 1
 
 
-def cluster():
+def cluster(config, clusters):
     """
     Cluster the documents using out of core Mini Batch KMeans. 
     
@@ -23,15 +22,10 @@ def cluster():
     """
 
     global dir_store, core_num, mini_batch_size
-    config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
     mini_batch_size = config['batch_size']
-
-    if len(sys.argv) < 2:
-        print('Missing number of clusters')
-        exit()
-    num_clusters = int(sys.argv[1])
+    num_clusters = clusters
 
     k_means = MiniBatchKMeans(n_clusters=num_clusters, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
@@ -206,7 +200,3 @@ def get_data_matrix(data_pack):
     data = data.tocoo()
     print('{} - {}'.format(process_id, data.count_nonzero()))
     return process_id, data
-
-
-if __name__ == '__main__':
-    cluster()

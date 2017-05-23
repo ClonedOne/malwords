@@ -6,15 +6,13 @@ from utilities import utils
 import seaborn as sns
 import numpy as np
 import hdbscan
-import json
-import sys
 import os
 
 dir_store = ''
 core_num = 1
 
 
-def cluster():
+def cluster(config, data_matrix, distance):
     """
     Cluster the documents using out of core Mini Batch KMeans. 
 
@@ -22,15 +20,11 @@ def cluster():
     """
 
     global dir_store, core_num
-    config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
 
-    if len(sys.argv) < 3:
-        print('Please specify distance metric (e for euclidean or c for cosine) and the data matrix file')
-        return
-    distance_type = sys.argv[1]
-    matrix_file = sys.argv[2]
+    distance_type = distance
+    matrix_file = data_matrix
 
     data = np.loadtxt(matrix_file)
     uuids = sorted(os.listdir(dir_store))

@@ -4,8 +4,6 @@ from utilities import output
 import utilities.evaluation
 from utilities import utils
 import numpy as np
-import json
-import sys
 import os
 
 dir_store = ''
@@ -13,7 +11,7 @@ core_num = 1
 max_iter = 5000
 
 
-def cluster():
+def cluster(config, data_matrix, clusters):
     """
     Cluster the documents using KMeans algorithm. 
 
@@ -21,16 +19,11 @@ def cluster():
     """
 
     global dir_store, core_num
-    config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
 
-    if len(sys.argv) < 3:
-        print('Please provide the data matrix file and the desired maximum number of clusters')
-        exit()
-
-    matrix_file = sys.argv[1]
-    num_clusters_max = int(sys.argv[2])
+    matrix_file = data_matrix
+    num_clusters_max = clusters
 
     uuids = sorted(os.listdir(dir_store))
     data = np.loadtxt(matrix_file)
@@ -91,7 +84,3 @@ def test_kmeans_clusters(data, base_labels, num_clusters_max):
     print('-' * 80)
     for sh in sorted(silhouettes.items(), key=itemgetter(1), reverse=True):
         print('Clusters {} Silhouette {}'.format(sh[0], sh[1]))
-
-
-if __name__ == '__main__':
-    cluster()

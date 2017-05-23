@@ -4,25 +4,17 @@ from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
 from utilities import utils
 import numpy as np
-import json
-import sys
 import os
 
 
-def classify():
+def classify(config, matrix_file):
     """
     Classify the documents using SVM and the AVClass labels as base truth.
 
     :return: 
     """
 
-    config = json.load(open('config.json'))
     dir_store = config['dir_store']
-
-    if len(sys.argv) < 2:
-        print('Please provide the data matrix file')
-        exit()
-    matrix_file = sys.argv[1]
 
     data = np.loadtxt(matrix_file)
     uuids = sorted(os.listdir(dir_store))
@@ -67,7 +59,3 @@ def classify():
     print('Linear SVC score:', lin_svc_score)
     print('SVC Precision Recall Fscore: {} {} {}'.format(svc_prf[0], svc_prf[1], svc_prf[2]))
     print('Linear SVC Precision Recall Fscore: {} {} {}'.format(lin_svc_prf[0], lin_svc_prf[1], lin_svc_prf[2]))
-
-
-if __name__ == '__main__':
-    classify()

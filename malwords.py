@@ -1,6 +1,9 @@
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_kernel_pca, dr_tsne
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf
+from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch
 from distances import compare_distances
+from classification import ca_svm
+from utilities import interaction
 from utilities import constants
 import json
 import sys
@@ -19,6 +22,13 @@ msg_dr = 'Please select a dimensionality reduction technique:\n' \
          'lda\n' \
          's to skip dimensionality reduction\n' \
          'q to quit\n'
+msg_ca = 'Please select a clustering or classification technique:\n' \
+         'kmeans for standard KMeans on feature selected data-set\n' \
+         'mini_kmeans for mini batch KMeans\n' \
+         'hdbscan for HDBSCAN on feature selected data-set\n' \
+         'svm for linear SVM on feature selected data-set\n' \
+         's to skip clustering/classification\n' \
+         'q to quit\n'
 
 
 def main():
@@ -28,8 +38,55 @@ def main():
 
     dimensionality_reduction(config)
 
+    cluster_classify(config)
+
 
 # Main lifecycle
+
+def cluster_classify(config):
+    """
+    Perform a clustering or classification step.
+    
+    :param config: 
+    :return: 
+    """
+
+    msg_clusters = 'clusters'
+    msg_data = 'data matrix file'
+
+    # Prompts the user to select an action
+    ca = ""
+    while ca == "":
+        ca = input(msg_ca)
+
+        if ca == 'kmeans':
+            clusters = interaction.ask_number(msg_clusters)
+            data_matrix = interaction.ask_file(msg_data)
+            ca_kmeans.cluster(config, data_matrix, clusters)
+
+        elif ca == 'mini_kmeans':
+            clusters = interaction.ask_number(msg_clusters)
+            ca_kmeans_minibatch.cluster(config, clusters)
+
+        elif ca == 'hdbscan':
+            data_matrix = interaction.ask_file(msg_data)
+            distance = interaction.ask_metric()
+            ca_hdbscan.cluster(config, data_matrix, distance)
+
+        elif ca == 'svm':
+            data_matrix = interaction.ask_file(msg_data)
+            ca_svm.classify(config, data_matrix)
+
+        elif ca == 's':
+            return
+
+        elif ca == 'q':
+            exit()
+
+        else:
+            pre_process('Not a valid input\n')
+            ca = ""
+
 
 def dimensionality_reduction(config):
     """
@@ -38,6 +95,8 @@ def dimensionality_reduction(config):
     :param config: 
     :return: 
     """
+
+    msg_components = 'components'
 
     # Check if user has specified any action
     if len(sys.argv) > 1:
@@ -49,39 +108,39 @@ def dimensionality_reduction(config):
             exit()
 
     # Prompts the user to select an action
-    action = ""
-    while action == "":
-        action = input(msg_dr)
+    dr = ""
+    while dr == "":
+        dr = input(msg_dr)
 
-        if action == 'pca':
-            components = ask_components()
+        if dr == 'pca':
+            components = interaction.ask_number(msg_components)
             dr_pca.get_pca(config, components)
 
-        elif action == 'svd':
-            components = ask_components()
+        elif dr == 'svd':
+            components = interaction.ask_number(msg_components)
             dr_svd.get_svd(config, components)
 
-        elif action == 'kernel-pca':
-            components = ask_components()
+        elif dr == 'kernel-pca':
+            components = interaction.ask_number(msg_components)
             dr_kernel_pca.get_kern_pca(config, components)
 
-        elif action == 'tnse':
-            components = ask_components()
+        elif dr == 'tnse':
+            components = interaction.ask_number(msg_components)
             dr_tsne.get_tsne(config, components)
 
-        elif action == 'lda':
-            components = ask_components()
+        elif dr == 'lda':
+            components = interaction.ask_number(msg_components)
             dr_lda.get_lda(config, components)
 
-        elif action == 's':
+        elif dr == 's':
             return
 
-        elif action == 'q':
+        elif dr == 'q':
             exit()
 
         else:
             pre_process('Not a valid input\n')
-            action = ""
+            dr = ""
 
 
 def pre_process(config):
@@ -118,35 +177,6 @@ def pre_process(config):
 
     if len(os.listdir(config['dir_store'])) == 0:
         pp_tfidf.get_tf_idf(config)
-
-
-# Helper methods
-
-def ask_components():
-    """
-    Ask user for the number of components
-    
-    :return: 
-    """
-
-    msg_components = 'Please select the desired number of components (q to quit)\n'
-    components = 0
-
-    while components == 0:
-
-        components = input(msg_components)
-
-        if components == 'q':
-            exit()
-
-        try:
-            components = int(components)
-
-        except:
-            pre_process('Not a valid input\n')
-            components = 0
-
-    return components
 
 
 if __name__ == '__main__':
