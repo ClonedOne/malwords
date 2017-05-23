@@ -1,3 +1,4 @@
+from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_kernel_pca, dr_tsne
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf
 from distances import compare_distances
 from utilities import constants
@@ -16,6 +17,7 @@ msg_dr = 'Please select a dimensionality reduction technique:\n' \
          'kernel-pca\n' \
          'tnse\n' \
          'lda\n' \
+         's to skip dimensionality reduction\n' \
          'q to quit\n'
 
 
@@ -51,7 +53,30 @@ def dimensionality_reduction(config):
     while action == "":
         action = input(msg_dr)
 
-        if action == 'q':
+        if action == 'pca':
+            components = ask_components()
+            dr_pca.get_pca(config, components)
+
+        elif action == 'svd':
+            components = ask_components()
+            dr_svd.get_svd(config, components)
+
+        elif action == 'kernel-pca':
+            components = ask_components()
+            dr_kernel_pca.get_kern_pca(config, components)
+
+        elif action == 'tnse':
+            components = ask_components()
+            dr_tsne.get_tsne(config, components)
+
+        elif action == 'lda':
+            components = ask_components()
+            dr_lda.get_lda(config, components)
+
+        elif action == 's':
+            return
+
+        elif action == 'q':
             exit()
 
         else:
@@ -93,6 +118,35 @@ def pre_process(config):
 
     if len(os.listdir(config['dir_store'])) == 0:
         pp_tfidf.get_tf_idf(config)
+
+
+# Helper methods
+
+def ask_components():
+    """
+    Ask user for the number of components
+    
+    :return: 
+    """
+
+    msg_components = 'Please select the desired number of components (q to quit)\n'
+    components = 0
+
+    while components == 0:
+
+        components = input(msg_components)
+
+        if components == 'q':
+            exit()
+
+        try:
+            components = int(components)
+
+        except:
+            pre_process('Not a valid input\n')
+            components = 0
+
+    return components
 
 
 if __name__ == '__main__':

@@ -1,38 +1,33 @@
 from sklearn.decomposition import TruncatedSVD
 from multiprocessing import Pool
+from utilities import constants
 from workers import wk_sparse
 from utilities import utils
 from scipy.sparse import *
 import numpy as np
 import json
-import sys
 import os
 
 dir_store = ''
 mini_batch_size = 0
 core_num = 1
-components = 0
+num_components = 0
 
 
-def get_svd():
+def get_svd(config, components):
     """
     Lower dimensionality of data vectors using SVD.
 
     :return: 
     """
 
-    global dir_store, core_num, mini_batch_size, components
-    config = json.load(open('config.json'))
+    global dir_store, core_num, mini_batch_size, num_components
     dir_store = config['dir_store']
     core_num = config['core_num']
-
-    if len(sys.argv) < 2:
-        print('Specify number of components')
-        exit()
-    components = int(sys.argv[1])
+    num_components = components
 
     svd = TruncatedSVD(n_components=components, random_state=42)
-    words = json.load(open('data/words.json', 'r'))
+    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     uuids = sorted(os.listdir(dir_store))
 
     # Force loading of full dataset in RAM (may result in MEMORY ERROR!)
@@ -50,7 +45,7 @@ def get_svd():
 
 def transform_vectors(svd, decomposed, rows, cols, uuids, words):
     """
-    Transform vectors using tSNE    
+    Transform vectors using SVD.    
 
     :return: 
     """
@@ -83,9 +78,5 @@ def transform_vectors(svd, decomposed, rows, cols, uuids, words):
 
         new_data = svd.fit_transform(data)
 
-        matrix_file = "data/matrix_svd_{}.txt".format(components)
+        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "svd_{}.txt".format(num_components))
         np.savetxt(open(matrix_file, "ab"), new_data)
-
-
-if __name__ == '__main__':
-    get_svd()

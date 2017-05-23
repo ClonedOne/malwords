@@ -1,41 +1,36 @@
 from sklearn.manifold import TSNE
 from multiprocessing import Pool
+from utilities import constants
 from workers import wk_sparse
 from utilities import utils
 from scipy.sparse import *
 import numpy as np
 import json
-import sys
 import os
 
 dir_store = ''
 mini_batch_size = 0
 core_num = 1
-components = 0
+num_components = 0
 
 
-def get_tsne():
+def get_tsne(config, components):
     """
     Lower dimensionality of data vectors using tSNE.
 
     :return: 
     """
 
-    global dir_store, core_num, mini_batch_size, components
-    config = json.load(open('config.json'))
+    global dir_store, core_num, mini_batch_size, num_components
     dir_store = config['dir_store']
     core_num = config['core_num']
+    num_components = components
 
-    if len(sys.argv) < 2:
-        print('Specify number of components')
-        exit()
-    components = int(sys.argv[1])
-
-    tsne = TSNE(n_components=components, random_state=42, method='exact')
-    words = json.load(open('data/words.json', 'r'))
+    tsne = TSNE(n_components=components, method='exact')
+    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     uuids = sorted(os.listdir(dir_store))
 
-    # Force loading of full dataset in RAM (may be a problem with low memory!)
+    # Force loading of full data-set in RAM (may be a problem with low memory!)
     mini_batch_size = len(uuids)
 
     cols = len(words)
@@ -55,10 +50,10 @@ def transform_vectors(tsne, decomposed, rows, cols, uuids, words):
     :return: 
     """
 
-    # Divide the docuements in mini batches of fixed size and apply Incremental PCA on them
+    # Divide the documents in mini batches of fixed size and apply Incremental PCA on them
     while decomposed < rows:
-
         print('Transforming documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
+
         # starting from the decomposed-th element of the uuids list
         file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
         formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store))
@@ -83,9 +78,5 @@ def transform_vectors(tsne, decomposed, rows, cols, uuids, words):
 
         new_data = tsne.fit_transform(data)
 
-        matrix_file = "data/matrix_tsne_{}.txt".format(components)
+        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "tsne_{}.txt".format(num_components))
         np.savetxt(open(matrix_file, "ab"), new_data)
-
-
-if __name__ == '__main__':
-    get_tsne()

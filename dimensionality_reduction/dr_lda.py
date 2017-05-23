@@ -1,38 +1,33 @@
 from sklearn.decomposition import LatentDirichletAllocation
 from multiprocessing import Pool
+from utilities import constants
 from workers import wk_dense
 from utilities import utils
 import numpy as np
 import random
 import json
-import sys
 import os
 
 dir_store = ''
 mini_batch_size = 0
 core_num = 1
-components = 0
+num_components = 0
 
 
-def get_lda():
+def get_lda(config, components):
     """
     Apply Latent Dirichlet Allocation to the tf-idf vectors.
 
     :return: 
     """
 
-    global dir_store, core_num, mini_batch_size, components
-    config = json.load(open('config.json'))
+    global dir_store, core_num, mini_batch_size, num_components
     dir_store = config['dir_store']
     core_num = config['core_num']
     mini_batch_size = config['batch_size']
+    num_components = components
 
-    if len(sys.argv) < 2:
-        print('Specify number of components')
-        exit()
-    components = int(sys.argv[1])
-
-    words = json.load(open('data/words.json', 'r'))
+    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     uuids = sorted(os.listdir(dir_store))
     rand_uuids = random.sample(uuids, len(uuids))
 
@@ -120,9 +115,5 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
 
         new_data = i_pca.transform(data)
 
-        matrix_file = "data/matrix_lda_{}.txt".format(components)
+        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "lda_{}.txt".format(num_components))
         np.savetxt(open(matrix_file, "ab"), new_data)
-
-
-if __name__ == '__main__':
-    get_lda()
