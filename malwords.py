@@ -1,5 +1,5 @@
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_kernel_pca, dr_tsne
-from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf
+from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js
 from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch
 from distances import compare_distances
 from classification import ca_svm
@@ -84,7 +84,7 @@ def cluster_classify(config):
             exit()
 
         else:
-            pre_process('Not a valid input\n')
+            print('Not a valid input\n')
             ca = ""
 
 
@@ -139,7 +139,7 @@ def dimensionality_reduction(config):
             exit()
 
         else:
-            pre_process('Not a valid input\n')
+            print('Not a valid input\n')
             dr = ""
 
 
@@ -177,6 +177,9 @@ def pre_process(config):
 
     if len(os.listdir(config['dir_store'])) == 0:
         pp_tfidf.get_tf_idf(config)
+
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)):
+        pp_js.get_js(config)
 
 
 if __name__ == '__main__':

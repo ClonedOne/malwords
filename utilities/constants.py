@@ -16,6 +16,7 @@ dir_dv = 'data_visualize'
 # File names
 
 file_labels = 'labels.txt'
+file_js = 'jensen_shannon.txt'
 json_avc_input = 'avc_input.json'
 json_labels = 'labels.json'
 json_inverted_labels = 'inverted_labels.json'

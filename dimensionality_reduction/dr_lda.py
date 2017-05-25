@@ -1,7 +1,7 @@
 from sklearn.decomposition import LatentDirichletAllocation
+from workers import wk_read_tfidf
 from multiprocessing import Pool
 from utilities import constants
-from workers import wk_dense
 from utilities import utils
 import numpy as np
 import random
@@ -56,9 +56,9 @@ def train_lda(lda, decomposed, rows, cols, rand_uuids, words):
         print('Processing documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
         # starting from the decomposed-th element of the uuids list
         file_name_lists = utils.divide_workload(rand_uuids[decomposed:][:mini_batch_size], core_num)
-        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store))
+        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, True))
         pool = Pool(processes=core_num)
-        results = pool.map(wk_dense.get_data_matrix, formatted_input)
+        results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
         pool.close()
         pool.join()
 
@@ -92,9 +92,9 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
         print('Transforming documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
         # starting from the decomposed-th element of the uuids list
         file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
-        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store))
+        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, True))
         pool = Pool(processes=core_num)
-        results = pool.map(wk_dense.get_data_matrix, formatted_input)
+        results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
         pool.close()
         pool.join()
 

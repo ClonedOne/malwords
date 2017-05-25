@@ -1,7 +1,7 @@
 from sklearn.metrics.pairwise import *
+from workers import wk_read_tfidf
 from multiprocessing import Pool
 from utilities import constants
-from workers import wk_dense
 from utilities import utils
 import numpy as np
 import json
@@ -27,14 +27,14 @@ def compute_distances(config):
 
     cols = len(words)
 
-    # Force loading of full dataset in RAM (may be a problem with low memory!)
+    # Force loading of full data-set in RAM (may be a problem with low memory!)
     mini_batch_size = len(uuids)
     decomposed = 0
 
     file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
-    formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store))
+    formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, True))
     pool = Pool(processes=core_num)
-    results = pool.map(wk_dense.get_data_matrix, formatted_input)
+    results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
     pool.close()
     pool.join()
 

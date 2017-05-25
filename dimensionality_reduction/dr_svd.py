@@ -1,7 +1,7 @@
 from sklearn.decomposition import TruncatedSVD
+from workers import wk_read_tfidf
 from multiprocessing import Pool
 from utilities import constants
-from workers import wk_sparse
 from utilities import utils
 from scipy.sparse import *
 import numpy as np
@@ -26,7 +26,7 @@ def get_svd(config, components):
     core_num = config['core_num']
     num_components = components
 
-    svd = TruncatedSVD(n_components=components, random_state=42)
+    svd = TruncatedSVD(n_components=components)
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     uuids = sorted(os.listdir(dir_store))
 
@@ -56,9 +56,9 @@ def transform_vectors(svd, decomposed, rows, cols, uuids, words):
         print('Transforming documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
         # starting from the decomposed-th element of the uuids list
         file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
-        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store))
+        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, False))
         pool = Pool(processes=core_num)
-        results = pool.map(wk_sparse.get_data_matrix, formatted_input)
+        results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
         pool.close()
         pool.join()
 
