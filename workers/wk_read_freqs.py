@@ -1,6 +1,5 @@
 from scipy.sparse import *
 import numpy as np
-import sys
 import os
 
 
@@ -38,7 +37,6 @@ def get_data_matrix(data_pack):
     for uuid in uuids:
         cur_row = extract_freqs(os.path.join(dir_files, uuid + '_ss.txt'), words, cols)
         data[row] = cur_row
-
         row += 1
 
     if dense:

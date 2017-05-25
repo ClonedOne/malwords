@@ -1,7 +1,6 @@
 from scipy.sparse import *
 import numpy as np
 import json
-import sys
 import os
 
 
@@ -39,7 +38,6 @@ def get_data_matrix(data_pack):
     for uuid in uuids:
         cur_row = extract_tfidf(os.path.join(dir_files, uuid), words, cols)
         data[row] = cur_row
-
         row += 1
 
     if dense:

@@ -50,11 +50,10 @@ def compute_js_dist(vec1, vec2):
     :return: jensen-shannon distance of the 2 word count vectors
     """
 
-    # vec1 = vec1.toarray()
-    # vec2 = vec2.toarray()
+    vec1 = vec1.toarray().flatten()
+    vec2 = vec2.toarray().flatten()
 
     vec1 = laplace_smoothing(vec1)
     vec2 = laplace_smoothing(vec2)
 
     return jensen_shannon_dist(vec1, vec2)
-

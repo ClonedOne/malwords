@@ -30,22 +30,13 @@ def get_js(config):
     mini_batch_size = len(uuids)
     decomposed = 0
 
+    print('Acquiring frequency matrix')
     file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
     formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, False))
     pool = Pool(processes=core_num)
     results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
     pool.close()
     pool.join()
-
-    # # Sort results by their worker number
-    # acc = []
-    # # Each worker will return a list of size (mini_batch_size / core_num)
-    # for i in range(core_num):
-    #     for res in results:
-    #         if res[0] == i:
-    #             acc.append(res[1])
-    # data = np.concatenate(acc)
-    # print(data.nbytes)
 
     # sort results
     acc = []
@@ -60,6 +51,12 @@ def get_js(config):
     print(data.shape)
     print(data.sum())
 
-    # distances = pairwise_distances(data, metric=jensen_shannon.compute_js_dist, n_jobs=core_num)
-    # matrix_file = os.path.join(constants.dir_d, constants.file_js)
-    # np.savetxt(matrix_file, distances)
+    print('Computing the distances')
+    distances = pairwise_distances(data, metric=jensen_shannon.compute_js_dist, n_jobs=core_num)
+    # distances = pairwise_distances(data, metric=uno, n_jobs=core_num)
+    matrix_file = os.path.join(constants.dir_d, constants.file_js)
+    np.savetxt(matrix_file, distances)
+
+
+def uno(a, b):
+    return 1
