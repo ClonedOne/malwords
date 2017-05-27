@@ -1,7 +1,6 @@
+from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import precision_recall_fscore_support
-from sklearn.model_selection import train_test_split
 from workers import wk_read_tfidf
-from sklearn.svm import LinearSVC
 from multiprocessing import Pool
 from utilities import constants
 from sklearn.svm import SVC
@@ -20,6 +19,7 @@ def classify(config, matrix_file, sparse=False):
     """
 
     dir_store = config['dir_store']
+    core_num = config['core_num']
 
     print('Loading data')
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
@@ -30,47 +30,31 @@ def classify(config, matrix_file, sparse=False):
     print('Acquiring base labels')
     base_labels_dict = utils.get_base_labels()
     base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
+    print('Number of distinct families: {}'.format(len(set(base_labels))))
 
-    print('Split training and testing data')
-    x_train, x_test, y_train, y_test = train_test_split(data, base_labels, test_size=0.2)
-    print(len(x_train), len(x_test), len(y_train), len(y_test))
-
-    print('Traing SVM')
     svc = SVC(kernel='linear')
-    svc.fit(x_train, y_train)
-    svc_pred = svc.predict(x_test)
 
-    print('Base test labels')
-    print(y_test)
+    scores = cross_val_score(svc, data, base_labels, cv=10, n_jobs=core_num, scoring='f1_micro')
 
-    print('SVC prediction')
-    print(svc_pred)
-
-    print('Evaluation')
-    svc_score = svc.score(x_test, y_test)
-    svc_prf = precision_recall_fscore_support(y_test, svc_pred, average='micro')
-
-    print('SVC score:', svc_score)
-    print('SVC Precision Recall Fscore: {} {} {}'.format(svc_prf[0], svc_prf[1], svc_prf[2]))
+    print('F1 Scores of cross validation: {}'.format(scores))
+    print('Average F1 score: {}'.format(sum(scores)/len(scores)))
 
     if sparse:
-        del x_train, x_test, y_train, y_test, svc, data, svc_pred
+        del svc, scores, data
+        print('Classifying sparse full-size feature vectors')
 
         decomposed = 0
         mini_batch_size = len(uuids)
         core_num = config['core_num']
-
-        data_sparse = get_sparse_data(uuids, decomposed, mini_batch_size, core_num, len(words), words, dir_store)
-        x_train, x_test, y_train, y_test = train_test_split(data_sparse, base_labels, test_size=0.2)
-
         svc = SVC(kernel='linear')
-        svc.fit(x_train, y_train)
-        svc_pred = svc.predict(x_test)
 
-        svc_score = svc.score(x_test, y_test)
-        svc_prf = precision_recall_fscore_support(y_test, svc_pred, average='micro')
-        print('SVC score:', svc_score)
-        print('SVC Precision Recall Fscore: {} {} {}'.format(svc_prf[0], svc_prf[1], svc_prf[2]))
+        print('Loading sparse data')
+        data_sparse = get_sparse_data(uuids, decomposed, mini_batch_size, core_num, len(words), words, dir_store)
+
+        scores = cross_val_score(svc, data_sparse, base_labels, cv=10, n_jobs=core_num, scoring='f1_micro')
+
+        print('F1 Scores of cross validation: {}'.format(scores))
+        print('Average F1 score: {}'.format(sum(scores)/len(scores)))
 
 
 def get_sparse_data(uuids, decomposed, mini_batch_size, core_num, cols, words, dir_store):
