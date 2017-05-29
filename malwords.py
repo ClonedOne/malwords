@@ -143,6 +143,7 @@ def pre_process(config):
         os.makedirs(os.path.join(constants.dir_d, constants.dir_dt))
         os.makedirs(os.path.join(constants.dir_d, constants.dir_dv))
 
+    # Create AVClass input data if needed
     if not os.path.isfile(os.path.join(constants.dir_d, constants.file_labels)):
         pp_avclass.prepare_vt(config)
         print('Please run the AVClass tool and relaunch')
@@ -151,10 +152,8 @@ def pre_process(config):
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_labels)):
         pp_labels.get_labels(config)
 
-    if len(os.listdir(config['dir_mini'])) == 0:
-        pp_subset.subset(config)
-        print('Please unzip file (if necessary) and relaunch')
-        exit()
+    # Select the data subset to operate upon
+    pp_subset.subset(config)
 
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
         pp_idf.get_idf(config)

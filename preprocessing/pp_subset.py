@@ -2,9 +2,8 @@ from shutil import copyfile
 import json
 import os
 
-f_ext = '_ss.txt.gz'
-err_msg = 'Please choose the subset of data to extract:\n' \
-          'l for labeled samples\n' \
+err_msg = 'Please choose the subset of data to workon on:\n' \
+          'l for all labeled samples\n' \
           'k for samples of families mydoom, neobar, gepys, lamer, neshta, bladabindi, flystudio\n' \
           's for 8 samples of families mydoom, gepys, bladabindi, flystudio\n' \
           'f for a single family\n' \
@@ -116,12 +115,7 @@ def load_samples(config, small=False):
         datasets = [inv_labels[family] for family in familes]
 
     for dataset in datasets:
-        for f_name in dataset:
-            if os.path.isfile(os.path.join(config['dir_malwords'], f_name + f_ext)):
-                copyfile(
-                    os.path.join(config['dir_malwords'], f_name + f_ext),
-                    os.path.join(config['dir_mini'], f_name + f_ext)
-                )
+        copy_files(config, dataset)
 
 
 def from_json(config, file_name):
@@ -134,12 +128,7 @@ def from_json(config, file_name):
     """
 
     uuids = json.load(open(file_name))
-    for uuid in uuids:
-        if os.path.isfile(os.path.join(config['dir_malwords'], uuid + f_ext)):
-            copyfile(
-                os.path.join(config['dir_malwords'], uuid + f_ext),
-                os.path.join(config['dir_mini'], uuid + f_ext)
-            )
+    copy_files(config, uuids)
 
 
 def get_family(config, family):
@@ -157,7 +146,25 @@ def get_family(config, family):
         print('Malware family not found')
         exit()
 
-    for uuid in inv_labels[family]:
+    copy_files(config, inv_labels[family])
+
+
+def copy_files(config, uuids):
+    """
+    Copy all the files in uuids.
+
+    :param config:
+    :param uuids:
+    :return:
+    """
+
+    f_ext = '_ss.txt'
+
+    for file_name in os.listdir(config['dir_malwords']):
+        if '.gz' in file_name:
+            f_ext = '_ss.txt.gz'
+
+    for uuid in uuids:
         if os.path.isfile(os.path.join(config['dir_malwords'], uuid + f_ext)):
             copyfile(
                 os.path.join(config['dir_malwords'], uuid + f_ext),
