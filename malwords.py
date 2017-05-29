@@ -80,7 +80,7 @@ def cluster_classify(config):
 
         elif ca == 'mlp':
             data_matrix = interaction.ask_file(msg_data)
-            ca_mlp.classify(config, data_matrix, sparse=False)
+            ca_mlp.classify(config, data_matrix, sparse=True)
 
         elif ca == 's':
             return

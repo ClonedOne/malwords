@@ -1,3 +1,4 @@
+from sklearn.random_projection import SparseRandomProjection
 from sklearn.model_selection import cross_val_score
 from sklearn.neural_network import MLPClassifier
 from workers import wk_read_tfidf
@@ -32,8 +33,20 @@ def classify(config, matrix_file, sparse=False):
     print('Number of distinct families: {}'.format(len(set(base_labels))))
 
     mlp = MLPClassifier(
-        hidden_layer_sizes=(data.shape[1], int(data.shape[1] / 1.5), int(data.shape[1] / 2), int(data.shape[1] / 3), int(data.shape[1] / 4), len(set(base_labels))),
-        max_iter=20000
+        hidden_layer_sizes=(
+            data.shape[1],
+            int(data.shape[1] * 2),
+            int(data.shape[1] * 1.5),
+            data.shape[1],
+            int(data.shape[1] / 1.5),
+            int(data.shape[1] / 2),
+            int(data.shape[1] / 3),
+            int(data.shape[1] / 4),
+            len(set(base_labels))
+        ),
+        max_iter=20000,
+        solver='adam',
+
     )
 
     scores = cross_val_score(mlp, data, base_labels, cv=10, n_jobs=core_num, scoring='f1_micro')
@@ -49,14 +62,31 @@ def classify(config, matrix_file, sparse=False):
         mini_batch_size = len(uuids)
         core_num = config['core_num']
 
+        print('Loading sparse data')
+        data = get_sparse_data(uuids, decomposed, mini_batch_size, core_num, len(words), words, dir_store)
+
+        print('Dimensionality reduction through random projection')
+        srp = SparseRandomProjection(n_components=10000)
+        data = srp.fit_transform(data)
+
+        print(data.shape)
+
         mlp = MLPClassifier(
-            hidden_layer_sizes=(len(uuids), len(uuids) / 2, len(set(base_labels)))
+            hidden_layer_sizes=(
+                data.shape[1],
+                int(data.shape[1] / 1.5),
+                int(data.shape[1] / 2),
+                int(data.shape[1] / 3),
+                int(data.shape[1] / 4),
+                len(set(base_labels))
+            ),
+            max_iter=500,
+            solver='adam',
+
         )
 
-        print('Loading sparse data')
-        data_sparse = get_sparse_data(uuids, decomposed, mini_batch_size, core_num, len(words), words, dir_store)
-
-        scores = cross_val_score(mlp, data_sparse, base_labels, cv=10, n_jobs=core_num, scoring='f1_micro')
+        print('Classification via MLP')
+        scores = cross_val_score(mlp, data, base_labels, cv=10, n_jobs=core_num, scoring='f1_micro')
 
         print('F1 Scores of cross validation: {}'.format(scores))
         print('Average F1 score: {}'.format(sum(scores) / len(scores)))
