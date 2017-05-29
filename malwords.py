@@ -1,8 +1,8 @@
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_kernel_pca, dr_tsne
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js
 from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch
+from classification import ca_svm, ca_mlp
 from distances import compare_distances
-from classification import ca_svm
 from utilities import interaction
 from utilities import constants
 import json
@@ -11,10 +11,10 @@ import os
 
 # Action messages
 
-msg_argv = 'Please select a valid action:\n' \
+msg_argv = '\nPlease select a valid action:\n' \
            'compare-distance --> show various distance metrics applies to the samples\n' \
            'q to quit\n'
-msg_dr = 'Please select a dimensionality reduction technique:\n' \
+msg_dr = '\nPlease select a dimensionality reduction technique:\n' \
          'pca\n' \
          'svd\n' \
          'kernel-pca\n' \
@@ -22,11 +22,12 @@ msg_dr = 'Please select a dimensionality reduction technique:\n' \
          'lda\n' \
          's to skip dimensionality reduction\n' \
          'q to quit\n'
-msg_ca = 'Please select a clustering or classification technique:\n' \
+msg_ca = '\nPlease select a clustering or classification technique:\n' \
          'kmeans for standard KMeans on feature selected data-set\n' \
          'mini_kmeans for mini batch KMeans\n' \
-         'hdbscan for HDBSCAN on feature selected data-set\n' \
-         'svm for linear SVM on feature selected data-set\n' \
+         'hdbscan for HDBSCAN \n' \
+         'svm for linear SVM \n' \
+         'mlp for multilayer Perceptron \n' \
          's to skip clustering/classification\n' \
          'q to quit\n'
 
@@ -76,6 +77,10 @@ def cluster_classify(config):
         elif ca == 'svm':
             data_matrix = interaction.ask_file(msg_data)
             ca_svm.classify(config, data_matrix, sparse=True)
+
+        elif ca == 'mlp':
+            data_matrix = interaction.ask_file(msg_data)
+            ca_mlp.classify(config, data_matrix, sparse=False)
 
         elif ca == 's':
             return
