@@ -153,7 +153,7 @@ def pre_process(config):
         pp_labels.get_labels(config)
 
     # Select the data subset to operate upon
-    pp_subset.subset(config)
+    # pp_subset.subset(config)
 
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
         pp_idf.get_idf(config)

@@ -1,5 +1,5 @@
 from collections import Counter
-from utilities import constants
+import subprocess
 import json
 import math
 import os
@@ -24,28 +24,41 @@ def compute_tf_idf(data_pack):
     norm_factor = 0.4
 
     for sample in sorted(file_name_list):
+
+        # Initialize per-file variables
+        freqs_file = os.path.join(dir_malwords, sample)
+        uuid = sample.split('.')[0][:-3]
         words = Counter()
-        total_words = 0
-        document_length = 0
-
-        # Scan once the bag of words files and memorize the words in a temporary per-file dictionary
-        with open(os.path.join(dir_malwords, sample), 'rb') as words_file:
-            for line in words_file:
-                line = line.strip().split()
-
-                word = line[0].decode('utf-8')
-                count = int(line[1])
-
-                # avoid excluded words
-                if word not in selected_words:
-                    continue
-
-                words[word] = count
-                document_length += count
-                total_words += 1
-
-        uuid = sample[:-7]
+        in_file = None
+        proc = None
         tf_idf = {}
+
+        # If it is a zipped file use fast gzip cat
+        if os.path.splitext(freqs_file)[1] == '.gz':
+            proc = subprocess.Popen(['gzip', '-cdfq', freqs_file], stdout=subprocess.PIPE, bufsize=4096)
+            lines = proc.stdout
+        else:
+            in_file = open(freqs_file, 'rb')
+            lines = in_file
+
+        # Retrieve word frequencies
+        for line in lines:
+            line = line.strip().split()
+
+            word = line[0].decode('utf-8')
+            count = int(line[1])
+
+            # avoid excluded words
+            if word not in selected_words:
+                continue
+
+            words[word] = count
+
+        # Cleanup
+        if os.path.splitext(freqs_file)[1] == '.gz':
+            proc.terminate()
+        else:
+            in_file.close()
 
         # find the most frequent word
         most_freq = max(list(words.values()))
@@ -53,8 +66,10 @@ def compute_tf_idf(data_pack):
         # Compute the term frequency of a word using double normalization
         for word in words:
             tf = norm_factor + ((1 - norm_factor) * (float(words[word]) / float(most_freq)))
+
             if multiplier:
                 tf = tf * len(word)
+
             idf = math.log(total_documents / float(dfs[word]))
             tf_idf[word] = tf * idf
 
@@ -74,12 +89,29 @@ def compute_df(data_pack):
 
     for sample in sorted(file_name_list):
 
-        with open(os.path.join(dir_malwords, sample), 'rb') as words_file:
+        # Initialize per-file variables
+        freqs_file = os.path.join(dir_malwords, sample)
+        in_file = None
+        proc = None
 
-            for line in words_file:
-                line = line.strip().split()
+        # If it is a zipped file use fast gzip cat
+        if os.path.splitext(freqs_file)[1] == '.gz':
+            proc = subprocess.Popen(['gzip', '-cdfq', freqs_file], stdout=subprocess.PIPE, bufsize=4096)
+            lines = proc.stdout
+        else:
+            in_file = open(freqs_file, 'rb')
+            lines = in_file
 
-                word = line[0].decode('utf-8')
-                dfs[word] += 1
+        for line in lines:
+            line = line.strip().split()
+
+            word = line[0].decode('utf-8')
+            dfs[word] += 1
+
+        # Cleanup
+        if os.path.splitext(freqs_file)[1] == '.gz':
+            proc.terminate()
+        else:
+            in_file.close()
 
     return dfs

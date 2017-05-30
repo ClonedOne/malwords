@@ -1,5 +1,6 @@
 from scipy.sparse import *
 import numpy as np
+import subprocess
 import os
 
 
@@ -48,7 +49,7 @@ def get_data_matrix(data_pack):
 
 def extract_freqs(freqs_file, words, cols):
     """
-    Extracts frequency vectors from bag-of-words files.
+    Extracts frequency vectors from bag-of-words files. Supports gzipped files.
     
     :param freqs_file: bag-of-words file 
     :param words: dictionary of valid words and related indices
@@ -57,18 +58,31 @@ def extract_freqs(freqs_file, words, cols):
     """
 
     cur_row = np.zeros(cols)
+    proc = None
+    in_file = None
 
-    with open(freqs_file, 'rb') as in_file:
-        for line in in_file:
-            line = line.strip().split()
+    if os.path.splitext(freqs_file)[1] == '.gz':
+        proc = subprocess.Popen(['gzip', '-cdfq', freqs_file], stdout=subprocess.PIPE, bufsize=4096)
+        lines = proc.stdout
+    else:
+        in_file = open(freqs_file, 'rb')
+        lines = in_file
 
-            word = line[0].decode('utf-8')
-            count = int(line[1])
+    for line in lines:
+        line = line.strip().split()
 
-            if word not in words:
-                continue
+        word = line[0].decode('utf-8')
+        count = int(line[1])
 
-            word_id = words[word]
-            cur_row[word_id] = count
+        if word not in words:
+            continue
+
+        word_id = words[word]
+        cur_row[word_id] = count
+
+    if os.path.splitext(freqs_file)[1] == '.gz':
+        proc.terminate()
+    else:
+        in_file.close()
 
     return cur_row
