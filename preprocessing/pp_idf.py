@@ -14,7 +14,7 @@ def get_idf(config):
     :return: 
     """
 
-    dir_malwords = config['dir_mini']
+    dir_malwords = config['dir_malwords']
     core_num = config['core_num']
     dir_base = config['dir_base']
 

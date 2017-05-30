@@ -13,7 +13,7 @@ def get_tf_idf(config):
     :return: 
     """
 
-    dir_malwords = config['dir_mini']
+    dir_malwords = config['dir_malwords']
     dir_store = config['dir_store']
     core_num = config['core_num']
 
