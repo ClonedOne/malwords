@@ -56,4 +56,7 @@ def compute_js_dist(vec1, vec2):
     vec1 = laplace_smoothing(vec1)
     vec2 = laplace_smoothing(vec2)
 
-    return jensen_shannon_dist(vec1, vec2)
+    dist = jensen_shannon_dist(vec1, vec2)
+
+    print(dist)
+    return dist

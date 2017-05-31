@@ -32,7 +32,7 @@ var pack = d3.pack()
     .size([diameter - 4, diameter - 4])
     .padding(paddingSize);
 
-d3.json("graph1.json", function(error, root) {
+d3.json("/home/yogaub/projects/malwords/malwords_cluster/data/data_visualize/graph1.json", function(error, root) {
   if (error) throw error;
 
   root = d3.hierarchy(root)

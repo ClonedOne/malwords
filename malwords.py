@@ -9,28 +9,6 @@ import json
 import sys
 import os
 
-# Action messages
-
-msg_argv = '\nPlease select a valid action:\n' \
-           'compare-distance --> show various distance metrics applies to the samples\n' \
-           'q to quit\n'
-msg_dr = '\nPlease select a dimensionality reduction technique:\n' \
-         'pca\n' \
-         'svd\n' \
-         'kernel-pca\n' \
-         'tnse\n' \
-         'lda\n' \
-         's to skip dimensionality reduction\n' \
-         'q to quit\n'
-msg_ca = '\nPlease select a clustering or classification technique:\n' \
-         'kmeans for standard KMeans on feature selected data-set\n' \
-         'mini_kmeans for mini batch KMeans\n' \
-         'hdbscan for HDBSCAN \n' \
-         'svm for linear SVM \n' \
-         'mlp for multilayer Perceptron \n' \
-         's to skip clustering/classification\n' \
-         'q to quit\n'
-
 
 def main():
     config = json.load(open('config.json', 'r'))
@@ -52,34 +30,30 @@ def cluster_classify(config):
     :return: 
     """
 
-    msg_clusters = 'clusters'
-    msg_data = 'data matrix file'
-
     # Prompts the user to select an action
     ca = ""
     while ca == "":
-        ca = input(msg_ca)
+        ca = input(constants.msg_ca)
 
         if ca == 'kmeans':
-            clusters = interaction.ask_number(msg_clusters)
-            data_matrix = interaction.ask_file(msg_data)
+            clusters = interaction.ask_number(constants.msg_clusters)
+            data_matrix = interaction.ask_file(constants.msg_data)
             ca_kmeans.cluster(config, data_matrix, clusters)
 
         elif ca == 'mini_kmeans':
-            clusters = interaction.ask_number(msg_clusters)
+            clusters = interaction.ask_number(constants.msg_clusters)
             ca_kmeans_minibatch.cluster(config, clusters)
 
         elif ca == 'hdbscan':
-            data_matrix = interaction.ask_file(msg_data)
             distance = interaction.ask_metric()
-            ca_hdbscan.cluster(config, data_matrix, distance)
+            ca_hdbscan.cluster(config, distance)
 
         elif ca == 'svm':
-            data_matrix = interaction.ask_file(msg_data)
+            data_matrix = interaction.ask_file(constants.msg_data)
             ca_svm.classify(config, data_matrix, sparse=True)
 
         elif ca == 'mlp':
-            data_matrix = interaction.ask_file(msg_data)
+            data_matrix = interaction.ask_file(constants.msg_data)
             ca_mlp.classify(config, data_matrix, sparse=True)
 
         elif ca == 's':
@@ -101,40 +75,38 @@ def dimensionality_reduction(config):
     :return: 
     """
 
-    msg_components = 'components'
-
     # Check if user has specified any action
     if len(sys.argv) > 1:
         if sys.argv[1] == 'compare-distance':
             compare_distances.compute_distances(config)
 
         else:
-            print(msg_argv)
+            print(constants.msg_argv)
             exit()
 
     # Prompts the user to select an action
     dr = ""
     while dr == "":
-        dr = input(msg_dr)
+        dr = input(constants.msg_dr)
 
         if dr == 'pca':
-            components = interaction.ask_number(msg_components)
+            components = interaction.ask_number(constants.msg_components)
             dr_pca.get_pca(config, components)
 
         elif dr == 'svd':
-            components = interaction.ask_number(msg_components)
+            components = interaction.ask_number(constants.msg_components)
             dr_svd.get_svd(config, components)
 
         elif dr == 'kernel-pca':
-            components = interaction.ask_number(msg_components)
+            components = interaction.ask_number(constants.msg_components)
             dr_kernel_pca.get_kern_pca(config, components)
 
         elif dr == 'tnse':
-            components = interaction.ask_number(msg_components)
+            components = interaction.ask_number(constants.msg_components)
             dr_tsne.get_tsne(config, components)
 
         elif dr == 'lda':
-            components = interaction.ask_number(msg_components)
+            components = interaction.ask_number(constants.msg_components)
             dr_lda.get_lda(config, components)
 
         elif dr == 's':
@@ -183,8 +155,8 @@ def pre_process(config):
     if len(os.listdir(config['dir_store'])) == 0:
         pp_tfidf.get_tf_idf(config)
 
-    # if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)):
-    #     pp_js.get_js(config)
+        # if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)):
+        #     pp_js.get_js(config)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 from sklearn.cluster import SpectralClustering
 
 import utilities.evaluation
+import utilities.output
 from utilities import utils
 import numpy as np
 import json
@@ -44,7 +45,7 @@ def cluster():
 
     utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
-    utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    utilities.output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 import json
-from collections import defaultdict
 import os
+from collections import defaultdict
+
 import numpy as np
 import plotly.graph_objs as go
 import plotly.plotly as py
@@ -98,35 +99,6 @@ def get_base_words(dir_base):
                 base_words.add(line.strip().split()[0].decode('utf-8'))
 
     return base_words
-
-
-def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):
-    """
-    Generate a json file structured so it can be used for visualization 
-
-    :param uuids: list of uuids
-    :param base_labels: base truth labels
-    :param computed_labels: clustering results 
-    :param num_clusters: number of clusters created
-    :return: 
-    """
-
-    out_dict = {'name': 'clustering', 'children': []}
-
-    for i in range(num_clusters):
-        child_dict = {'name': str(i), 'children': []}
-
-        for j in range(len(computed_labels)):
-            label = int(computed_labels[j])
-            if label == i:
-                true_label = int(base_labels[j])
-                child_inner = {'name': uuids[j], 'color': true_label}
-                child_dict['children'].append(child_inner)
-
-        out_dict['children'].append(child_dict)
-
-    graph_path = 'visualize/graph1.json'
-    json.dump(out_dict, open(graph_path, 'w'), indent=2)
 
 
 def visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters):

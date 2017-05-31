@@ -2,6 +2,7 @@ from sklearn.cluster import MiniBatchKMeans
 from multiprocessing import Pool
 
 import utilities.evaluation
+import utilities.output
 from utilities import utils
 from scipy.sparse import *
 import numpy as np
@@ -52,7 +53,7 @@ def cluster(config, clusters):
 
     utilities.evaluation.evaluate_clustering(base_labels, computed_labels)
 
-    utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    utilities.output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
 
 def train_k_means(k_means, clustered, rows, cols, rand_uuids, words):

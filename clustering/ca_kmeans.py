@@ -1,5 +1,7 @@
 from sklearn.cluster import KMeans
 from operator import itemgetter
+
+import utilities.output
 from utilities import output
 import utilities.evaluation
 from utilities import utils
@@ -54,7 +56,7 @@ def cluster(config, data_matrix, clusters):
 
     output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'euclidean', 'kmeans')
 
-    utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    utilities.output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
 
 def test_kmeans_clusters(data, base_labels, num_clusters_max):

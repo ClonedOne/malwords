@@ -1,3 +1,4 @@
+from utilities import constants
 import readline
 import glob
 import os
@@ -65,20 +66,17 @@ def ask_metric():
     :return: 
     """
 
-    msg_request = 'Please select the desired metric\n' \
-                  'e for euclidean\n' \
-                  'c for cosine\n' \
-                  'q to quit\n'
+    possible_metrics = ['e', 'c', 'j']
     metric = ''
 
     while metric == '':
 
-        metric = input(msg_request)
+        metric = input(constants.msg_metric)
 
         if metric == 'q':
             exit()
 
-        elif metric == 'e' or metric == 'c':
+        elif metric in possible_metrics:
             return metric
 
         else:
@@ -89,5 +87,4 @@ def ask_metric():
 
 
 def complete(text, state):
-    return (glob.glob(text+'*')+[None])[state]
-
+    return (glob.glob(text + '*') + [None])[state]

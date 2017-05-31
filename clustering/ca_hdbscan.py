@@ -1,32 +1,37 @@
 from sklearn.metrics import pairwise_distances
+from distances import jensen_shannon
+from utilities import interaction
+from helpers import loader_freqs
+from utilities import evaluation
+from utilities import constants
 import matplotlib.pyplot as plt
 from utilities import output
-import utilities.evaluation
 from utilities import utils
 import seaborn as sns
 import numpy as np
 import hdbscan
+import json
 import os
 
-dir_store = ''
 core_num = 1
 
 
-def cluster(config, data_matrix, distance):
+def cluster(config, distance):
     """
     Cluster the documents using out of core Mini Batch KMeans. 
 
     :return: 
     """
 
-    global dir_store, core_num
+    global core_num
     dir_store = config['dir_store']
+    dir_malwords = config['dir_mini']
     core_num = config['core_num']
+    min_cluster_size = 30
 
     distance_type = distance
-    matrix_file = data_matrix
 
-    data = np.loadtxt(matrix_file)
+    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     uuids = sorted(os.listdir(dir_store))
 
     # Retrieve base labels
@@ -35,11 +40,53 @@ def cluster(config, data_matrix, distance):
     base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     if distance_type == 'e':
-        euclidean(data, uuids, base_labels, 30)
+        matrix_file = interaction.ask_file(constants.msg_data)
+        data = np.loadtxt(matrix_file)
+        euclidean(data, uuids, base_labels, min_cluster_size)
+
     elif distance_type == 'c':
-        cosine(data, uuids, base_labels, 30)
+        matrix_file = interaction.ask_file(constants.msg_data)
+        data = np.loadtxt(matrix_file)
+        cosine(data, uuids, base_labels, min_cluster_size)
+
+    elif distance_type == 'j':
+        js(uuids, base_labels, min_cluster_size, words, dir_malwords)
+
     else:
         print('Please specify distance metric, either e for euclidean or c for cosine')
+
+
+def js(uuids, base_labels, min_cluster_size, words, dir_malwords):
+    """
+      Perform HDBSCAN with jensen-shannon distance
+
+      :param uuids: list of uuids corresponding to data points
+      :param base_labels: reference clustering
+      :param min_cluster_size: minimum number of points to generate cluster
+      :param words: dictionary of valid words with id
+      :param dir_malwords: directory containing bag-of-word files
+      :return:
+      """
+
+    print('Perform clustering with jensen-shannon distance')
+
+    data = loader_freqs.load_freqs(uuids, core_num, len(words), words, dir_malwords, dense=False, ordered=True)
+
+    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric=jensen_shannon.compute_js_dist)
+    hdbs.fit(data)
+
+    computed_labels = hdbs.labels_
+
+    num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)
+
+    if num_clusters == 1:
+        data = None
+
+    evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
+
+    output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+
+    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'jensen_shannon', 'hdbscan')
 
 
 def euclidean(data, uuids, base_labels, min_cluster_size):
@@ -54,7 +101,8 @@ def euclidean(data, uuids, base_labels, min_cluster_size):
     """
 
     print('Perform clustering with euclidean distance')
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric='euclidean', gen_min_span_tree=True, match_reference_implementation=True)
+    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric='euclidean', gen_min_span_tree=True,
+                           match_reference_implementation=True)
     hdbs.fit(data)
     computed_labels = hdbs.labels_
 
@@ -63,9 +111,9 @@ def euclidean(data, uuids, base_labels, min_cluster_size):
     if num_clusters == 1:
         data = None
 
-    utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
+    evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
-    utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
     output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'euclidean', 'hdbscan')
 
@@ -96,9 +144,9 @@ def cosine(data, uuids, base_labels, min_cluster_size):
     if num_clusters == 1:
         data = None
 
-    utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
+    evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
-    utils.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
     output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'cosine', 'hdbscan')
 
@@ -144,7 +192,3 @@ def plot_against_2d(hdbs, num_clusters, has_tree=False):
         plt.show()
         hdbs.single_linkage_tree_.plot(cmap='viridis', colorbar=True)
         plt.show()
-
-
-if __name__ == '__main__':
-    cluster()
