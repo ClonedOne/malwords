@@ -31,7 +31,7 @@ def jensen_shannon_dist(prob1, prob2):
     :return: jensen-shannon distance of the 2 word probability vectors
     """
 
-    m_vec = (prob1 + prob2)
+    m_vec = (prob1 + prob2) * 0.5
 
     kl_1 = entropy(prob1, m_vec)
     kl_2 = entropy(prob2, m_vec)

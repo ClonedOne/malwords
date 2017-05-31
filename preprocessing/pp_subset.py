@@ -1,6 +1,5 @@
 from shutil import copyfile
 import json
-import sys
 import os
 
 f_ext = '_ss.txt.gz'

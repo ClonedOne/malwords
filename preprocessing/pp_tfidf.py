@@ -31,4 +31,3 @@ def get_tf_idf(config):
     pool.map(wk_tfidf.compute_tf_idf, formatted_input)
     pool.close()
     pool.join()
-
