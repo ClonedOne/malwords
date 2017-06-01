@@ -71,10 +71,10 @@ def js(uuids, base_labels, min_cluster_size, words, dir_malwords):
     print('Perform clustering with jensen-shannon distance')
 
     data = loader_freqs.load_freqs(uuids, core_num, len(words), words, dir_malwords, dense=False, ordered=True)
+    distance = pairwise_distances(data, metric=jensen_shannon.jensen_shannon_dist, n_jobs=core_num)
 
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric=jensen_shannon.compute_js_dist)
-    hdbs.fit(data)
-
+    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric='precomputed')
+    hdbs.fit(distance)
     computed_labels = hdbs.labels_
 
     num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)

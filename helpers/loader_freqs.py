@@ -40,6 +40,7 @@ def load_freqs(uuids, core_num, cols, words, dir_malwords, dense=False, ordered=
         data = np.concatenate(acc)
     else:
         data = vstack(acc)
+        data = data.tocsc()
 
     print(data.shape)
 
