@@ -155,8 +155,8 @@ def pre_process(config):
     if len(os.listdir(config['dir_store'])) == 0:
         pp_tfidf.get_tf_idf(config)
 
-        # if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)):
-        #     pp_js.get_js(config)
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)):
+        pp_js.get_js(config)
 
 
 if __name__ == '__main__':

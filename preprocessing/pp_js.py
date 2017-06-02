@@ -1,7 +1,7 @@
 from sklearn.metrics.pairwise import pairwise_distances
-from workers import wk_read_freqs, wk_read_tfidf
 from utilities import utils, constants
 from distances import jensen_shannon
+from helpers import loader_freqs
 from multiprocessing import Pool
 from scipy.sparse import *
 import numpy as np
@@ -19,6 +19,7 @@ def get_js(config):
 
     dir_store = config['dir_store']
     core_num = config['core_num']
+    dir_malwords = config['dir_mini']
 
     uuids = sorted(os.listdir(dir_store))
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
@@ -26,37 +27,12 @@ def get_js(config):
 
     print('Creating Jensen-Shannon distance matrix')
 
-    # Force loading of full data-set in RAM (may be a problem with low memory!)
-    mini_batch_size = len(uuids)
-    decomposed = 0
-
     print('Acquiring frequency matrix')
-    file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
-    formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, False))
-    pool = Pool(processes=core_num)
-    results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
-    pool.close()
-    pool.join()
-
-    # sort results
-    acc = []
-    for i in range(core_num):
-        for res in results:
-            if res[0] == i:
-                acc.append(res[1])
-    data = vstack(acc)
-    data = data.tocsr()
-    print(data.data.nbytes)
-
+    data = loader_freqs.load_freqs(uuids, core_num, cols, words, dir_malwords, dense=False, ordered=True)
     print(data.shape)
     print(data.sum())
 
     print('Computing the distances')
-    distances = pairwise_distances(data, metric=jensen_shannon.compute_js_dist, n_jobs=core_num)
-    # distances = pairwise_distances(data, metric=uno, n_jobs=core_num)
+    distances = pairwise_distances(data, metric=jensen_shannon.jensen_shannon_dist, n_jobs=core_num)
     matrix_file = os.path.join(constants.dir_d, constants.file_js)
     np.savetxt(matrix_file, distances)
-
-
-def uno(a, b):
-    return 1
