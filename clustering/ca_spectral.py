@@ -1,38 +1,29 @@
 from sklearn.cluster import SpectralClustering
-
+from utilities import constants
+from utilities import output
+from utilities import utils
 import utilities.evaluation
 import utilities.output
-from utilities import utils
 import numpy as np
-import json
-import sys
 import os
 
-dir_store = ''
-core_num = 1
 
-
-def cluster():
+def cluster(config, num_clusters):
     """
-    Cluster the documents using out of core Mini Batch KMeans. 
+    Cluster the documents using the Jensen-Shannon metric and Spectral Clustering algorithm.
 
     :return: 
     """
 
-    global dir_store, core_num
-    config = json.load(open('config.json'))
     dir_store = config['dir_store']
     core_num = config['core_num']
 
-    if len(sys.argv) < 3:
-        print('Please provide the data matrix file and the desired number of clusters')
-        exit()
-
-    matrix_file = sys.argv[1]
-    num_clusters = int(sys.argv[2])
-
-    data = np.loadtxt(matrix_file)
     uuids = sorted(os.listdir(dir_store))
+    data = np.loadtxt(os.path.join(constants.dir_d, constants.file_js))
+
+    # Convert distance matrix to affinity matrix
+    delta = 1
+    data = np.exp(- data ** 2 / (2. * delta ** 2))
 
     # Retrieve base labels
     print('Acquiring base labels')
@@ -40,13 +31,11 @@ def cluster():
     base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     print('Perform clustering')
-    spectral = SpectralClustering(n_clusters=num_clusters, n_jobs=core_num)
+    spectral = SpectralClustering(affinity='precomputed', n_clusters=num_clusters, n_jobs=core_num)
     computed_labels = spectral.fit_predict(data)
 
     utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
     utilities.output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
-
-if __name__ == '__main__':
-    cluster()
+    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'jensen_shannon', 'spectral')

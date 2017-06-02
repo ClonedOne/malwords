@@ -8,7 +8,6 @@ from utilities import utils
 import numpy as np
 import os
 
-dir_store = ''
 core_num = 1
 max_iter = 5000
 
@@ -20,7 +19,7 @@ def cluster(config, data_matrix, clusters):
     :return: 
     """
 
-    global dir_store, core_num
+    global core_num
     dir_store = config['dir_store']
     core_num = config['core_num']
 

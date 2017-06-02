@@ -1,9 +1,7 @@
 from sklearn.metrics.pairwise import pairwise_distances
-from utilities import utils, constants
 from distances import jensen_shannon
 from helpers import loader_freqs
-from multiprocessing import Pool
-from scipy.sparse import *
+from utilities import constants
 import numpy as np
 import json
 import os
