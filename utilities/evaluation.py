@@ -2,7 +2,7 @@ from sklearn import metrics
 import bcubed
 
 
-def evaluate_clustering(base_labels, computed_labels, data=None):
+def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclidean'):
     """
     Print evaluation values for the clustering results
     
@@ -12,6 +12,7 @@ def evaluate_clustering(base_labels, computed_labels, data=None):
     # Converts labels list to dictionaries for the BCubed library
     base_dict = {k: {v} for k, v in dict(enumerate(base_labels)).items()}
     computed_dict = {k: {v} for k, v in dict(enumerate(computed_labels)).items()}
+    num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)
 
     print('-' * 80)
 
@@ -25,7 +26,7 @@ def evaluate_clustering(base_labels, computed_labels, data=None):
     fs = bcubed.fscore(p, r)
 
     print('Clustering evaluation')
-    print('Number of clusters', len(set(computed_labels)))
+    print('Number of clusters', num_clusters)
     print('Number of distinct families', len(set(base_labels)))
     print('Adjusted Rand index:', ars)
     print('Adjusted Mutual Information:', ami)
@@ -35,10 +36,9 @@ def evaluate_clustering(base_labels, computed_labels, data=None):
     print('BCubed Precision:', p)
     print('BCubed Recall:', r)
     print('BCubed FScore:', fs)
-    # print('F1Score:', f1)
 
     if data is not None:
-        sh = metrics.silhouette_score(data, computed_labels, metric='euclidean')
+        sh = metrics.silhouette_score(data, computed_labels, metric=metric)
         print('Silhouette', sh)
         ret = (ars, ami, fm, h, c, p, r, fs, sh)
     else:

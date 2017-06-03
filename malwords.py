@@ -1,6 +1,6 @@
+from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch, ca_spectral, ca_dbscan
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_kernel_pca, dr_tsne
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js
-from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch, ca_spectral
 from classification import ca_svm, ca_mlp
 from distances import compare_distances
 from utilities import interaction
@@ -47,6 +47,9 @@ def cluster_classify(config):
         elif ca == 'spectral':
             clusters = interaction.ask_number(constants.msg_clusters)
             ca_spectral.cluster(config, clusters)
+
+        elif ca == 'dbscan':
+            ca_dbscan.cluster(config)
 
         elif ca == 'hdbscan':
             distance = interaction.ask_metric()

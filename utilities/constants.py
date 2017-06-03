@@ -43,7 +43,8 @@ msg_ca = '\nPlease select a clustering or classification technique:\n' \
          'mini_kmeans for mini batch KMeans\n' \
          'hdbscan for HDBSCAN \n' \
          'svm for linear SVM \n' \
-         'spectral for Spectral clustering using Jensen-Shannon metric' \
+         'spectral for Spectral clustering using Jensen-Shannon metric\n' \
+         'dbscan for DBSCAN clustering using Jensen-Shannon metric\n' \
          'mlp for multilayer Perceptron \n' \
          's to skip clustering/classification\n' \
          'q to quit\n'
