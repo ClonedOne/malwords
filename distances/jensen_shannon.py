@@ -1,5 +1,4 @@
 from scipy.stats import entropy
-import numpy as np
 import math
 
 
