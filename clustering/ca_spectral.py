@@ -8,17 +8,15 @@ import numpy as np
 import os
 
 
-def cluster(config, num_clusters):
+def cluster(config, num_clusters, uuids):
     """
     Cluster the documents using the Jensen-Shannon metric and Spectral Clustering algorithm.
 
     :return: 
     """
 
-    dir_store = config['dir_store']
     core_num = config['core_num']
 
-    uuids = sorted(os.listdir(dir_store))
     data = np.loadtxt(os.path.join(constants.dir_d, constants.file_js))
 
     # Convert distance matrix to affinity matrix

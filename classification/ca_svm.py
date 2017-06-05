@@ -10,7 +10,7 @@ import json
 import os
 
 
-def classify(config, matrix_file, sparse=False):
+def classify(config, matrix_file, uuids, sparse=False):
     """
     Classify the documents using SVM and the AVClass labels as base truth.
 
@@ -23,7 +23,6 @@ def classify(config, matrix_file, sparse=False):
     print('Loading data')
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     data = np.loadtxt(matrix_file)
-    uuids = sorted(os.listdir(dir_store))
 
     # Retrieve base labels
     print('Acquiring base labels')

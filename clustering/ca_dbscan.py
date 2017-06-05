@@ -7,17 +7,15 @@ import numpy as np
 import os
 
 
-def cluster(config):
+def cluster(config, uuids):
     """
     Cluster the documents using DBScan. 
 
     :return: 
     """
 
-    dir_store = config['dir_store']
     core_num = config['core_num']
 
-    uuids = sorted(os.listdir(dir_store))
     data = np.loadtxt(os.path.join(constants.dir_d, constants.file_js))
 
     # Retrieve base labels

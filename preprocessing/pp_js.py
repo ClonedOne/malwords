@@ -7,19 +7,28 @@ import json
 import os
 
 
-def get_js(config):
+def get_js(config, uuids):
     """
     Produces a distance matrix applying the Jensen-Shannon Distance to all the feature vectors.
     
-    :param config: 
-    :return: 
+    :param config: configuration dictionary
+    :param uuids: list of uuids to operate on
+    :return:
     """
 
-    dir_store = config['dir_store']
     core_num = config['core_num']
     dir_malwords = config['dir_mini']
 
-    uuids = sorted(os.listdir(dir_store))
+    chosen = False
+    while not chosen:
+        choice = input(constants.msg_js)
+
+        if choice.lower() == 'y':
+            chosen = True
+
+        elif choice.lower() == 'n':
+            return
+
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     cols = len(words)
 

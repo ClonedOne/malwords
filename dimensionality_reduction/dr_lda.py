@@ -14,7 +14,7 @@ core_num = 1
 num_components = 0
 
 
-def get_lda(config, components):
+def get_lda(config, components, uuids):
     """
     Apply Latent Dirichlet Allocation to the tf-idf vectors.
 
@@ -28,7 +28,6 @@ def get_lda(config, components):
     num_components = components
 
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    uuids = sorted(os.listdir(dir_store))
     rand_uuids = random.sample(uuids, len(uuids))
 
     cols = len(words)

@@ -53,3 +53,5 @@ msg_metric = 'Please select the desired metric\n' \
              'c for cosine\n' \
              'j for jensen-shannon' \
              'q to quit\n'
+msg_js = 'Do you want to compute the Jensen-Shannon distance matrix for the chose data? [y/n]\n ' \
+         'It may take very long, deending on the number of selected samples\n'

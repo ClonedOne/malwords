@@ -76,13 +76,12 @@ def get_labeled(config):
 
     print('Not labeled:', len(not_labeled))
 
+    result = []
     for file_name in sorted(os.listdir(config['dir_malwords'])):
         if file_name not in not_labeled:
-            if os.path.isfile(os.path.join(config['dir_malwords'], file_name)):
-                copyfile(
-                    os.path.join(config['dir_malwords'], file_name),
-                    os.path.join(config['dir_mini'], file_name)
-                )
+            result.append(file_name.split('.')[0][:-3])
+
+    return result
 
 
 def load_samples(config, small=False):
@@ -114,8 +113,7 @@ def load_samples(config, small=False):
         familes = ['mydoom', 'neobar', 'gepys', 'lamer', 'neshta', 'bladabindi', 'flystudio']
         datasets = [inv_labels[family] for family in familes]
 
-    for dataset in datasets:
-        copy_files(config, dataset)
+    return [uuid for dataset in datasets for uuid in dataset]
 
 
 def from_json(config, file_name):
@@ -128,7 +126,7 @@ def from_json(config, file_name):
     """
 
     uuids = json.load(open(file_name))
-    copy_files(config, uuids)
+    return sorted(uuids)
 
 
 def get_family(config, family):
@@ -146,7 +144,7 @@ def get_family(config, family):
         print('Malware family not found')
         exit()
 
-    copy_files(config, inv_labels[family])
+    return sorted(inv_labels[family])
 
 
 def copy_files(config, uuids):

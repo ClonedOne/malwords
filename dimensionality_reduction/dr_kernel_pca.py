@@ -14,7 +14,7 @@ core_num = 1
 num_components = 0
 
 
-def get_kern_pca(config, components):
+def get_kern_pca(config, components, uuids):
     """
     Lower dimensionality of data vectors using tSNE.
 
@@ -29,7 +29,6 @@ def get_kern_pca(config, components):
 
     kernel_pca = KernelPCA(n_components=components, n_jobs=core_num, kernel='poly', remove_zero_eig=True, copy_X=False)
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    uuids = sorted(os.listdir(dir_store))
 
     # Force loading of full dataset in RAM (may be a problem with low memory!)
     mini_batch_size = len(uuids)

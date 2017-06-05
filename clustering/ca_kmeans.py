@@ -12,7 +12,7 @@ core_num = 1
 max_iter = 5000
 
 
-def cluster(config, data_matrix, clusters):
+def cluster(config, data_matrix, clusters, uuids):
     """
     Cluster the documents using KMeans algorithm. 
 
@@ -20,13 +20,11 @@ def cluster(config, data_matrix, clusters):
     """
 
     global core_num
-    dir_store = config['dir_store']
     core_num = config['core_num']
 
     matrix_file = data_matrix
     num_clusters_max = clusters
 
-    uuids = sorted(os.listdir(dir_store))
     data = np.loadtxt(matrix_file)
 
     # Retrieve base labels

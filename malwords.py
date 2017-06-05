@@ -13,20 +13,21 @@ import os
 def main():
     config = json.load(open('config.json', 'r'))
 
-    pre_process(config)
+    uuids = pre_process(config)
 
-    dimensionality_reduction(config)
+    dimensionality_reduction(uuids, config)
 
-    cluster_classify(config)
+    cluster_classify(uuids, config)
 
 
 # Main lifecycle
 
-def cluster_classify(config):
+def cluster_classify(uuids, config):
     """
     Perform a clustering or classification step.
     
-    :param config: 
+    :param uuids:
+    :param config:
     :return: 
     """
 
@@ -38,30 +39,30 @@ def cluster_classify(config):
         if ca == 'kmeans':
             clusters = interaction.ask_number(constants.msg_clusters)
             data_matrix = interaction.ask_file(constants.msg_data)
-            ca_kmeans.cluster(config, data_matrix, clusters)
+            ca_kmeans.cluster(config, data_matrix, clusters, uuids)
 
         elif ca == 'mini_kmeans':
             clusters = interaction.ask_number(constants.msg_clusters)
-            ca_kmeans_minibatch.cluster(config, clusters)
+            ca_kmeans_minibatch.cluster(config, clusters, uuids)
 
         elif ca == 'spectral':
             clusters = interaction.ask_number(constants.msg_clusters)
-            ca_spectral.cluster(config, clusters)
+            ca_spectral.cluster(config, clusters, uuids)
 
         elif ca == 'dbscan':
-            ca_dbscan.cluster(config)
+            ca_dbscan.cluster(config, uuids)
 
         elif ca == 'hdbscan':
             distance = interaction.ask_metric()
-            ca_hdbscan.cluster(config, distance)
+            ca_hdbscan.cluster(config, distance, uuids)
 
         elif ca == 'svm':
             data_matrix = interaction.ask_file(constants.msg_data)
-            ca_svm.classify(config, data_matrix, sparse=True)
+            ca_svm.classify(config, data_matrix, uuids, sparse=True)
 
         elif ca == 'mlp':
             data_matrix = interaction.ask_file(constants.msg_data)
-            ca_mlp.classify(config, data_matrix, sparse=True)
+            ca_mlp.classify(config, data_matrix, uuids, sparse=True)
 
         elif ca == 's':
             return
@@ -74,11 +75,12 @@ def cluster_classify(config):
             ca = ""
 
 
-def dimensionality_reduction(config):
+def dimensionality_reduction(uuids, config):
     """
     Perform a dimensionality reduction step (or skip).
     
-    :param config: 
+    :param uuids:
+    :param config:
     :return: 
     """
 
@@ -98,23 +100,23 @@ def dimensionality_reduction(config):
 
         if dr == 'pca':
             components = interaction.ask_number(constants.msg_components)
-            dr_pca.get_pca(config, components)
+            dr_pca.get_pca(config, components, uuids)
 
         elif dr == 'svd':
             components = interaction.ask_number(constants.msg_components)
-            dr_svd.get_svd(config, components)
+            dr_svd.get_svd(config, components, uuids)
 
         elif dr == 'kernel-pca':
             components = interaction.ask_number(constants.msg_components)
-            dr_kernel_pca.get_kern_pca(config, components)
+            dr_kernel_pca.get_kern_pca(config, components, uuids)
 
         elif dr == 'tnse':
             components = interaction.ask_number(constants.msg_components)
-            dr_tsne.get_tsne(config, components)
+            dr_tsne.get_tsne(config, components, uuids)
 
         elif dr == 'lda':
             components = interaction.ask_number(constants.msg_components)
-            dr_lda.get_lda(config, components)
+            dr_lda.get_lda(config, components, uuids)
 
         elif dr == 's':
             return
@@ -131,7 +133,7 @@ def pre_process(config):
     """
     Perform pre-processing steps
     
-    :param config: 
+    :param config:
     :return: 
     """
 
@@ -152,17 +154,19 @@ def pre_process(config):
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_labels)):
         pp_labels.get_labels(config)
 
-    # Select the data subset to operate upon
-    # pp_subset.subset(config)
-
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
         pp_idf.get_idf(config)
 
-    if len(os.listdir(config['dir_store'])) == 0:
+    if len(os.listdir(config['dir_store'])) != len(os.listdir(config['dir_malwords'])):
         pp_tfidf.get_tf_idf(config)
 
+    # Select the data subset to operate upon
+    uuids = pp_subset.subset(config)
+
     if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)):
-        pp_js.get_js(config)
+        pp_js.get_js(config, uuids)
+
+    return uuids
 
 
 if __name__ == '__main__':

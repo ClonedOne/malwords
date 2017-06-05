@@ -12,7 +12,7 @@ import os
 core_num = 1
 
 
-def cluster(config, distance):
+def cluster(config, distance, uuids):
     """
     Cluster the documents using out of core Mini Batch KMeans. 
 
@@ -20,13 +20,10 @@ def cluster(config, distance):
     """
 
     global core_num
-    dir_store = config['dir_store']
     core_num = config['core_num']
     min_cluster_size = 30
 
     distance_type = distance
-
-    uuids = sorted(os.listdir(dir_store))
 
     # Retrieve base labels
     print('Acquiring base labels')

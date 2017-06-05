@@ -15,7 +15,7 @@ mini_batch_size = 0
 core_num = 1
 
 
-def cluster(config, clusters):
+def cluster(config, clusters, uuids):
     """
     Cluster the documents using out of core Mini Batch KMeans. 
     
@@ -30,7 +30,6 @@ def cluster(config, clusters):
 
     k_means = MiniBatchKMeans(n_clusters=num_clusters, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
-    uuids = sorted(os.listdir(dir_store))
     rand_uuids = random.sample(uuids, len(uuids))
 
     clustered = 0

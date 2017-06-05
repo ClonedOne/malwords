@@ -14,7 +14,7 @@ core_num = 1
 num_components = 0
 
 
-def get_svd(config, components):
+def get_svd(config, components, uuids):
     """
     Lower dimensionality of data vectors using SVD.
 
@@ -28,7 +28,6 @@ def get_svd(config, components):
 
     svd = TruncatedSVD(n_components=components)
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    uuids = sorted(os.listdir(dir_store))
 
     # Force loading of full dataset in RAM (may result in MEMORY ERROR!)
     mini_batch_size = len(uuids)

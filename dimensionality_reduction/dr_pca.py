@@ -15,7 +15,7 @@ core_num = 1
 num_components = 0
 
 
-def get_pca(config, components):
+def get_pca(config, components, uuids):
     """
     Apply Incremental Principal Components Analysis to the tf-idf vectors.
     
@@ -30,7 +30,6 @@ def get_pca(config, components):
 
     i_pca = IncrementalPCA(n_components=num_components, batch_size=mini_batch_size)
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    uuids = sorted(os.listdir(dir_store))
     rand_uuids = random.sample(uuids, len(uuids))
 
     cols = len(words)
