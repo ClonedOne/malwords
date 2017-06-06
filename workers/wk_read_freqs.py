@@ -29,6 +29,12 @@ def get_data_matrix(data_pack):
     dir_files = data_pack[4]
     dense = data_pack[5]
 
+    zipped = False
+    file_ext = '_ss.txt'
+    if os.path.splitext(os.listdir(dir_files)[0])[1] == '.gz':
+        zipped = True
+        file_ext = '_ss.txt.gz'
+
     if dense:
         data = np.zeros((rows, cols))
     else:
@@ -36,7 +42,7 @@ def get_data_matrix(data_pack):
 
     row = 0
     for uuid in uuids:
-        cur_row = extract_freqs(os.path.join(dir_files, uuid + '_ss.txt'), words, cols)
+        cur_row = extract_freqs(os.path.join(dir_files, uuid + file_ext), words, cols, zipped)
         data[row] = cur_row
         row += 1
 
@@ -47,21 +53,22 @@ def get_data_matrix(data_pack):
     return process_id, data
 
 
-def extract_freqs(freqs_file, words, cols):
+def extract_freqs(freqs_file, words, cols, zipped=False):
     """
     Extracts frequency vectors from bag-of-words files. Supports gzipped files.
     
-    :param freqs_file: bag-of-words file 
+    :param freqs_file: bag-of-words file
     :param words: dictionary of valid words and related indices
     :param cols: number of features of the vector
     :return: frequency vector
+    :param zipped: flag, if set the file is gzipped
     """
 
     cur_row = np.zeros(cols)
     proc = None
     in_file = None
 
-    if os.path.splitext(freqs_file)[1] == '.gz':
+    if zipped:
         proc = subprocess.Popen(['gzip', '-cdfq', freqs_file], stdout=subprocess.PIPE, bufsize=4096)
         lines = proc.stdout
     else:
@@ -80,7 +87,7 @@ def extract_freqs(freqs_file, words, cols):
         word_id = words[word]
         cur_row[word_id] = count
 
-    if os.path.splitext(freqs_file)[1] == '.gz':
+    if zipped:
         proc.terminate()
     else:
         in_file.close()

@@ -40,6 +40,7 @@ def load_tfidf(uuids, core_num, cols, words, dir_store, dense=False, ordered=Fal
         data = np.concatenate(acc)
     else:
         data = vstack(acc)
+        data = data.tocsc()
 
     print(data.shape)
 

@@ -59,11 +59,11 @@ def cluster_classify(uuids, config):
 
         elif ca == 'svm':
             data_matrix = interaction.ask_file(constants.msg_data)
-            ca_svm.classify(config, data_matrix, uuids, sparse=True)
+            ca_svm.classify(config, data_matrix, uuids, sparse=False)
 
         elif ca == 'mlp':
             data_matrix = interaction.ask_file(constants.msg_data)
-            ca_mlp.classify(config, data_matrix, uuids, sparse=True)
+            ca_mlp.classify(config, data_matrix, uuids, sparse=False)
 
         elif ca == 's':
             return

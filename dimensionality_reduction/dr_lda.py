@@ -1,17 +1,10 @@
 from sklearn.decomposition import LatentDirichletAllocation
-from workers import wk_read_tfidf
-from multiprocessing import Pool
+from helpers import loader_freqs
 from utilities import constants
-from utilities import utils
 import numpy as np
 import random
 import json
 import os
-
-dir_store = ''
-mini_batch_size = 0
-core_num = 1
-num_components = 0
 
 
 def get_lda(config, components, uuids):
@@ -21,11 +14,9 @@ def get_lda(config, components, uuids):
     :return: 
     """
 
-    global dir_store, core_num, mini_batch_size, num_components
-    dir_store = config['dir_store']
+    dir_malwords = config['dir_malwords']
     core_num = config['core_num']
     mini_batch_size = config['batch_size']
-    num_components = components
 
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     rand_uuids = random.sample(uuids, len(uuids))
@@ -33,86 +24,53 @@ def get_lda(config, components, uuids):
     cols = len(words)
     rows = len(uuids)
 
-    lda = LatentDirichletAllocation(batch_size=mini_batch_size, n_jobs=core_num, n_topics=components, max_iter=50,
-                                    total_samples=len(uuids), random_state=42)
+    lda = LatentDirichletAllocation(batch_size=mini_batch_size, n_jobs=core_num, n_topics=components, max_iter=100,
+                                    total_samples=len(uuids), learning_method='online')
 
-    decomposed = 0
-    train_lda(lda, decomposed, rows, cols, rand_uuids, words)
+    train_lda(lda, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_malwords)
 
-    decomposed = 0
-    transform_vectors(lda, decomposed, rows, cols, uuids, words)
+    data = transform_vectors(lda, rows, cols, uuids, words, mini_batch_size, core_num, dir_malwords)
+
+    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "lda_{}.txt".format(components))
+    np.savetxt(open(matrix_file, "wb"), data)
 
 
-def train_lda(lda, decomposed, rows, cols, rand_uuids, words):
+def train_lda(lda, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_malwords):
     """
     Train the LDA algorithm incrementally using mini batches of data.    
 
     :return: 
     """
 
+    decomposed = 0
+
     while decomposed < rows:
-
         print('Processing documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
-        # starting from the decomposed-th element of the uuids list
-        file_name_lists = utils.divide_workload(rand_uuids[decomposed:][:mini_batch_size], core_num)
-        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, True))
-        pool = Pool(processes=core_num)
-        results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
-        pool.close()
-        pool.join()
+        data = loader_freqs.load_freqs(rand_uuids[decomposed:][:mini_batch_size], core_num, cols, words, dir_malwords,
+                                       dense=True, ordered=False)
 
-        # sort results
-        acc = []
-        # Each worker will return a list of size (mini_batch_size / core_num)
-        for i in range(core_num):
-            for res in results:
-                if res[0] == i:
-                    acc.append(res[1])
-        data = np.concatenate(acc)
-
-        print(data.shape)
-
-        del results
-        del acc
         decomposed += mini_batch_size
 
         lda.partial_fit(data)
 
 
-def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
+def transform_vectors(lda, rows, cols, uuids, words, mini_batch_size, core_num, dir_malwords):
     """
-    Transorm the data vectors in mini batches.   
+    Transorm the data vectors.
 
     :return: 
     """
 
+    decomposed = 0
+    new_data = []
+
     while decomposed < rows:
-
         print('Transforming documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
-        # starting from the decomposed-th element of the uuids list
-        file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
-        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, True))
-        pool = Pool(processes=core_num)
-        results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
-        pool.close()
-        pool.join()
+        data = loader_freqs.load_freqs(uuids[decomposed:][:mini_batch_size], core_num, cols, words, dir_malwords,
+                                       dense=True, ordered=True)
 
-        # sort results
-        acc = []
-        # Each worker will return a list of size (mini_batch_size / core_num)
-        for i in range(core_num):
-            for res in results:
-                if res[0] == i:
-                    acc.append(res[1])
-        data = np.concatenate(acc)
-
-        print(data.shape)
-
-        del results
-        del acc
         decomposed += mini_batch_size
 
-        new_data = i_pca.transform(data)
+        new_data.append(lda.transform(data))
 
-        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "lda_{}.txt".format(num_components))
-        np.savetxt(open(matrix_file, "ab"), new_data)
+    return np.concatenate(new_data)
