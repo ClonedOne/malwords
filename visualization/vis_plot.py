@@ -144,3 +144,30 @@ def plot_hdbs_against_2d(hdbs, num_clusters, has_tree=False):
         plt.show()
         hdbs.single_linkage_tree_.plot(cmap='viridis', colorbar=True)
         plt.show()
+
+
+def visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters):
+    """
+    Experiment
+
+    :param uuids: list of uuids
+    :param reduced_data:
+    :param base_labels: base truth labels
+    :param computed_labels: clustering results
+    :param num_clusters: number of clusters created
+    :return:
+    """
+    trace = go.Scattergl(
+        x=reduced_data[0],
+        y=reduced_data[1],
+        mode='markers',
+        marker=dict(
+            size='16',
+            color=np.random.randn(500),  # set color equal to a variable
+            colorscale='Viridis',
+            showscale=True
+        )
+    )
+    data = [trace]
+
+    py.plot(data, filename='test_color')

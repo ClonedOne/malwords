@@ -27,17 +27,17 @@ def subset(config):
         subset_type = input(err_msg)
 
         if subset_type == 'l':
-            get_labeled(config)
+            return get_labeled(config)
 
         elif subset_type == 'k':
-            load_samples(config)
+            return load_samples(config)
 
         elif subset_type == 'f':
             family = input(family_msg)
-            get_family(config, family)
+            return get_family(config, family)
 
         elif subset_type == 's':
-            load_samples(config, small=True)
+            return load_samples(config, small=True)
 
         elif subset_type == 'j':
             json_file = input(json_msg)
@@ -46,7 +46,7 @@ def subset(config):
                 print('json file not found')
                 exit()
 
-            from_json(config, json_file)
+            return from_json(config, json_file)
 
         elif subset_type == 'q':
             exit()
@@ -58,14 +58,13 @@ def subset(config):
 
 def get_labeled(config):
     """
-    Take oly samples for which there is a known malware family label.
+    Take only samples for which there is a known malware family label.
     
     :param config: 
     :return: 
     """
 
     labels = json.load(open('data/labels.json'))
-    print('Total labeled:', len(labels))
     not_labeled = []
 
     for file_name in sorted(os.listdir(config['dir_malwords'])):
@@ -74,14 +73,12 @@ def get_labeled(config):
         if uuid not in labels:
             not_labeled.append(file_name)
 
-    print('Not labeled:', len(not_labeled))
-
     result = []
     for file_name in sorted(os.listdir(config['dir_malwords'])):
         if file_name not in not_labeled:
             result.append(file_name.split('.')[0][:-3])
 
-    return result
+    return sorted(result)
 
 
 def load_samples(config, small=False):
@@ -94,7 +91,6 @@ def load_samples(config, small=False):
     """
 
     inv_labels = json.load(open('data/inverted_labels.json'))
-    print('Number of malware families', len(inv_labels))
 
     small_subset = [
         "761dd266-466c-41e3-8fab-a550adbe1a7c",
@@ -113,7 +109,7 @@ def load_samples(config, small=False):
         familes = ['mydoom', 'neobar', 'gepys', 'lamer', 'neshta', 'bladabindi', 'flystudio']
         datasets = [inv_labels[family] for family in familes]
 
-    return [uuid for dataset in datasets for uuid in dataset]
+    return sorted([uuid for dataset in datasets for uuid in dataset])
 
 
 def from_json(config, file_name):

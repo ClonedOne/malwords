@@ -9,48 +9,43 @@ import json
 import os
 
 
-dir_store = ''
-mini_batch_size = 0
-core_num = 1
-num_components = 0
-
-
-def get_pca(config, components, uuids):
+def get_pca(config, uuids, components):
     """
     Apply Incremental Principal Components Analysis to the tf-idf vectors.
     
     :return: 
     """
 
-    global dir_store, core_num, mini_batch_size, num_components
     dir_store = config['dir_store']
     core_num = config['core_num']
     mini_batch_size = config['batch_size']
-    num_components = components
 
-    i_pca = IncrementalPCA(n_components=num_components, batch_size=mini_batch_size)
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     rand_uuids = random.sample(uuids, len(uuids))
 
     cols = len(words)
     rows = len(uuids)
 
-    decomposed = 0
-    train_pca(i_pca, decomposed, rows, cols, rand_uuids, words)
+    i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
+
+    train_pca(i_pca, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store)
 
     print('Explained Variance Ratio')
     print(sum(i_pca.explained_variance_ratio_))
 
-    decomposed = 0
-    transform_vectors(i_pca, decomposed, rows, cols, uuids, words)
+    check_old_file(components)
+
+    transform_vectors(i_pca, rows, cols, uuids, words, mini_batch_size, core_num, dir_store, components)
 
 
-def train_pca(i_pca, decomposed, rows, cols, rand_uuids, words):
+def train_pca(i_pca, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store):
     """
     Train the PCA algorithm incrementally using mini batches of data.    
     
     :return: 
     """
+
+    decomposed = 0
 
     while decomposed < rows:
 
@@ -81,12 +76,14 @@ def train_pca(i_pca, decomposed, rows, cols, rand_uuids, words):
         i_pca.partial_fit(data)
 
 
-def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
+def transform_vectors(i_pca, rows, cols, uuids, words, mini_batch_size, core_num, dir_store, components):
     """
     Transorm the data vectors in mini batches.  
 
     :return: 
     """
+
+    decomposed = 0
 
     while decomposed < rows:
 
@@ -98,6 +95,7 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
         results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
         pool.close()
         pool.join()
+        os.path.join(constants.dir_d, constants.dir_dm, "pca_{}.txt".format(components))
 
         # sort results
         acc = []
@@ -116,5 +114,18 @@ def transform_vectors(i_pca, decomposed, rows, cols, uuids, words):
 
         new_data = i_pca.transform(data)
 
-        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "pca_{}.txt".format(num_components))
+        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "pca_{}.txt".format(components))
         np.savetxt(open(matrix_file, "ab"), new_data)
+
+
+def check_old_file(components):
+    """
+    Checks for the presence of an old PCA matrix file with the same number of components.
+    If found, deletes it.
+
+    :param components:
+    :return:
+    """
+
+    if os.path.isfile(os.path.join(constants.dir_d, constants.dir_dm, "pca_{}.txt".format(components))):
+        os.remove(os.path.join(constants.dir_d, constants.dir_dm, "pca_{}.txt".format(components)))

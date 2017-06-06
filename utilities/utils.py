@@ -1,10 +1,7 @@
+from collections import defaultdict
+import numpy as np
 import json
 import os
-from collections import defaultdict
-
-import numpy as np
-import plotly.graph_objs as go
-import plotly.plotly as py
 
 
 def divide_workload(item_list, core_num, ordered=False):
@@ -64,6 +61,21 @@ def format_worker_input(core_num, item_sublists, fixed_params):
     return formatted_input
 
 
+def get_base_labels_uuids(uuids):
+    """
+    Returns a list of numerical indices mapping each uuid to a malware family.
+
+    :param uuids: list of uuids whose malware families are required
+    :return: list of malware families
+    """
+
+    print('Acquiring base labels')
+    base_labels_dict = get_base_labels()
+    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
+
+    return base_labels
+
+
 def get_base_labels():
     """
     Returns a dictionary mapping uuids to its malware family expressed as numerical index. 
@@ -99,30 +111,3 @@ def get_base_words(dir_base):
                 base_words.add(line.strip().split()[0].decode('utf-8'))
 
     return base_words
-
-
-def visualize_cluster(uuids, reduced_data, computed_labels, base_labels, num_clusters):
-    """
-    Experiment
-    
-    :param uuids: list of uuids
-    :param reduced_data: 
-    :param base_labels: base truth labels
-    :param computed_labels: clustering results 
-    :param num_clusters: number of clusters created
-    :return: 
-    """
-    trace = go.Scattergl(
-        x=reduced_data[0],
-        y=reduced_data[1],
-        mode='markers',
-        marker=dict(
-            size='16',
-            color=np.random.randn(500),  # set color equal to a variable
-            colorscale='Viridis',
-            showscale=True
-        )
-    )
-    data = [trace]
-
-    py.plot(data, filename='test_color')

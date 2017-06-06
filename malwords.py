@@ -5,6 +5,7 @@ from classification import ca_svm, ca_mlp
 from distances import compare_distances
 from utilities import interaction
 from utilities import constants
+from utilities import utils
 import json
 import sys
 import os
@@ -13,7 +14,7 @@ import os
 def main():
     config = json.load(open('config.json', 'r'))
 
-    uuids = pre_process(config)
+    uuids, base_labels = pre_process(config)
 
     dimensionality_reduction(uuids, config)
 
@@ -100,7 +101,7 @@ def dimensionality_reduction(uuids, config):
 
         if dr == 'pca':
             components = interaction.ask_number(constants.msg_components)
-            dr_pca.get_pca(config, components, uuids)
+            dr_pca.get_pca(config, uuids, components)
 
         elif dr == 'svd':
             components = interaction.ask_number(constants.msg_components)
@@ -163,10 +164,15 @@ def pre_process(config):
     # Select the data subset to operate upon
     uuids = pp_subset.subset(config)
 
+    # Retrieve base labels
+    base_labels = utils.get_base_labels_uuids(uuids)
+
+    print('Acquired {} samples belonging to {} different families.\n'.format(len(uuids), len(set(base_labels))))
+
     if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)):
         pp_js.get_js(config, uuids)
 
-    return uuids
+    return uuids, base_labels
 
 
 if __name__ == '__main__':

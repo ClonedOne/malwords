@@ -2,7 +2,6 @@ from sklearn.cluster import DBSCAN
 from utilities import evaluation
 from utilities import constants
 from utilities import output
-from utilities import utils
 import numpy as np
 import os
 
@@ -18,10 +17,6 @@ def cluster(config, uuids):
 
     data = np.loadtxt(os.path.join(constants.dir_d, constants.file_js))
 
-    # Retrieve base labels
-    print('Acquiring base labels')
-    base_labels_dict = utils.get_base_labels()
-    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     print('Perform clustering')
     dbscan = DBSCAN(eps=0.55, metric='precomputed', n_jobs=core_num, min_samples=25)
