@@ -7,9 +7,9 @@ import json
 import os
 
 
-def get_lda(config, components, uuids):
+def get_lda(config, uuids, components):
     """
-    Apply Latent Dirichlet Allocation to the tf-idf vectors.
+    Apply Latent Dirichlet Allocation to the bag of words data-set.
 
     :return: 
     """
@@ -25,7 +25,7 @@ def get_lda(config, components, uuids):
     rows = len(uuids)
 
     lda = LatentDirichletAllocation(batch_size=mini_batch_size, n_jobs=core_num, n_topics=components, max_iter=100,
-                                    total_samples=len(uuids), learning_method='online')
+                                    total_samples=len(uuids), learning_method='online', verbose=3)
 
     train_lda(lda, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_malwords)
 

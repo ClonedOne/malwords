@@ -1,6 +1,6 @@
 from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch, ca_spectral, ca_dbscan
-from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_kernel_pca, dr_tsne
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js
+from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
 from classification import ca_svm, ca_mlp
 from distances import compare_distances
 from utilities import interaction
@@ -105,19 +105,15 @@ def dimensionality_reduction(uuids, config):
 
         elif dr == 'svd':
             components = interaction.ask_number(constants.msg_components)
-            dr_svd.get_svd(config, components, uuids)
+            dr_svd.get_svd(config, uuids, components)
 
-        elif dr == 'kernel-pca':
+        elif dr == 'tsne':
             components = interaction.ask_number(constants.msg_components)
-            dr_kernel_pca.get_kern_pca(config, components, uuids)
-
-        elif dr == 'tnse':
-            components = interaction.ask_number(constants.msg_components)
-            dr_tsne.get_tsne(config, components, uuids)
+            dr_tsne.get_tsne(config, uuids, components)
 
         elif dr == 'lda':
             components = interaction.ask_number(constants.msg_components)
-            dr_lda.get_lda(config, components, uuids)
+            dr_lda.get_lda(config, uuids, components)
 
         elif dr == 's':
             return

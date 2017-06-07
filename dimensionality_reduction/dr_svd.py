@@ -1,32 +1,22 @@
 from sklearn.decomposition import TruncatedSVD
-from workers import wk_read_tfidf
-from multiprocessing import Pool
+from helpers import loader_tfidf
 from utilities import constants
-from utilities import utils
-from scipy.sparse import *
 import numpy as np
 import json
 import os
 
-dir_store = ''
-mini_batch_size = 0
-core_num = 1
-num_components = 0
 
-
-def get_svd(config, components, uuids):
+def get_svd(config, uuids, components):
     """
     Lower dimensionality of data vectors using SVD.
 
     :return: 
     """
 
-    global dir_store, core_num, mini_batch_size, num_components
     dir_store = config['dir_store']
     core_num = config['core_num']
-    num_components = components
 
-    svd = TruncatedSVD(n_components=components)
+    svd = TruncatedSVD(n_components=components, n_iter=10)
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
 
     # Force loading of full dataset in RAM (may result in MEMORY ERROR!)
@@ -35,47 +25,33 @@ def get_svd(config, components, uuids):
     cols = len(words)
     rows = len(uuids)
 
-    decomposed = 0
-    transform_vectors(svd, decomposed, rows, cols, uuids, words)
+    data = transform_vectors(svd, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
 
     print('Explained Variance Ratio')
     print(sum(svd.explained_variance_ratio_))
 
+    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "svd_{}.txt".format(components))
+    np.savetxt(open(matrix_file, "wb"), data)
 
-def transform_vectors(svd, decomposed, rows, cols, uuids, words):
+
+def transform_vectors(svd, rows, cols, uuids, words, mini_batch_size, core_num, dir_store):
     """
     Transform vectors using SVD.    
 
     :return: 
     """
 
-    # Divide the docuements in mini batches of fixed size and apply Incremental PCA on them
+    decomposed = 0
+    new_data = []
+
     while decomposed < rows:
-
         print('Transforming documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
-        # starting from the decomposed-th element of the uuids list
-        file_name_lists = utils.divide_workload(uuids[decomposed:][:mini_batch_size], core_num, ordered=True)
-        formatted_input = utils.format_worker_input(core_num, file_name_lists, (cols, words, dir_store, False))
-        pool = Pool(processes=core_num)
-        results = pool.map(wk_read_tfidf.get_data_matrix, formatted_input)
-        pool.close()
-        pool.join()
 
-        # sort results
-        acc = []
-        for i in range(core_num):
-            for res in results:
-                if res[0] == i:
-                    acc.append(res[1])
-        data = vstack(acc)
+        data = loader_tfidf.load_tfidf(uuids[decomposed:][:mini_batch_size], core_num, cols, words, dir_store,
+                                       dense=False, ordered=True)
 
-        print(data.shape)
-
-        del results
-        del acc
         decomposed += mini_batch_size
 
-        new_data = svd.fit_transform(data)
+        new_data.append(svd.fit_transform(data))
 
-        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "svd_{}.txt".format(num_components))
-        np.savetxt(open(matrix_file, "ab"), new_data)
+    return np.concatenate(new_data)

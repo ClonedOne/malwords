@@ -33,8 +33,7 @@ msg_argv = '\nPlease select a valid action:\n' \
 msg_dr = '\nPlease select a dimensionality reduction technique:\n' \
          'pca\n' \
          'svd\n' \
-         'kernel-pca\n' \
-         'tnse\n' \
+         'tsne\n' \
          'lda\n' \
          's to skip dimensionality reduction\n' \
          'q to quit\n'
