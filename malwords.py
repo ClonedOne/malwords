@@ -18,17 +18,18 @@ def main():
 
     dimensionality_reduction(uuids, config)
 
-    cluster_classify(uuids, config)
+    cluster_classify(uuids, base_labels, config)
 
 
 # Main lifecycle
 
-def cluster_classify(uuids, config):
+def cluster_classify(uuids, base_labels, config):
     """
     Perform a clustering or classification step.
     
-    :param uuids:
-    :param config:
+    :param uuids: list of uuids
+    :param base_labels: list of malware families
+    :param config: configuration dictionary
     :return: 
     """
 
@@ -40,22 +41,22 @@ def cluster_classify(uuids, config):
         if ca == 'kmeans':
             clusters = interaction.ask_number(constants.msg_clusters)
             data_matrix = interaction.ask_file(constants.msg_data)
-            ca_kmeans.cluster(config, data_matrix, clusters, uuids)
+            ca_kmeans.cluster(config, data_matrix, clusters, uuids, base_labels)
 
         elif ca == 'mini_kmeans':
             clusters = interaction.ask_number(constants.msg_clusters)
-            ca_kmeans_minibatch.cluster(config, clusters, uuids)
+            ca_kmeans_minibatch.cluster(config, clusters, uuids, base_labels)
 
         elif ca == 'spectral':
             clusters = interaction.ask_number(constants.msg_clusters)
-            ca_spectral.cluster(config, clusters, uuids)
+            ca_spectral.cluster(config, clusters, uuids, base_labels)
 
         elif ca == 'dbscan':
-            ca_dbscan.cluster(config, uuids)
+            ca_dbscan.cluster(config, uuids, base_labels)
 
         elif ca == 'hdbscan':
             distance = interaction.ask_metric()
-            ca_hdbscan.cluster(config, distance, uuids)
+            ca_hdbscan.cluster(config, distance, uuids, base_labels)
 
         elif ca == 'svm':
             data_matrix = interaction.ask_file(constants.msg_data)
@@ -80,8 +81,8 @@ def dimensionality_reduction(uuids, config):
     """
     Perform a dimensionality reduction step (or skip).
     
-    :param uuids:
-    :param config:
+    :param uuids: list of uuids
+    :param config: configuration dictionary
     :return: 
     """
 
@@ -128,10 +129,10 @@ def dimensionality_reduction(uuids, config):
 
 def pre_process(config):
     """
-    Perform pre-processing steps
+    Perform pre-processing steps and returns a list of sample uuids and a list or related labels.
     
-    :param config:
-    :return: 
+    :param config: configuration dictionary
+    :return: tuple of lists, uuids and malware families
     """
 
     # Create results data directories if needed

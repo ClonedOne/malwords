@@ -4,51 +4,42 @@ from utilities import interaction
 from utilities import evaluation
 from utilities import constants
 from utilities import output
-from utilities import utils
 import numpy as np
 import hdbscan
 import os
 
-core_num = 1
 
-
-def cluster(config, distance, uuids):
+def cluster(config, distance, uuids, base_labels):
     """
     Cluster the documents using out of core Mini Batch KMeans. 
 
     :return: 
     """
 
-    global core_num
     core_num = config['core_num']
     min_cluster_size = 30
 
     distance_type = distance
 
-    # Retrieve base labels
-    print('Acquiring base labels')
-    base_labels_dict = utils.get_base_labels()
-    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
-
     if distance_type == 'e':
         matrix_file = interaction.ask_file(constants.msg_data)
         data = np.loadtxt(matrix_file)
-        euclidean(data, uuids, base_labels, min_cluster_size)
+        euclidean(data, uuids, base_labels, min_cluster_size, core_num)
 
     elif distance_type == 'c':
         matrix_file = interaction.ask_file(constants.msg_data)
         data = np.loadtxt(matrix_file)
-        cosine(data, uuids, base_labels, min_cluster_size)
+        cosine(data, uuids, base_labels, min_cluster_size, core_num)
 
     elif distance_type == 'j':
         data = np.loadtxt(os.path.join(constants.dir_d, constants.file_js))
-        js(data, uuids, base_labels, min_cluster_size)
+        js(data, uuids, base_labels, min_cluster_size, core_num)
 
     else:
         print('Please specify distance metric, either e for euclidean or c for cosine')
 
 
-def js(data, uuids, base_labels, min_cluster_size):
+def js(data, uuids, base_labels, min_cluster_size, core_num):
     """
       Perform HDBSCAN with jensen-shannon distance
 
@@ -56,6 +47,7 @@ def js(data, uuids, base_labels, min_cluster_size):
       :param uuids: list of uuids corresponding to data points
       :param base_labels: reference clustering
       :param min_cluster_size: minimum number of points to generate cluster
+      :param core_num: number of available cpu cores
       :return:
       """
 
@@ -78,7 +70,7 @@ def js(data, uuids, base_labels, min_cluster_size):
     output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'jensen_shannon', 'hdbscan')
 
 
-def euclidean(data, uuids, base_labels, min_cluster_size):
+def euclidean(data, uuids, base_labels, min_cluster_size, core_num):
     """
     Perform HDBSCAN with euclidean distance
     
@@ -86,6 +78,7 @@ def euclidean(data, uuids, base_labels, min_cluster_size):
     :param uuids: list of uuids corresponding to data points
     :param base_labels: reference clustering
     :param min_cluster_size: minimum number of points to generate cluster
+    :param core_num: number of available cpu cores
     :return: 
     """
 
@@ -109,7 +102,7 @@ def euclidean(data, uuids, base_labels, min_cluster_size):
     vis_plot.plot_hdbs_against_2d(hdbs, num_clusters, has_tree=True)
 
 
-def cosine(data, uuids, base_labels, min_cluster_size):
+def cosine(data, uuids, base_labels, min_cluster_size, core_num):
     """
     Perform HDBSCAN with cosine distance
 
@@ -117,6 +110,7 @@ def cosine(data, uuids, base_labels, min_cluster_size):
     :param uuids: list of uuids corresponding to data points
     :param base_labels: reference clustering
     :param min_cluster_size: minimum number of points to generate cluster
+    :param core_num: number of available cpu cores
     :return: 
     """
 

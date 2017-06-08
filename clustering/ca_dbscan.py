@@ -6,7 +6,7 @@ import numpy as np
 import os
 
 
-def cluster(config, uuids):
+def cluster(config, uuids, base_labels):
     """
     Cluster the documents using DBScan. 
 
@@ -16,7 +16,6 @@ def cluster(config, uuids):
     core_num = config['core_num']
 
     data = np.loadtxt(os.path.join(constants.dir_d, constants.file_js))
-
 
     print('Perform clustering')
     dbscan = DBSCAN(eps=0.55, metric='precomputed', n_jobs=core_num, min_samples=25)

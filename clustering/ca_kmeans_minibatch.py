@@ -1,6 +1,5 @@
 from sklearn.cluster import MiniBatchKMeans
 from multiprocessing import Pool
-
 import utilities.evaluation
 import utilities.output
 from utilities import utils
@@ -15,7 +14,7 @@ mini_batch_size = 0
 core_num = 1
 
 
-def cluster(config, clusters, uuids):
+def cluster(config, clusters, uuids, base_labels):
     """
     Cluster the documents using out of core Mini Batch KMeans. 
     
@@ -37,11 +36,6 @@ def cluster(config, clusters, uuids):
     rows = len(uuids)
 
     print('Matrix dimensions: ', rows, cols)
-
-    # Retrieve base labels
-    print('Acquiring base labels')
-    base_labels_dict = utils.get_base_labels()
-    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
     print('\nTraining KMeans')
     train_k_means(k_means, clustered, rows, cols, rand_uuids, words)

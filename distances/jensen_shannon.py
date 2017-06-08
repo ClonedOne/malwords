@@ -19,3 +19,15 @@ def jensen_shannon_dist(vec1, vec2):
 
     m_vec = 0.5 * (vec1 + vec2)
     return math.sqrt(0.5 * (entropy(vec1, m_vec) + entropy(vec2, m_vec)))
+
+
+# def jensen_shannon_affinity(vec1, vec2):
+#     """
+#     Returns the affinity between two vectors as the opposite of the Jensen-Shannon distance.
+#
+#     :param vec1: word count vector
+#     :param vec2: word count vector
+#     :return: affinity as opposite of jensen-shannon distance
+#     """
+#
+#     return 1 - jensen_shannon_dist(vec1, vec2)

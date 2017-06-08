@@ -1,14 +1,13 @@
 from sklearn.cluster import SpectralClustering
 from utilities import constants
 from utilities import output
-from utilities import utils
 import utilities.evaluation
 import utilities.output
 import numpy as np
 import os
 
 
-def cluster(config, num_clusters, uuids):
+def cluster(config, num_clusters, uuids, base_labels):
     """
     Cluster the documents using the Jensen-Shannon metric and Spectral Clustering algorithm.
 
@@ -23,13 +22,10 @@ def cluster(config, num_clusters, uuids):
     delta = 1
     data = np.exp(- data ** 2 / (2. * delta ** 2))
 
-    # Retrieve base labels
-    print('Acquiring base labels')
-    base_labels_dict = utils.get_base_labels()
-    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
+    print('Performing clustering')
+    spectral = SpectralClustering(affinity='precomputed', n_clusters=num_clusters, n_jobs=core_num, eigen_solver='amg',
+                                  n_init=20)
 
-    print('Perform clustering')
-    spectral = SpectralClustering(affinity='precomputed', n_clusters=num_clusters, n_jobs=core_num)
     computed_labels = spectral.fit_predict(data)
 
     utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
