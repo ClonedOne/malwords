@@ -4,7 +4,7 @@ import os
 
 err_msg = 'Please choose the subset of data to workon on:\n' \
           'l for all labeled samples\n' \
-          'k for samples of families mydoom, neobar, gepys, lamer, neshta, bladabindi, flystudio\n' \
+          'k for samples of families mydoom, gepys, lamer, neshta, bladabindi, flystudio, eorezo\n' \
           's for 8 samples of families mydoom, gepys, bladabindi, flystudio\n' \
           'f for a single family\n' \
           'j for json list of uuids\n' \
@@ -106,7 +106,7 @@ def load_samples(config, small=False):
     if small:
         datasets = [small_subset, ]
     else:
-        familes = ['mydoom', 'neobar', 'gepys', 'lamer', 'neshta', 'bladabindi', 'flystudio']
+        familes = ['mydoom', 'gepys', 'lamer', 'neshta', 'bladabindi', 'flystudio', 'eorezo']
         datasets = [inv_labels[family] for family in familes]
 
     return sorted([uuid for dataset in datasets for uuid in dataset])

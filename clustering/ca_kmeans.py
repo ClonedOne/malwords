@@ -21,7 +21,7 @@ def cluster(config, data_matrix, clusters, uuids, base_labels):
 
     data = np.loadtxt(matrix_file)
 
-    test_kmeans_clusters(data, base_labels, num_clusters_max)
+    test_kmeans_clusters(data, base_labels, num_clusters_max, core_num, max_iter)
 
     # Forces the user to choose the desired number of clusters
     num_clusters = interaction.ask_clusters(num_clusters_max)

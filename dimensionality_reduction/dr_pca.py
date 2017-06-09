@@ -7,12 +7,14 @@ import json
 import os
 
 
-def get_pca(config, uuids, components):
+def get_pca(config, uuids, components, objective):
     """
     Apply Incremental Principal Components Analysis to the tf-idf vectors.
     
     :return: 
     """
+
+    print('Performing dimensionality reduction using PCA')
 
     dir_store = config['dir_store']
     core_num = config['core_num']
@@ -33,7 +35,7 @@ def get_pca(config, uuids, components):
 
     data = transform_vectors(i_pca, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "pca_{}.txt".format(components))
+    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "pca_{}_{}.txt".format(components, objective))
     np.savetxt(open(matrix_file, "wb"), data)
 
 

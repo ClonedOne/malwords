@@ -7,12 +7,14 @@ import json
 import os
 
 
-def get_lda(config, uuids, components):
+def get_lda(config, uuids, components, objective):
     """
     Apply Latent Dirichlet Allocation to the bag of words data-set.
 
     :return: 
     """
+
+    print('Performing dimensionality reduction using LDA')
 
     dir_malwords = config['dir_malwords']
     core_num = config['core_num']
@@ -31,7 +33,7 @@ def get_lda(config, uuids, components):
 
     data = transform_vectors(lda, rows, cols, uuids, words, mini_batch_size, core_num, dir_malwords)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "lda_{}.txt".format(components))
+    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "lda_{}_{}.txt".format(components, objective))
     np.savetxt(open(matrix_file, "wb"), data)
 
 

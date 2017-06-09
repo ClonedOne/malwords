@@ -6,12 +6,14 @@ import json
 import os
 
 
-def get_tsne(config, uuids, components):
+def get_tsne(config, uuids, components, objective):
     """
     Lower dimensionality of data vectors using tSNE.
 
     :return: 
     """
+
+    print('Performing dimensionality reduction using TSNE')
 
     dir_store = config['dir_store']
     core_num = config['core_num']
@@ -31,7 +33,7 @@ def get_tsne(config, uuids, components):
     print('Kullback-Leibler divergence')
     print(tsne.kl_divergence_)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "tsne_{}.txt".format(components))
+    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "tsne_{}_{}.txt".format(components, objective))
     np.savetxt(open(matrix_file, "wb"), data)
 
 

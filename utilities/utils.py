@@ -1,4 +1,5 @@
 from collections import defaultdict
+from utilities import constants
 import numpy as np
 import json
 import os
@@ -69,7 +70,6 @@ def get_base_labels_uuids(uuids):
     :return: list of malware families
     """
 
-    print('Acquiring base labels')
     base_labels_dict = get_base_labels()
     base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
 
@@ -84,8 +84,8 @@ def get_base_labels():
     """
 
     base_labels = {}
-    inverted_label = json.load(open('data/inverted_labels.json'))
-    uuid_label = json.load(open('data/labels.json'))
+    inverted_label = json.load(open(os.path.join(constants.dir_d, constants.json_inverted_labels)))
+    uuid_label = json.load(open(os.path.join(constants.dir_d, constants.json_labels)))
     sorted_families = sorted(list(inverted_label.keys()))
     families_index = {sorted_families[index]: index for index in range(len(sorted_families))}
 
@@ -111,3 +111,17 @@ def get_base_words(dir_base):
                 base_words.add(line.strip().split()[0].decode('utf-8'))
 
     return base_words
+
+
+def get_index_labels():
+    """
+    Returns a dictionary mapping numerical index to malware families.
+
+    :return: dictionary mapping integers to malware families
+    """
+
+    inverted_label = json.load(open(os.path.join(constants.dir_d, constants.json_inverted_labels)))
+    sorted_families = sorted(list(inverted_label.keys()))
+    index_label = {index: sorted_families[index] for index in range(len(sorted_families))}
+
+    return index_label
