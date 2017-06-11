@@ -109,5 +109,27 @@ def ask_metric():
     return metric
 
 
+def ask_yes_no(msg):
+    """
+    Ask user for a yes/no answer.
+
+    :param msg:
+    :return:
+    """
+
+    chosen = False
+    while not chosen:
+        choice = input(msg)
+
+        if choice.lower() == 'y':
+            return True
+
+        elif choice.lower() == 'n':
+            return False
+
+        else:
+            print('Not a valid input\n')
+
+
 def complete(text, state):
     return (glob.glob(text + '*') + [None])[state]

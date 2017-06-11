@@ -22,12 +22,12 @@ def main():
 
     dimensionality_reduction(uuids, x_train, x_test, config)
 
-    cluster_classify(uuids, y_train, y_test, base_labels, config)
+    cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
 
 
 # Main lifecycle
 
-def cluster_classify(uuids, y_train, y_test, base_labels, config):
+def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config):
     """
     Perform a clustering or classification step.
     
@@ -65,14 +65,22 @@ def cluster_classify(uuids, y_train, y_test, base_labels, config):
             ca_hdbscan.cluster(config, distance, uuids, base_labels)
 
         elif ca == 'svm':
-            data_matrix = interaction.ask_file(constants.msg_data_train)
-            data_matrix_test = interaction.ask_file(constants.msg_data_test)
-            ca_svm.classify(config, data_matrix, data_matrix_test, uuids, y_train, y_test, sparse=False)
+            sparse = interaction.ask_yes_no(constants.msg_sparse)
+            if sparse:
+                train, test = x_train, x_test
+            else:
+                train = interaction.ask_file(constants.msg_data_train)
+                test = interaction.ask_file(constants.msg_data_test)
+            ca_svm.classify(config, train, test, y_train, y_test, sparse=sparse)
 
         elif ca == 'mlp':
-            data_matrix = interaction.ask_file(constants.msg_data_train)
-            data_matrix_test = interaction.ask_file(constants.msg_data_test)
-            ca_mlp.classify(config, data_matrix, data_matrix_test, uuids, y_train, y_test, sparse=False)
+            sparse = interaction.ask_yes_no(constants.msg_sparse)
+            if sparse:
+                train, test = x_train, x_test
+            else:
+                train = interaction.ask_file(constants.msg_data_train)
+                test = interaction.ask_file(constants.msg_data_test)
+            ca_mlp.classify(config, train, test, y_train, y_test, sparse=sparse)
 
         elif ca == 's':
             return

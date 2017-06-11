@@ -1,5 +1,6 @@
 from sklearn.metrics.pairwise import pairwise_distances
 from distances import jensen_shannon
+from utilities import interaction
 from helpers import loader_freqs
 from utilities import constants
 import numpy as np
@@ -19,15 +20,9 @@ def get_js(config, uuids):
     core_num = config['core_num']
     dir_malwords = config['dir_mini']
 
-    chosen = False
-    while not chosen:
-        choice = input(constants.msg_js)
-
-        if choice.lower() == 'y':
-            chosen = True
-
-        elif choice.lower() == 'n':
-            return
+    proceed = interaction.ask_yes_no(constants.msg_js)
+    if not proceed:
+        return
 
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     cols = len(words)

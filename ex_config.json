@@ -1,6 +1,6 @@
 {
+  "info": "Fill this section with the paths to relevant data",
   "dir_malwords": "",
-  "dir_mini": "",
   "dir_store": "",
   "dir_base": "",
   "dir_test": "",

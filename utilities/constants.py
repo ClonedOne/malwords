@@ -58,4 +58,7 @@ msg_metric = '\nPlease select the desired metric\n' \
              'q to quit\n'
 
 msg_js = '\nWould you like to compute the Jensen-Shannon distance matrix for the chosen data? [y/n]\n' \
-         'It may take very long, deending on the number of selected samples\n'
+         'It may take very long, depending on the number of selected samples\n'
+
+msg_sparse = '\nWould you like to use all the data as a sparse matrix? [y/n]\n' \
+             'It may take very long, depending on the number of selected samples\n'
