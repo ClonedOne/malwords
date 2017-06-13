@@ -132,7 +132,7 @@ def plot_classification(data_matrix, classification, base_labels):
     """
     Plots the result of classification against the base truth, over a dimensionality reduced space.
 
-    :param data:
+    :param data_matrix:
     :param classification:
     :param base_labels:
     :return:

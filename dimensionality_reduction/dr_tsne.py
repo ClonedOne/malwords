@@ -6,7 +6,7 @@ import json
 import os
 
 
-def reduce(config, uuids, components, objective):
+def reduce(config, train, test, components, objective):
     """
     Lower dimensionality of data vectors using tSNE.
 
@@ -23,18 +23,25 @@ def reduce(config, uuids, components, objective):
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
 
     # Force loading of full data-set in RAM (may be a problem with low memory!)
-    mini_batch_size = len(uuids)
+    mini_batch_size = len(train)
 
     cols = len(words)
-    rows = len(uuids)
+    rows = len(train)
 
-    data = transform_vectors(tsne, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
+    data = transform_vectors(tsne, rows, cols, train, words, mini_batch_size, core_num, dir_store)
 
     print('Kullback-Leibler divergence')
     print(tsne.kl_divergence_)
 
     matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "tsne_{}_{}.txt".format(components, objective))
     np.savetxt(open(matrix_file, "wb"), data)
+
+    if test is not None:
+        rows = len(test)
+        data = transform_vectors(tsne, rows, cols, test, words, mini_batch_size, core_num, dir_store)
+
+        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "tsne_{}_{}.txt".format(components, 'test'))
+        np.savetxt(open(matrix_file, "wb"), data)
 
 
 def transform_vectors(tsne, rows, cols, uuids, words, mini_batch_size, core_num, dir_store):

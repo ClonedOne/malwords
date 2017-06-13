@@ -7,7 +7,7 @@ import json
 import os
 
 
-def reduce(config, uuids, components, objective):
+def reduce(config, train, test, components, objective):
     """
     Apply Latent Dirichlet Allocation to the bag of words data-set.
 
@@ -21,20 +21,27 @@ def reduce(config, uuids, components, objective):
     mini_batch_size = config['batch_size']
 
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    rand_uuids = random.sample(uuids, len(uuids))
+    rand_uuids = random.sample(train, len(train))
 
     cols = len(words)
-    rows = len(uuids)
+    rows = len(train)
 
     lda = LatentDirichletAllocation(batch_size=mini_batch_size, n_jobs=core_num, n_topics=components, max_iter=100,
-                                    total_samples=len(uuids), learning_method='online', verbose=3)
+                                    total_samples=len(train), learning_method='online', verbose=3)
 
     train_lda(lda, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_malwords)
 
-    data = transform_vectors(lda, rows, cols, uuids, words, mini_batch_size, core_num, dir_malwords)
+    data = transform_vectors(lda, rows, cols, train, words, mini_batch_size, core_num, dir_malwords)
 
     matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "lda_{}_{}.txt".format(components, objective))
     np.savetxt(open(matrix_file, "wb"), data)
+
+    if test is not None:
+        rows = len(test)
+        data = transform_vectors(lda, rows, cols, test, words, mini_batch_size, core_num, dir_malwords)
+
+        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "lda_{}_{}.txt".format(components, 'test'))
+        np.savetxt(open(matrix_file, "wb"), data)
 
 
 def train_lda(lda, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_malwords):

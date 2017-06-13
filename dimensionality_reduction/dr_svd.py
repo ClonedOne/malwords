@@ -6,7 +6,7 @@ import json
 import os
 
 
-def reduce(config, uuids, components, objective):
+def reduce(config, train, test, components, objective):
     """
     Lower dimensionality of data vectors using SVD.
 
@@ -22,18 +22,48 @@ def reduce(config, uuids, components, objective):
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
 
     # Force loading of full dataset in RAM (may result in MEMORY ERROR!)
-    mini_batch_size = len(uuids)
+    mini_batch_size = len(train)
 
     cols = len(words)
-    rows = len(uuids)
+    rows = len(train)
 
-    data = transform_vectors(svd, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
+    train_svd(svd, rows, cols, train, words, mini_batch_size, core_num, dir_store)
+
+    data = transform_vectors(svd, rows, cols, train, words, mini_batch_size, core_num, dir_store)
 
     print('Explained Variance Ratio')
     print(sum(svd.explained_variance_ratio_))
 
     matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "svd_{}_{}.txt".format(components, objective))
     np.savetxt(open(matrix_file, "wb"), data)
+
+    if test is not None:
+        rows = len(test)
+        mini_batch_size = len(test)
+
+        data = transform_vectors(svd, rows, cols, test, words, mini_batch_size, core_num, dir_store)
+
+        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "svd_{}_{}.txt".format(components, 'test'))
+        np.savetxt(open(matrix_file, "wb"), data)
+
+
+def train_svd(svd, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store):
+    """
+    Train the SVD algorithm.
+
+    :return:
+    """
+
+    decomposed = 0
+
+    while decomposed < rows:
+        print('Processing documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
+        data = loader_tfidf.load_tfidf(rand_uuids[decomposed:][:mini_batch_size], core_num, cols, words, dir_store,
+                                       dense=True, ordered=False)
+
+        decomposed += mini_batch_size
+
+        svd.fit(data)
 
 
 def transform_vectors(svd, rows, cols, uuids, words, mini_batch_size, core_num, dir_store):
@@ -54,6 +84,6 @@ def transform_vectors(svd, rows, cols, uuids, words, mini_batch_size, core_num, 
 
         decomposed += mini_batch_size
 
-        new_data.append(svd.fit_transform(data))
+        new_data.append(svd.transform(data))
 
     return np.concatenate(new_data)

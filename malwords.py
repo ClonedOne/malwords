@@ -23,16 +23,20 @@ def main():
 
     cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
 
-    visualize(uuids, base_labels)
+    visualize(x_test, base_labels)
 
 
 # Main lifecycle
 
-def visualize(uuids, base_labels):
+def visualize(uuids, x_train, x_test, y_train, y_test, base_labels):
     """
     Perform visualization operations
 
+    :param y_test:
+    :param y_train:
+    :param x_train:
     :param uuids:
+    :param x_test:
     :param base_labels:
     :return:
     """
@@ -40,6 +44,13 @@ def visualize(uuids, base_labels):
     if interaction.ask_yes_no(constants.msg_visualization):
         data_matrix = interaction.ask_file(constants.msg_data_visualize)
         vis_plot.plot_data(data_matrix, base_labels)
+
+    if interaction.ask_yes_no(constants.msg_visualize_ca):
+        data = json.load(open(interaction.ask_file(constants.msg_results_ca), 'r'))
+        classification = [data[uuid] for uuid in x_test]
+        data_matrix = interaction.ask_file(constants.msg_data_visualize)
+        vis_plot.plot_classification(data_matrix, classification, base_labels)
+
 
 
 def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config):
@@ -135,9 +146,8 @@ def dimensionality_reduction(uuids, x_train, x_test, config):
 
         if dr in drs:
             components = interaction.ask_number(constants.msg_components)
-            drs[dr].reduce(config, uuids, components, 'all')
-            drs[dr].reduce(config, x_train, components, 'train')
-            drs[dr].reduce(config, x_test, components, 'test')
+            drs[dr].reduce(config, uuids, None, components, 'all')
+            drs[dr].reduce(config, x_train, x_test, components, 'train')
 
         elif dr == 's':
             return

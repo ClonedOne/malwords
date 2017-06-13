@@ -30,6 +30,7 @@ msg_data_visualize = 'data matrix file to visualize'
 msg_data_visualize_base = 'base data matrix file to visualize'
 msg_clusters = 'clusters'
 msg_components = 'components'
+msg_results_ca = 'clustering or classification result file'
 
 msg_argv = '\nPlease select a valid action:\n' \
            'compare-distance --> show various distance metrics applies to the samples\n' \
