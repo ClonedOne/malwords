@@ -121,8 +121,14 @@ def from_json(config, file_name):
     :return: 
     """
 
+    result = []
     uuids = json.load(open(file_name))
-    return sorted(uuids)
+    for file_name in sorted(os.listdir(config['dir_malwords'])):
+        uuid = file_name.split('.')[0][:-3]
+        if uuid in uuids:
+            result.append(uuid)
+
+    return sorted(result)
 
 
 def get_family(config, family):

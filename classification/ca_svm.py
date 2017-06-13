@@ -1,14 +1,17 @@
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import f1_score
+from visualization import vis_plot
+from utilities import interaction
 from helpers import loader_tfidf
 from utilities import constants
+from utilities import output
 from sklearn.svm import SVC
 import numpy as np
 import json
 import os
 
 
-def classify(config, train, test, y_train, y_test, sparse=False):
+def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False):
     """
     Classify the documents using SVM and the AVClass labels as base truth.
 
@@ -21,7 +24,7 @@ def classify(config, train, test, y_train, y_test, sparse=False):
 
     print('Loading data')
     if sparse:
-        data_train = loader_tfidf.load_tfidf(train, core_num, len(words), words, dir_store, dense=False, ordered=True)
+        data_train = loader_tfidf.load_tfidf(x_train, core_num, len(words), words, dir_store, dense=False, ordered=True)
     else:
         data_train = np.loadtxt(train)
 
@@ -36,7 +39,7 @@ def classify(config, train, test, y_train, y_test, sparse=False):
     svc.fit(data_train, y_train)
 
     if sparse:
-        data_test = loader_tfidf.load_tfidf(test, core_num, len(words), words, dir_store, dense=False, ordered=True)
+        data_test = loader_tfidf.load_tfidf(x_test, core_num, len(words), words, dir_store, dense=False, ordered=True)
     else:
         data_test = np.loadtxt(test)
 
@@ -44,4 +47,9 @@ def classify(config, train, test, y_train, y_test, sparse=False):
 
     test_score = f1_score(computed_labels, y_test, average='micro')
     print('F1 score of test: {}'.format(test_score))
+
+    output.out_classification(dict(zip(x_test, computed_labels.tolist())), 'linear', 'svm')
+
+    data_matrix = interaction.ask_file(constants.msg_data_visualize_base)
+    vis_plot.plot_classification(data_matrix, computed_labels, y_test)
 

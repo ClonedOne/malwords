@@ -14,7 +14,7 @@ def get_stats():
     threshold_high = 800
     threshold_low = 200
     uuids = inside_thresholds(stats_labels, threshold_low, threshold_high, stats_labels[5])
-    json.dump(uuids, open('data/uuids.json', 'w'), indent=2)
+    json.dump(uuids, open('data/balanced.json', 'w'), indent=2)
 
 
 def inside_thresholds(stats_labels, threshold_low, threshold_high, fam_uuids):

@@ -6,7 +6,7 @@ import json
 import os
 
 
-def get_svd(config, uuids, components, objective):
+def reduce(config, uuids, components, objective):
     """
     Lower dimensionality of data vectors using SVD.
 

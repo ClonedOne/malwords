@@ -20,6 +20,23 @@ def out_clustering(clustering_dict, distance, algo):
     json.dump(clustering_dict, open(os.path.join(constants.dir_d, constants.dir_dc, out_file), 'w'), indent=2)
 
 
+def out_classification(classification_dict, distance, algo):
+    """
+    Dumps the dictionary resulting from classification into a json file.
+
+    :param classification_dict:
+    :param distance:
+    :param algo:
+    :return:
+    """
+
+    n_samples = len(classification_dict)
+
+    out_file = 'classification_{}_{}_{}.json'.format(algo, distance, n_samples)
+
+    json.dump(classification_dict, open(os.path.join(constants.dir_d, constants.dir_ds, out_file), 'w'), indent=2)
+
+
 def result_to_visualize(uuids, base_labels, computed_labels, num_clusters):
     """
     Generate a json file structured so it can be used for visualization

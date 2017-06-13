@@ -10,6 +10,7 @@ dir_dc = 'data_cluster'
 dir_dg = 'data_gensim'
 dir_dm = 'data_matrix'
 dir_dt = 'data_tfidf'
+dir_ds = 'data_classification'
 dir_dv = 'data_visualize'
 
 # File names
@@ -26,6 +27,7 @@ json_graph = 'graph1.json'
 msg_data_train = 'training matrix file'
 msg_data_test = 'testing matrix file'
 msg_data_visualize = 'data matrix file to visualize'
+msg_data_visualize_base = 'base data matrix file to visualize'
 msg_clusters = 'clusters'
 msg_components = 'components'
 
@@ -65,3 +67,4 @@ msg_sparse = '\nWould you like to use all the data as a sparse matrix? [y/n]\n' 
              'It may take very long, depending on the number of selected samples\n'
 
 msg_visualization = '\nWould you like to visualize the dimensionality reduced data-set? [y/n]\n'
+msg_visualize_ca = '\nWould you like to visualize the result of clustering/classification? [y/n]\n'

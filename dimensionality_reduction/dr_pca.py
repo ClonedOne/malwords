@@ -7,7 +7,7 @@ import json
 import os
 
 
-def get_pca(config, uuids, components, objective):
+def reduce(config, uuids, components, objective):
     """
     Apply Incremental Principal Components Analysis to the tf-idf vectors.
     

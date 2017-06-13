@@ -3,14 +3,12 @@ from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
 from sklearn.model_selection import train_test_split
 from classification import ca_svm, ca_mlp
-from distances import compare_distances
 from visualization import vis_plot
 from utilities import interaction
 from collections import Counter
 from utilities import constants
 from utilities import utils
 import json
-import sys
 import os
 
 
@@ -39,9 +37,7 @@ def visualize(uuids, base_labels):
     :return:
     """
 
-    vis = interaction.ask_yes_no(constants.msg_visualization)
-
-    if vis:
+    if interaction.ask_yes_no(constants.msg_visualization):
         data_matrix = interaction.ask_file(constants.msg_data_visualize)
         vis_plot.plot_data(data_matrix, base_labels)
 
@@ -51,6 +47,8 @@ def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, confi
     Perform a clustering or classification step.
     
     :param uuids: list of uuids
+    :param x_train:
+    :param x_test:
     :param y_train: list of train set labels
     :param y_test: list of test set labels
     :param base_labels: list of malware families
@@ -86,20 +84,20 @@ def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, confi
         elif ca == 'svm':
             sparse = interaction.ask_yes_no(constants.msg_sparse)
             if sparse:
-                train, test = x_train, x_test
+                train, test = None, None
             else:
                 train = interaction.ask_file(constants.msg_data_train)
                 test = interaction.ask_file(constants.msg_data_test)
-            ca_svm.classify(config, train, test, y_train, y_test, sparse=sparse)
+            ca_svm.classify(config, train, test, x_train, x_test, y_train, y_test, sparse=sparse)
 
         elif ca == 'mlp':
             sparse = interaction.ask_yes_no(constants.msg_sparse)
             if sparse:
-                train, test = x_train, x_test
+                train, test = None, None
             else:
                 train = interaction.ask_file(constants.msg_data_train)
                 test = interaction.ask_file(constants.msg_data_test)
-            ca_mlp.classify(config, train, test, y_train, y_test, sparse=sparse)
+            ca_mlp.classify(config, train, test, x_train, x_test, y_train, y_test, sparse=sparse)
 
         elif ca == 's':
             return
@@ -123,41 +121,23 @@ def dimensionality_reduction(uuids, x_train, x_test, config):
     :return: 
     """
 
-    # Check if user has specified any action
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'compare-distance':
-            compare_distances.compute_distances(config)
-
-        else:
-            print(constants.msg_argv)
-            exit()
+    drs = {
+        'pca': dr_pca,
+        'svd': dr_svd,
+        'tsne': dr_tsne,
+        'lda': dr_lda
+    }
 
     # Prompts the user to select an action
     dr = ""
     while dr == "":
         dr = input(constants.msg_dr)
 
-        if dr == 'pca':
+        if dr in drs:
             components = interaction.ask_number(constants.msg_components)
-            dr_pca.get_pca(config, uuids, components, 'all')
-            dr_pca.get_pca(config, x_train, components, 'train')
-            dr_pca.get_pca(config, x_test, components, 'test')
-
-        elif dr == 'svd':
-            components = interaction.ask_number(constants.msg_components)
-            dr_svd.get_svd(config, uuids, components, 'all')
-            dr_svd.get_svd(config, x_train, components, 'train')
-            dr_svd.get_svd(config, x_test, components, 'test')
-
-        elif dr == 'tsne':
-            components = interaction.ask_number(constants.msg_components)
-            dr_tsne.get_tsne(config, uuids, components, 'all')
-
-        elif dr == 'lda':
-            components = interaction.ask_number(constants.msg_components)
-            dr_lda.get_lda(config, uuids, components, 'all')
-            dr_lda.get_lda(config, x_train, components, 'train')
-            dr_lda.get_lda(config, x_test, components, 'test')
+            drs[dr].reduce(config, uuids, components, 'all')
+            drs[dr].reduce(config, x_train, components, 'train')
+            drs[dr].reduce(config, x_test, components, 'test')
 
         elif dr == 's':
             return
@@ -184,6 +164,7 @@ def pre_process(config):
         os.makedirs(os.path.join(constants.dir_d, constants.dir_dg))
         os.makedirs(os.path.join(constants.dir_d, constants.dir_dm))
         os.makedirs(os.path.join(constants.dir_d, constants.dir_dt))
+        os.makedirs(os.path.join(constants.dir_d, constants.dir_ds))
         os.makedirs(os.path.join(constants.dir_d, constants.dir_dv))
 
     # Create AVClass input data if needed
