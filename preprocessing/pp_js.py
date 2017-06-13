@@ -18,7 +18,7 @@ def get_js(config, uuids):
     """
 
     core_num = config['core_num']
-    dir_malwords = config['dir_mini']
+    dir_malwords = config['dir_malwords']
 
     proceed = interaction.ask_yes_no(constants.msg_js)
     if not proceed:

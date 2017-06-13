@@ -23,8 +23,7 @@ def cluster(config, num_clusters, uuids, base_labels):
     data = np.exp(- data ** 2 / (2. * delta ** 2))
 
     print('Performing clustering')
-    spectral = SpectralClustering(affinity='precomputed', n_clusters=num_clusters, n_jobs=core_num, eigen_solver='amg',
-                                  n_init=20)
+    spectral = SpectralClustering(affinity='precomputed', n_clusters=num_clusters, n_jobs=core_num, n_init=20)
 
     computed_labels = spectral.fit_predict(data)
 

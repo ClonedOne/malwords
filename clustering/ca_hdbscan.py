@@ -22,12 +22,12 @@ def cluster(config, distance, uuids, base_labels):
     distance_type = distance
 
     if distance_type == 'e':
-        matrix_file = interaction.ask_file(constants.msg_data)
+        matrix_file = interaction.ask_file(constants.msg_data_train)
         data = np.loadtxt(matrix_file)
         euclidean(data, uuids, base_labels, min_cluster_size, core_num)
 
     elif distance_type == 'c':
-        matrix_file = interaction.ask_file(constants.msg_data)
+        matrix_file = interaction.ask_file(constants.msg_data_train)
         data = np.loadtxt(matrix_file)
         cosine(data, uuids, base_labels, min_cluster_size, core_num)
 
