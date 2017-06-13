@@ -1,37 +1,19 @@
 import matplotlib.pyplot as plt
 import plotly.graph_objs as go
-from utilities import utils
 import plotly.plotly as py
 import seaborn as sns
 import numpy as np
-import json
-import sys
 import os
 
 
-def plot_data():
+def plot_data(data_matrix, base_labels):
     """
     Plot dimensionality reduced representations of data.
 
     :return: 
     """
 
-    config = json.load(open('config.json'))
-    dir_store = config['dir_store']
-
-    if len(sys.argv) < 2:
-        print('Missing number of clusters')
-        exit()
-    matrix_file_name = sys.argv[1]
-
-    uuids = sorted(os.listdir(dir_store))
-    matrix_file = open(matrix_file_name, 'r')
-    data = np.loadtxt(matrix_file)
-
-    # Retrieve base labels
-    print('Acquiring base labels')
-    base_labels_dict = utils.get_base_labels()
-    base_labels = np.asarray([base_labels_dict[uuid] for uuid in uuids])
+    data = np.loadtxt(data_matrix)
 
     print('Number of labels:', len(set(base_labels)))
 

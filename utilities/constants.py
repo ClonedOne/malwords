@@ -25,6 +25,7 @@ json_graph = 'graph1.json'
 # Interface messages
 msg_data_train = 'training matrix file'
 msg_data_test = 'testing matrix file'
+msg_data_visualize = 'data matrix file to visualize'
 msg_clusters = 'clusters'
 msg_components = 'components'
 
@@ -62,3 +63,5 @@ msg_js = '\nWould you like to compute the Jensen-Shannon distance matrix for the
 
 msg_sparse = '\nWould you like to use all the data as a sparse matrix? [y/n]\n' \
              'It may take very long, depending on the number of selected samples\n'
+
+msg_visualization = '\nWould you like to visualize the dimensionality reduced data-set? [y/n]\n'

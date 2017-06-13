@@ -4,6 +4,7 @@ from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
 from sklearn.model_selection import train_test_split
 from classification import ca_svm, ca_mlp
 from distances import compare_distances
+from visualization import vis_plot
 from utilities import interaction
 from collections import Counter
 from utilities import constants
@@ -24,8 +25,26 @@ def main():
 
     cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
 
+    visualize(uuids, base_labels)
+
 
 # Main lifecycle
+
+def visualize(uuids, base_labels):
+    """
+    Perform visualization operations
+
+    :param uuids:
+    :param base_labels:
+    :return:
+    """
+
+    vis = interaction.ask_yes_no(constants.msg_visualization)
+
+    if vis:
+        data_matrix = interaction.ask_file(constants.msg_data_visualize)
+        vis_plot.plot_data(data_matrix, base_labels)
+
 
 def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config):
     """
