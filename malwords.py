@@ -49,7 +49,7 @@ def visualize(uuids, x_train, x_test, y_train, y_test, base_labels):
         data = json.load(open(interaction.ask_file(constants.msg_results_ca), 'r'))
         classification = [data[uuid] for uuid in x_test]
         data_matrix = interaction.ask_file(constants.msg_data_visualize)
-        vis_plot.plot_classification(data_matrix, classification, base_labels)
+        vis_plot.plot_classification(data_matrix, classification, y_test)
 
 
 def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config):

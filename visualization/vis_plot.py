@@ -146,5 +146,5 @@ def plot_classification(data_matrix, classification, base_labels):
     colors_base = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in base_labels]
     colors_classified = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in classification]
 
-    plt.scatter(*data.T, s=50, linewidth=5, c=colors_base, edgecolors=colors_classified, alpha=0.25)
+    plt.scatter(*data.T, s=60, linewidth=2, c=colors_base, edgecolors=colors_classified, alpha=0.8)
     plt.show()
