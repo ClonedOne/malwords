@@ -23,7 +23,7 @@ def main():
 
     cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
 
-    visualize(x_test, base_labels)
+    visualize(uuids, x_train, x_test, y_train, y_test, base_labels)
 
 
 # Main lifecycle
