@@ -218,7 +218,7 @@ def show_data(uuids, base_labels):
 
     index_label = utils.get_index_labels()
 
-    x_train, x_test, y_train, y_test = train_test_split(uuids, base_labels, test_size=0.2)
+    x_train, x_test, y_train, y_test = train_test_split(uuids, base_labels, test_size=0.2, random_state=30)
 
     print('\n{} train samples belonging to {} malware families'.format(len(x_train), len(set(y_train))))
     distribution = Counter(y_train)
