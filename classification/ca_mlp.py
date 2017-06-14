@@ -21,12 +21,12 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
     dir_store = config['dir_store']
     core_num = config['core_num']
     components = 10000
+    srp = SparseRandomProjection(n_components=components)
 
     print('Loading data')
     if sparse:
         data_train = loader_tfidf.load_tfidf(x_train, core_num, len(words), words, dir_store, dense=False, ordered=True)
         print('Dimensionality reduction through random projection')
-        srp = SparseRandomProjection(n_components=components)
         data_train = srp.fit_transform(data_train)
 
     else:
@@ -58,8 +58,7 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
     if sparse:
         data_test = loader_tfidf.load_tfidf(x_test, core_num, len(words), words, dir_store, dense=False, ordered=True)
         print('Dimensionality reduction through random projection')
-        srp = SparseRandomProjection(n_components=components)
-        data_test = srp.fit_transform(data_test)
+        data_test = srp.transform(data_test)
 
     else:
         data_test = np.loadtxt(test)
