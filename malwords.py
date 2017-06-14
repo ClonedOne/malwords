@@ -52,7 +52,6 @@ def visualize(uuids, x_train, x_test, y_train, y_test, base_labels):
         vis_plot.plot_classification(data_matrix, classification, base_labels)
 
 
-
 def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config):
     """
     Perform a clustering or classification step.
