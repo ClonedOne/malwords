@@ -9,6 +9,7 @@
 #include <iterator>
 #include <fstream>
 #include <typeinfo>
+#include <cerrno>
 #include <cstring>
 #include <set>
 
@@ -47,6 +48,7 @@ struct args_t_js {
 int NR_CPU;
 int rows;
 int cols;
+int zipped;
 
 json words;
 json file_paths;
@@ -90,6 +92,9 @@ long inline merge_int(int x, int y);
 
 void inline split_long(long l, int *x, int *y);
 
+std::string read_txt(const char *filename);
+
+
 
 
 //// MAIN
@@ -102,12 +107,14 @@ void inline split_long(long l, int *x, int *y);
 int main(int argc, char *argv[]) {
 
     // Get arguments from command line
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " NR_CPU PATH/TO/DIR" << std::endl;
+    if (argc < 4) {
+        std::cerr << "Usage: " << argv[0] << " NR_CPU PATH/TO/DIR ZIPPED" << std::endl;
         exit(1);
     }
 
     NR_CPU = std::stoi(argv[1]);
+    zipped = std::stoi(argv[3]);
+
     std::ifstream i_p(argv[2]);
     i_p >> file_paths;
     for (std::string file_path : file_paths) sorted_files.insert(file_path);
@@ -157,7 +164,12 @@ void acquire_data(int cur_rows, std::vector<std::string> cur_files,
     int row_iter = 0;
 
     for (std::string file_n : cur_files) {
-        std::string result = exec((command + file_n).c_str());
+        std::string result;
+
+        if (zipped == 1)
+            result = exec((command + file_n).c_str());
+        else
+            result = read_txt(file_n.c_str());
 
         for (std::string line : split(result, '\n')) {
             if (line.empty()) continue;
@@ -417,4 +429,24 @@ long inline merge_int(int x, int y) {
 void inline split_long(long l, int *x, int *y) {
     *x = (int) (l >> 32);
     *y = (int) l;
+}
+
+
+/**
+ * Reads a file into a string object.
+ * @param filename
+ * @return
+ */
+std::string read_txt(const char *filename) {
+    std::ifstream in(filename, std::ios::in | std::ios::binary);
+    if (in) {
+        std::string contents;
+        in.seekg(0, std::ios::end);
+        contents.resize(in.tellg());
+        in.seekg(0, std::ios::beg);
+        in.read(&contents[0], contents.size());
+        in.close();
+        return (contents);
+    }
+    throw (errno);
 }

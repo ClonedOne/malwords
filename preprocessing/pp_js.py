@@ -23,8 +23,10 @@ def get_js(config, uuids):
     dir_malwords = config['dir_malwords']
 
     file_ext = '_ss.txt'
+    zipped = 0
     if os.path.splitext(os.listdir(dir_malwords)[0])[1] == '.gz':
         file_ext = '_ss.txt.gz'
+        zipped = 1
 
     proceed = interaction.ask_yes_no(constants.msg_js)
     if not proceed:
@@ -51,5 +53,5 @@ def get_js(config, uuids):
     json.dump(uuids_paths, open(uuids_paths_file, 'w'), indent=2)
     time.sleep(1)
 
-    proc = subprocess.Popen(['./js_dist', str(core_num), uuids_paths_file])
+    proc = subprocess.Popen(['./js_dist', str(core_num), uuids_paths_file, str(zipped)])
     proc.wait()
