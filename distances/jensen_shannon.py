@@ -17,6 +17,9 @@ def jensen_shannon_dist(vec1, vec2):
     vec1 = vec1.toarray().flatten()
     vec2 = vec2.toarray().flatten()
 
+    vec1 = (vec1 + 1) / (sum(vec1) + len(vec1))
+    vec2 = (vec2 + 1) / (sum(vec2) + len(vec2))
+
     m_vec = 0.5 * (vec1 + vec2)
     return math.sqrt(0.5 * (entropy(vec1, m_vec) + entropy(vec2, m_vec)))
 
