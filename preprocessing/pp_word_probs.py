@@ -19,9 +19,36 @@ def get_word_probabilities():
 
     get_ngrams_probs(file_list, combined, ngram_probs, counters)
 
+    ngram_map = get_ngrams_map(ngram_probs)
+
     print(positions)
     print(counters)
+    print(len(ngram_probs))
     print(ngram_probs)
+    print(len(ngram_map))
+    print(ngram_map)
+
+
+def get_ngrams_map(ngram_probs):
+    """
+    Returns a mapping of n-gram bytes and their probability
+    :param ngram_probs: probability of each n-gram
+    :return:
+    """
+
+    ngram_map = {}
+    bswaps = [bswap1, bswap2, bswap3]
+
+    for i in range(len(ngram_probs)):
+
+        for j in range(len(positions)):
+
+            if positions[j] <= i < positions[j + 1]:
+                bswap = bswaps[j % 3]
+                current_bytes = bswap(i)
+                ngram_map[current_bytes] = ngram_probs[i]
+
+    return ngram_map
 
 
 def get_ngrams_probs(file_list, combined, ngram_probs, counters):
@@ -46,6 +73,36 @@ def get_ngrams_probs(file_list, combined, ngram_probs, counters):
     for i in range(len(counters)):
         counters[i] = np.sum(combined[positions[i]:positions[i + 1]])
         ngram_probs[positions[i]:positions[i + 1]] = combined[positions[i]:positions[i + 1]] / counters[i]
+
+
+def bswap3(i):
+    """
+    Returns the conversion in byte of a given integer
+    :param i: integer position
+    :return:
+    """
+
+    return bytes([(i >> 16) & 0xff]), bytes([(i >> 8) & 0xff]), bytes([i & 0xff])
+
+
+def bswap2(i):
+    """
+    Returns the conversion in byte of a given integer
+    :param i: integer position
+    :return:
+    """
+
+    return bytes([(i >> 8) & 0xff]), bytes([i & 0xff])
+
+
+def bswap1(i):
+    """
+    Returns the conversion in byte of a given integer
+    :param i: integer position
+    :return:
+    """
+
+    return bytes([i, ])
 
 
 def out_combined_hist_file(combined):
