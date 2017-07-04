@@ -1,5 +1,8 @@
+from nltk import trigrams, bigrams, ngrams
+# from utilities import constants
 import numpy as np
 import gzip
+import json
 import os
 
 file_dir = "/home/yogaub/projects/projects_data/malrec/memhist"
@@ -21,12 +24,44 @@ def get_word_probabilities():
 
     ngram_map = get_ngrams_map(ngram_probs)
 
+    # get_words_probs(ngram_map, os.path.join(constants.dir_d, constants.json_words))
+    word_probs = get_words_probs(ngram_map, "/home/yogaub/projects/malwords/malwords_cluster/data/words.json")
+
+    json.dump(word_probs, open("word_probs.json", "w"), indent=2)
+
     print(positions)
     print(counters)
     print(len(ngram_probs))
-    print(ngram_probs)
     print(len(ngram_map))
-    print(ngram_map)
+    print(len(word_probs))
+
+
+def get_words_probs(ngram_map, words_file):
+    """
+    Returns a mapping of words to their probability to be randomly generated
+    :param ngram_map:
+    :param words_file:
+    :return:
+    """
+
+    word_probs = {}
+    words = json.load(open(words_file))
+
+    for word in sorted(words):
+        trigs = trigrams(word.encode())
+        prob = 0.0
+
+        for trig in trigs:
+
+            if trig not in ngram_map:
+                print('{} is not in the map'.format(trig))
+
+            prob += ngram_map[trig]
+
+        word_probs[word] = prob
+
+    return word_probs
+
 
 
 def get_ngrams_map(ngram_probs):
@@ -45,7 +80,7 @@ def get_ngrams_map(ngram_probs):
 
             if positions[j] <= i < positions[j + 1]:
                 bswap = bswaps[j % 3]
-                current_bytes = bswap(i)
+                current_bytes = bswap(i % pos_writes[-1])
                 ngram_map[current_bytes] = ngram_probs[i]
 
     return ngram_map
@@ -54,7 +89,7 @@ def get_ngrams_map(ngram_probs):
 def get_ngrams_probs(file_list, combined, ngram_probs, counters):
     """
     Computes the probability of each n-gram.
-    :param file_list: lis of memhist files
+    :param file_list: lis of mem-hist files
     :param combined: Numpy array of unsigned 64 bit integers
     :param ngram_probs: Numpy array to fill up
     :param counters:
@@ -72,7 +107,7 @@ def get_ngrams_probs(file_list, combined, ngram_probs, counters):
 
     for i in range(len(counters)):
         counters[i] = np.sum(combined[positions[i]:positions[i + 1]])
-        ngram_probs[positions[i]:positions[i + 1]] = combined[positions[i]:positions[i + 1]] / counters[i]
+        ngram_probs[positions[i]:positions[i + 1]] = np.log(combined[positions[i]:positions[i + 1]] / counters[i])
 
 
 def bswap3(i):
@@ -82,7 +117,7 @@ def bswap3(i):
     :return:
     """
 
-    return bytes([(i >> 16) & 0xff]), bytes([(i >> 8) & 0xff]), bytes([i & 0xff])
+    return (i >> 16) & 0xff, (i >> 8) & 0xff, i & 0xff
 
 
 def bswap2(i):
@@ -92,7 +127,7 @@ def bswap2(i):
     :return:
     """
 
-    return bytes([(i >> 8) & 0xff]), bytes([i & 0xff])
+    return (i >> 8) & 0xff, i & 0xff
 
 
 def bswap1(i):
@@ -102,7 +137,7 @@ def bswap1(i):
     :return:
     """
 
-    return bytes([i, ])
+    return i & 0xff
 
 
 def out_combined_hist_file(combined):
