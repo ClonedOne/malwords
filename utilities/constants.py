@@ -1,5 +1,3 @@
-from enum import Enum
-
 """
 This module is a collection of constants values used by the different modules
 """
@@ -20,6 +18,7 @@ json_avc_input = 'avc_input.json'
 json_labels = 'labels.json'
 json_inverted_labels = 'inverted_labels.json'
 json_words = 'words.json'
+json_words_probs = 'words_probs.json'
 json_dfs = 'dfs.json'
 json_graph = 'graph1.json'
 

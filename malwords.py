@@ -188,7 +188,8 @@ def pre_process(config):
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
         pp_idf.get_idf(config)
 
-    pp_word_probs.get_word_probabilities()
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words_probs)):
+        pp_word_probs.get_word_probabilities(config, 3)
 
     # if len(os.listdir(config['dir_store'])) != len(os.listdir(config['dir_malwords'])):
     #     pp_tfidf.get_tf_idf(config)

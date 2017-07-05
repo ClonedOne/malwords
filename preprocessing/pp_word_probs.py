@@ -4,21 +4,20 @@ from utilities import constants
 from utilities import utils
 from nltk import trigrams
 import numpy as np
+import time
 import json
 import os
 
 
-def get_word_probabilities():
+def get_word_probabilities(config, mono_bi_tri):
     # Initialization of variables
-    file_dir = "/home/yogaub/projects/projects_data/malrec/memhist"
+    file_dir = config['dir_mem']
+    core_num = config['core_num']
 
     # Positions in memhist files
     pos_writes = np.array([0, 2 ** 8, 2 ** 8 + 2 ** 16, 2 ** 8 + 2 ** 16 + 2 ** 24])
     pos_reads = np.array([pos_writes[-1] + i for i in pos_writes[1:]])
     positions = np.concatenate((pos_writes, pos_reads))
-
-    mono_bi_tri = 3
-    core_num = 4
 
     file_list = sorted(os.listdir(file_dir))
 
@@ -28,7 +27,7 @@ def get_word_probabilities():
 
     word_probs = get_words_probs(ngram_map, os.path.join(constants.dir_d, constants.json_words))
 
-    json.dump(word_probs, open("word_probs.json", "w"), indent=2)
+    json.dump(word_probs, open(os.path.join(constants.dir_d, constants.json_words_probs), "w"), indent=2)
 
     print(positions)
     print(len(ngram_probs))
@@ -159,7 +158,3 @@ def out_combined_hist_file(combined):
 
     with open('combined_histogram.dat', 'w') as memhist_file:
         combined.tofile(memhist_file)
-
-
-if __name__ == "__main__":
-    get_word_probabilities()

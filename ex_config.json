@@ -6,6 +6,7 @@
   "dir_test": "",
   "dir_vt": "",
   "dir_db": "",
+  "dir_mem": "",
   "core_num": 1,
   "batch_size": 0
 }
