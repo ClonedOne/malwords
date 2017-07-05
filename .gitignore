@@ -141,6 +141,4 @@ ENV/
 .idea/
 config.json
 data/
-data_visualize/
-data_cluster/
-data_gensim/
+/js_dist
