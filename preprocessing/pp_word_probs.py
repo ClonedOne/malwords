@@ -1,44 +1,79 @@
-from nltk import trigrams, bigrams, ngrams
-# from utilities import constants
+from workers import wk_read_memhist
+from multiprocessing import Pool
+from utilities import constants
+from utilities import utils
+from nltk import trigrams
 import numpy as np
-import gzip
 import json
 import os
 
-file_dir = "/home/yogaub/projects/projects_data/malrec/memhist"
-
-# Positions in memhist files
-pos_writes = np.array([0, 2 ** 8, 2 ** 8 + 2 ** 16, 2 ** 8 + 2 ** 16 + 2 ** 24])
-pos_reads = np.array([pos_writes[-1] + i for i in pos_writes[1:]])
-positions = np.concatenate((pos_writes, pos_reads))
-SIZE = pos_reads[-1]
-
 
 def get_word_probabilities():
+    # Initialization of variables
+    file_dir = "/home/yogaub/projects/projects_data/malrec/memhist"
+
+    # Positions in memhist files
+    pos_writes = np.array([0, 2 ** 8, 2 ** 8 + 2 ** 16, 2 ** 8 + 2 ** 16 + 2 ** 24])
+    pos_reads = np.array([pos_writes[-1] + i for i in pos_writes[1:]])
+    positions = np.concatenate((pos_writes, pos_reads))
+
+    mono_bi_tri = 3
+    core_num = 4
+
     file_list = sorted(os.listdir(file_dir))
-    combined = np.zeros(SIZE, dtype=np.uint64)
-    ngram_probs = np.zeros(SIZE, dtype=np.float_)
-    counters = np.zeros(6, dtype=np.uint64)
 
-    get_ngrams_probs(file_list, combined, ngram_probs, counters)
+    ngram_probs = get_ngrams_probs_multi(file_list, file_dir, mono_bi_tri, core_num, positions)
 
-    ngram_map = get_ngrams_map(ngram_probs)
+    ngram_map = get_ngrams_map(ngram_probs, mono_bi_tri, positions)
 
-    # get_words_probs(ngram_map, os.path.join(constants.dir_d, constants.json_words))
-    word_probs = get_words_probs(ngram_map, "/home/yogaub/projects/malwords/malwords_cluster/data/words.json")
+    word_probs = get_words_probs(ngram_map, os.path.join(constants.dir_d, constants.json_words))
 
     json.dump(word_probs, open("word_probs.json", "w"), indent=2)
 
     print(positions)
-    print(counters)
     print(len(ngram_probs))
     print(len(ngram_map))
     print(len(word_probs))
 
 
+def get_ngrams_probs_multi(file_list, file_dir, mono_bi_tri, core_num, positions):
+    """
+    Computes the probability of each n-gram using multiple subprocesses.
+
+    :param positions:
+    :param core_num:
+    :param file_dir:
+    :param file_list: lis of mem-hist files
+    :param mono_bi_tri: int specifying monograms/bigrams/trigrams
+    :return:
+    """
+
+    size = positions[mono_bi_tri] - positions[mono_bi_tri - 1]
+    combined = np.zeros(size, dtype=np.uint64)
+    total_ngrams = 0.0
+
+    print('Acquiring memhist data')
+
+    file_name_lists = utils.divide_workload(file_list, core_num)
+    formatted_input = utils.format_worker_input(core_num, file_name_lists, (file_dir, size, mono_bi_tri, positions))
+    pool = Pool(processes=core_num)
+    results = pool.map(wk_read_memhist.get_data_array, formatted_input)
+    pool.close()
+    pool.join()
+
+    for result in results:
+        total_ngrams += result[2]
+        combined += result[1]
+
+    ngram_probs = np.log(combined / total_ngrams)
+
+    return ngram_probs
+
+
 def get_words_probs(ngram_map, words_file):
     """
-    Returns a mapping of words to their probability to be randomly generated
+    Returns a mapping of words to their probability to be randomly generated.
+
     :param ngram_map:
     :param words_file:
     :return:
@@ -52,10 +87,6 @@ def get_words_probs(ngram_map, words_file):
         prob = 0.0
 
         for trig in trigs:
-
-            if trig not in ngram_map:
-                print('{} is not in the map'.format(trig))
-
             prob += ngram_map[trig]
 
         word_probs[word] = prob
@@ -63,56 +94,32 @@ def get_words_probs(ngram_map, words_file):
     return word_probs
 
 
-
-def get_ngrams_map(ngram_probs):
+def get_ngrams_map(ngram_probs, mono_bi_tri, positions):
     """
-    Returns a mapping of n-gram bytes and their probability
+    Returns a mapping of n-gram bytes and their probability.
+
     :param ngram_probs: probability of each n-gram
-    :return:
+    :param mono_bi_tri: int specifying monograms/bigrams/trigrams
+    :param positions:
+    :return: dictionary mapping bytes and probabilities
     """
 
     ngram_map = {}
     bswaps = [bswap1, bswap2, bswap3]
+    bswap = bswaps[mono_bi_tri - 1]
+    displacement = positions[mono_bi_tri - 1]
 
     for i in range(len(ngram_probs)):
-
-        for j in range(len(positions)):
-
-            if positions[j] <= i < positions[j + 1]:
-                bswap = bswaps[j % 3]
-                current_bytes = bswap(i % pos_writes[-1])
-                ngram_map[current_bytes] = ngram_probs[i]
+        current_bytes = bswap(i + displacement)
+        ngram_map[current_bytes] = ngram_probs[i]
 
     return ngram_map
 
 
-def get_ngrams_probs(file_list, combined, ngram_probs, counters):
-    """
-    Computes the probability of each n-gram.
-    :param file_list: lis of mem-hist files
-    :param combined: Numpy array of unsigned 64 bit integers
-    :param ngram_probs: Numpy array to fill up
-    :param counters:
-    :return:
-    """
-
-    for memhist_file in file_list:
-        data = gzip.GzipFile(os.path.join(file_dir, memhist_file)).read()
-
-        if not data:
-            continue
-
-        npd = np.frombuffer(data, dtype=np.uint64)
-        combined += npd
-
-    for i in range(len(counters)):
-        counters[i] = np.sum(combined[positions[i]:positions[i + 1]])
-        ngram_probs[positions[i]:positions[i + 1]] = np.log(combined[positions[i]:positions[i + 1]] / counters[i])
-
-
 def bswap3(i):
     """
-    Returns the conversion in byte of a given integer
+    Returns the conversion in byte of a given integer.
+
     :param i: integer position
     :return:
     """
@@ -122,7 +129,8 @@ def bswap3(i):
 
 def bswap2(i):
     """
-    Returns the conversion in byte of a given integer
+    Returns the conversion in byte of a given integer.
+
     :param i: integer position
     :return:
     """
@@ -132,7 +140,8 @@ def bswap2(i):
 
 def bswap1(i):
     """
-    Returns the conversion in byte of a given integer
+    Returns the conversion in byte of a given integer.
+
     :param i: integer position
     :return:
     """
@@ -143,6 +152,7 @@ def bswap1(i):
 def out_combined_hist_file(combined):
     """
     Prints out the combined array on file.
+
     :param combined: Numpy array of unsigned 64 bit integers
     :return:
     """

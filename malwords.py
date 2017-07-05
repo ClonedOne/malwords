@@ -1,5 +1,5 @@
+from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js, pp_word_probs
 from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch, ca_spectral, ca_dbscan
-from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
 from sklearn.model_selection import train_test_split
 from classification import ca_svm, ca_mlp
@@ -17,13 +17,13 @@ def main():
 
     uuids, base_labels = pre_process(config)
 
-    x_train, x_test, y_train, y_test = show_data(uuids, base_labels)
-
-    dimensionality_reduction(uuids, x_train, x_test, config)
-
-    cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
-
-    visualize(uuids, x_train, x_test, y_train, y_test, base_labels)
+    # x_train, x_test, y_train, y_test = show_data(uuids, base_labels)
+    #
+    # dimensionality_reduction(uuids, x_train, x_test, config)
+    #
+    # cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
+    #
+    # visualize(uuids, x_train, x_test, y_train, y_test, base_labels)
 
 
 # Main lifecycle
@@ -188,20 +188,22 @@ def pre_process(config):
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
         pp_idf.get_idf(config)
 
-    if len(os.listdir(config['dir_store'])) != len(os.listdir(config['dir_malwords'])):
-        pp_tfidf.get_tf_idf(config)
+    pp_word_probs.get_word_probabilities()
 
-    # Select the data subset to operate upon
-    uuids = pp_subset.subset(config)
+    # if len(os.listdir(config['dir_store'])) != len(os.listdir(config['dir_malwords'])):
+    #     pp_tfidf.get_tf_idf(config)
+    #
+    # # Select the data subset to operate upon
+    # uuids = pp_subset.subset(config)
+    #
+    # # Retrieve base labels
+    # base_labels = utils.get_base_labels_uuids(uuids)
+    #
+    # print('\nAcquired {} samples belonging to {} different families'.format(len(uuids), len(set(base_labels))))
+    #
+    # pp_js.get_js(config, uuids)
 
-    # Retrieve base labels
-    base_labels = utils.get_base_labels_uuids(uuids)
-
-    print('\nAcquired {} samples belonging to {} different families'.format(len(uuids), len(set(base_labels))))
-
-    pp_js.get_js(config, uuids)
-
-    return uuids, base_labels
+    # return uuids, base_labels
 
 
 # Helper methods
