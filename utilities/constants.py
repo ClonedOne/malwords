@@ -30,6 +30,8 @@ msg_data_visualize_base = 'base data matrix file to visualize'
 msg_clusters = 'clusters'
 msg_components = 'components'
 msg_results_ca = 'clustering or classification result file'
+msg_json = 'json file'
+msg_family = 'malware family'
 
 msg_argv = '\nPlease select a valid action:\n' \
            'compare-distance --> show various distance metrics applies to the samples\n' \
@@ -66,5 +68,17 @@ msg_js = '\nWould you like to compute the Jensen-Shannon distance matrix for the
 msg_sparse = '\nWould you like to use all the data as a sparse matrix? [y/n]\n' \
              'It may take very long, depending on the number of selected samples\n'
 
+msg_subset = 'Please choose the subset of data to workon on:\n' \
+             'l for all labeled samples\n' \
+             'k for samples of families mydoom, gepys, lamer, neshta, bladabindi, flystudio, eorezo\n' \
+             's for 8 samples of families mydoom, gepys, bladabindi, flystudio\n' \
+             'f for a single family\n' \
+             'j for json list of uuids\n' \
+             'q to quit\n'
+
 msg_visualization = '\nWould you like to visualize the dimensionality reduced data-set? [y/n]\n'
+
 msg_visualize_ca = '\nWould you like to visualize the result of clustering/classification? [y/n]\n'
+
+msg_memhist = '\nWould you like to compute the tf-idf weights using memhist data? [y/n]\n' \
+              'It may take very long.\n'

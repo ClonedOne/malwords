@@ -18,7 +18,7 @@ def compute_tf_idf(data_pack):
     total_documents = data_pack[3]
     dir_malwords = data_pack[4]
     dir_store = data_pack[5]
-    multiplier = data_pack[6]
+    words_probs = data_pack[6]
     selected_words = data_pack[7]
 
     norm_factor = 0.4
@@ -67,8 +67,10 @@ def compute_tf_idf(data_pack):
         for word in words:
             tf = norm_factor + ((1 - norm_factor) * (float(words[word]) / float(most_freq)))
 
-            if multiplier:
+            if not words_probs:
                 tf = tf * len(word)
+            else:
+                tf = tf * (-1) * words_probs[word]
 
             idf = math.log(total_documents / float(dfs[word]))
             tf_idf[word] = tf * idf

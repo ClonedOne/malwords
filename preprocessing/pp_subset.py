@@ -1,16 +1,8 @@
+from utilities import interaction
+from utilities import constants
 from shutil import copyfile
 import json
 import os
-
-err_msg = 'Please choose the subset of data to workon on:\n' \
-          'l for all labeled samples\n' \
-          'k for samples of families mydoom, gepys, lamer, neshta, bladabindi, flystudio, eorezo\n' \
-          's for 8 samples of families mydoom, gepys, bladabindi, flystudio\n' \
-          'f for a single family\n' \
-          'j for json list of uuids\n' \
-          'q to quit\n'
-json_msg = 'Please specify the json file\n'
-family_msg = 'Specify malware family name\n'
 
 
 def subset(config):
@@ -24,7 +16,7 @@ def subset(config):
     subset_type = ""
 
     while subset_type == "":
-        subset_type = input(err_msg)
+        subset_type = input(constants.msg_subset)
 
         if subset_type == 'l':
             return get_labeled(config)
@@ -33,14 +25,14 @@ def subset(config):
             return load_samples(config)
 
         elif subset_type == 'f':
-            family = input(family_msg)
+            family = input(constants.msg_family)
             return get_family(config, family)
 
         elif subset_type == 's':
             return load_samples(config, small=True)
 
         elif subset_type == 'j':
-            json_file = input(json_msg)
+            json_file = interaction.ask_file(constants.msg_json)
 
             if not os.path.isfile(json_file):
                 print('json file not found')
@@ -53,7 +45,7 @@ def subset(config):
 
         else:
             subset_type = ""
-            print(err_msg)
+            print(constants.msg_subset)
 
 
 def get_labeled(config):

@@ -17,13 +17,13 @@ def main():
 
     uuids, base_labels = pre_process(config)
 
-    # x_train, x_test, y_train, y_test = show_data(uuids, base_labels)
-    #
-    # dimensionality_reduction(uuids, x_train, x_test, config)
-    #
-    # cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
-    #
-    # visualize(uuids, x_train, x_test, y_train, y_test, base_labels)
+    x_train, x_test, y_train, y_test = show_data(uuids, base_labels)
+
+    dimensionality_reduction(uuids, x_train, x_test, config)
+
+    cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
+
+    visualize(uuids, x_train, x_test, y_train, y_test, base_labels)
 
 
 # Main lifecycle
@@ -188,23 +188,23 @@ def pre_process(config):
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
         pp_idf.get_idf(config)
 
-    if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words_probs)):
+    if interaction.ask_yes_no(constants.msg_memhist):
         pp_word_probs.get_word_probabilities(config, 3)
 
-    # if len(os.listdir(config['dir_store'])) != len(os.listdir(config['dir_malwords'])):
-    #     pp_tfidf.get_tf_idf(config)
-    #
-    # # Select the data subset to operate upon
-    # uuids = pp_subset.subset(config)
-    #
-    # # Retrieve base labels
-    # base_labels = utils.get_base_labels_uuids(uuids)
-    #
-    # print('\nAcquired {} samples belonging to {} different families'.format(len(uuids), len(set(base_labels))))
-    #
-    # pp_js.get_js(config, uuids)
+    if len(os.listdir(config['dir_store'])) != len(os.listdir(config['dir_malwords'])):
+        pp_tfidf.get_tf_idf(config)
 
-    # return uuids, base_labels
+    # Select the data subset to operate upon
+    uuids = pp_subset.subset(config)
+
+    # Retrieve base labels
+    base_labels = utils.get_base_labels_uuids(uuids)
+
+    print('\nAcquired {} samples belonging to {} different families'.format(len(uuids), len(set(base_labels))))
+
+    pp_js.get_js(config, uuids)
+
+    return uuids, base_labels
 
 
 # Helper methods

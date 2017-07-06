@@ -19,6 +19,11 @@ def get_tf_idf(config):
 
     total_documents = float(len(os.listdir(dir_malwords)))
 
+    if os.path.isfile(os.path.join(constants.dir_d, constants.json_words_probs)):
+        words_probs = json.load(open(os.path.join(constants.dir_d, constants.json_words_probs)))
+    else:
+        words_probs = None
+
     dfs = json.load(open(os.path.join(constants.dir_d, constants.json_dfs)))
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words)))
 
@@ -26,7 +31,7 @@ def get_tf_idf(config):
 
     print('Computing Tf-Idf values')
     formatted_input = utils.format_worker_input(core_num, file_name_lists,
-                                                (dfs, total_documents, dir_malwords, dir_store, True, words))
+                                                (dfs, total_documents, dir_malwords, dir_store, words_probs, words))
     pool = Pool(processes=core_num)
     pool.map(wk_tfidf.compute_tf_idf, formatted_input)
     pool.close()
