@@ -20,7 +20,7 @@ json_inverted_labels = 'inverted_labels.json'
 json_words = 'words.json'
 json_words_probs = 'words_probs.json'
 json_dfs = 'dfs.json'
-json_graph = 'graph1.json'
+json_graph = 'graph_{}.json'
 
 # Interface messages
 msg_data_train = 'training matrix file'

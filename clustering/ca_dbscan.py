@@ -27,6 +27,6 @@ def cluster(config, uuids, base_labels):
 
     evaluation.evaluate_clustering(base_labels, computed_labels, data=data, metric='precomputed')
 
-    output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters, 'dbscan_js')
 
     output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'jensen_shannon', 'dbscan')

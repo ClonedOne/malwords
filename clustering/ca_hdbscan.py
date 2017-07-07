@@ -102,7 +102,7 @@ def js2(data, uuids, base_labels, min_cluster_size, core_num):
     if num_clusters == 1:
         data = None
 
-    evaluation.evaluate_clustering(base_labels, computed_labels, data=data, metric='precomputed')
+    evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
 
     output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
 
