@@ -4,8 +4,7 @@ import sys
 import os
 
 
-def extract_keywords():
-    config = json.load(open('config.json'))
+def extract_keywords(config):
     dir_store = config['dir_store']
 
     if len(sys.argv) < 2:

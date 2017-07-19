@@ -3,6 +3,7 @@ from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch, ca_spectral, 
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
 from sklearn.model_selection import train_test_split
 from classification import ca_svm, ca_mlp
+from keywords import kw_keyword_tfidf
 from visualization import vis_plot
 from utilities import interaction
 from collections import Counter
@@ -25,8 +26,37 @@ def main():
 
     visualize(uuids, x_train, x_test, y_train, y_test, base_labels)
 
+    keywords_extraction(config)
+
 
 # Main lifecycle
+
+def keywords_extraction(config):
+    """
+    Perform keywords extraction from the clustered data
+
+    :param config: configuration dictionary
+    :return:
+    """
+
+    # Prompts the user to select an action
+    kw = ''
+    while kw == '':
+        kw = input(constants.msg_kw)
+
+        if kw == 'tfidf':
+            kw_keyword_tfidf.extract_keywords(config)
+
+        elif kw == 's':
+            return
+
+        elif kw == 'q':
+            exit()
+
+        else:
+            print('Not a valid input\n')
+            kw = ''
+
 
 def visualize(uuids, x_train, x_test, y_train, y_test, base_labels):
     """
@@ -67,14 +97,18 @@ def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, confi
     """
 
     # Prompts the user to select an action
-    ca = ""
-    while ca == "":
+    ca = ''
+    while ca == '':
         ca = input(constants.msg_ca)
 
         if ca == 'kmeans':
+            sparse = interaction.ask_yes_no(constants.msg_sparse)
+            if sparse:
+                data_matrix = None
+            else:
+                data_matrix = interaction.ask_file(constants.msg_data_train)
             clusters = interaction.ask_number(constants.msg_clusters)
-            data_matrix = interaction.ask_file(constants.msg_data_train)
-            ca_kmeans.cluster(config, data_matrix, clusters, uuids, base_labels)
+            ca_kmeans.cluster(config, data_matrix, clusters, uuids, base_labels, sparse=sparse)
 
         elif ca == 'mini_kmeans':
             clusters = interaction.ask_number(constants.msg_clusters)
@@ -117,13 +151,13 @@ def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, confi
 
         else:
             print('Not a valid input\n')
-            ca = ""
+            ca = ''
 
 
 def dimensionality_reduction(uuids, x_train, x_test, config):
     """
     Perform a dimensionality reduction step (or skip).
-    
+
     :param uuids: list of uuids
     :param x_train: list of uuids for training
     :param x_test: list of uuids for testing
@@ -139,8 +173,8 @@ def dimensionality_reduction(uuids, x_train, x_test, config):
     }
 
     # Prompts the user to select an action
-    dr = ""
-    while dr == "":
+    dr = ''
+    while dr == '':
         dr = input(constants.msg_dr)
 
         if dr in drs:
@@ -156,7 +190,7 @@ def dimensionality_reduction(uuids, x_train, x_test, config):
 
         else:
             print('Not a valid input\n')
-            dr = ""
+            dr = ''
 
 
 def pre_process(config):
