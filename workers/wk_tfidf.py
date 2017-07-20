@@ -70,7 +70,7 @@ def compute_tf_idf(data_pack):
             if not words_probs:
                 tf = tf * len(word)
             else:
-                tf = tf * (-1) * words_probs[word]
+                tf = tf * (-1) * words_probs[word] / len(word)
 
             idf = math.log(total_documents / float(dfs[word]))
             tf_idf[word] = tf * idf

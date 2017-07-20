@@ -30,6 +30,7 @@ msg_data_visualize_base = 'base data matrix file to visualize'
 msg_clusters = 'clusters'
 msg_components = 'components'
 msg_results_ca = 'clustering or classification result file'
+msg_results_cluster = 'clustering result file'
 msg_json = 'json file'
 msg_family = 'malware family'
 
@@ -83,7 +84,8 @@ msg_visualize_ca = '\nWould you like to visualize the result of clustering/class
 msg_memhist = '\nWould you like to compute the tf-idf weights using memhist data? [y/n]\n' \
               'It may take very long.\n'
 
-msg_kw = '\nPlease select a keywords extraction technique:' \
+msg_kw = '\nPlease select a keywords extraction technique:\n' \
          'tfidf for the words with highest weighted tf-idf\n' \
          's to skip keywords extraction\n' \
          'q to quit\n'
+

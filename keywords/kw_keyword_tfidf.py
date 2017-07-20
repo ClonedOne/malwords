@@ -1,18 +1,12 @@
 from collections import Counter, defaultdict
 import json
-import sys
 import os
 
 
-def extract_keywords(config):
+def extract_keywords(config, result_file):
     dir_store = config['dir_store']
 
-    if len(sys.argv) < 2:
-        print('Specify the clustering result to process')
-        exit()
-    clustering_file = sys.argv[1]
-
-    clustering = json.load(open(clustering_file, 'r'))
+    clustering = json.load(open(result_file, 'r'))
 
     reverse_clustering = defaultdict(list)
     for uuid, cluster in clustering.items():
@@ -20,7 +14,7 @@ def extract_keywords(config):
 
     print('Number of clusters:', len(set(reverse_clustering.keys())))
 
-    with open(clustering_file[:-5] + '_keywords_tfidf', 'w', encoding='utf-8', errors='replace') as out_file:
+    with open(result_file[:-5] + '_keywords_tfidf', 'w', encoding='utf-8', errors='replace') as out_file:
         for cluster in sorted(reverse_clustering):
             out_file.write('{}\t{}\n'.format('Cluster', cluster))
             highest_tfidf = Counter()
@@ -34,7 +28,3 @@ def extract_keywords(config):
             for keyword, tfidf in highest_tfidf.most_common(10):
                 out_file.write('{}\t{}\n'.format(keyword, tfidf))
             out_file.write('\n')
-
-
-if __name__ == '__main__':
-    extract_keywords()

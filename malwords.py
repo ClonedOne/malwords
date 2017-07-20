@@ -45,7 +45,8 @@ def keywords_extraction(config):
         kw = input(constants.msg_kw)
 
         if kw == 'tfidf':
-            kw_keyword_tfidf.extract_keywords(config)
+            result_file = interaction.ask_file(constants.msg_results_cluster)
+            kw_keyword_tfidf.extract_keywords(config, result_file)
 
         elif kw == 's':
             return
