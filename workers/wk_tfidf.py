@@ -22,6 +22,7 @@ def compute_tf_idf(data_pack):
     selected_words = data_pack[7]
 
     norm_factor = 0.4
+    empty_samples = 0
 
     for sample in sorted(file_name_list):
 
@@ -60,6 +61,12 @@ def compute_tf_idf(data_pack):
         else:
             in_file.close()
 
+        # Handle the case where all the words in a recording are removed
+        if len(words) == 0:
+            print('\nEmpty: ', sample)
+            empty_samples += 1
+            continue
+
         # find the most frequent word
         most_freq = max(list(words.values()))
 
@@ -76,6 +83,8 @@ def compute_tf_idf(data_pack):
             tf_idf[word] = tf * idf
 
         json.dump(tf_idf, open(os.path.join(dir_store, uuid), "w"), indent=2)
+
+    print('Number of empty samples: ', empty_samples)
 
 
 def compute_df(data_pack):

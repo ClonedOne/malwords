@@ -4,7 +4,6 @@ from utilities import constants
 from utilities import utils
 from nltk import trigrams
 import numpy as np
-import time
 import json
 import os
 

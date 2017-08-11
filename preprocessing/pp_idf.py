@@ -62,6 +62,7 @@ def remove_useless_words(dfs, total_documents, filter_high, filter_low, dir_base
     rare_words = 0
     in_base = 0
     digits = 0
+    non_ascii = 0
 
     print('Initial features number:', len(dfs))
     print('Document frequency thresholds: {} {}'.format(threshold_low, threshold_high))
@@ -73,6 +74,10 @@ def remove_useless_words(dfs, total_documents, filter_high, filter_low, dir_base
         if word.isdigit():
             to_remove.add(word)
             digits += 1
+
+        elif len(word) != len(word.encode()):
+            to_remove.add(word)
+            non_ascii += 1
 
         elif dfs[word] == 1:
             to_remove.add(word)
@@ -99,6 +104,7 @@ def remove_useless_words(dfs, total_documents, filter_high, filter_low, dir_base
     print('Words over threshold_high frequency:', frequent_words)
     print('Words under threshold_low frequency:', rare_words)
     print('Words appearing in base:', in_base)
+    print('Words with non ascii characters:', non_ascii)
 
     # Create a dictionary mapping each (sorted) word with a numerical index
     words = dict(zip(sorted(list(dfs.keys())), list(range(len(dfs)))))

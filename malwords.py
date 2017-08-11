@@ -124,7 +124,8 @@ def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, confi
 
         elif ca == 'hdbscan':
             distance = interaction.ask_metric()
-            ca_hdbscan.cluster(config, distance, uuids, base_labels)
+            sparse = interaction.ask_yes_no(constants.msg_sparse)
+            ca_hdbscan.cluster(config, distance, uuids, base_labels, sparse=sparse)
 
         elif ca == 'svm':
             sparse = interaction.ask_yes_no(constants.msg_sparse)
@@ -226,7 +227,7 @@ def pre_process(config):
     if interaction.ask_yes_no(constants.msg_memhist):
         pp_word_probs.get_word_probabilities(config, 3)
 
-    if len(os.listdir(config['dir_store'])) != len(os.listdir(config['dir_malwords'])):
+    if len(os.listdir(config['dir_store'])) == 0:
         pp_tfidf.get_tf_idf(config)
 
     # Select the data subset to operate upon

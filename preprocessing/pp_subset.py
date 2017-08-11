@@ -101,7 +101,15 @@ def load_samples(config, small=False):
         familes = ['mydoom', 'gepys', 'lamer', 'neshta', 'bladabindi', 'flystudio', 'eorezo']
         datasets = [inv_labels[family] for family in familes]
 
-    return sorted([uuid for dataset in datasets for uuid in dataset])
+    available = set(os.listdir(config['dir_store']))
+    to_return = []
+
+    for dataset in datasets:
+        for uuid in dataset:
+            if uuid in available:
+                to_return.append(uuid)
+
+    return sorted(to_return)
 
 
 def from_json(config, file_name):
@@ -115,7 +123,7 @@ def from_json(config, file_name):
 
     result = []
     uuids = json.load(open(file_name))
-    for file_name in sorted(os.listdir(config['dir_malwords'])):
+    for file_name in sorted(os.listdir(config['dir_store'])):
         uuid = file_name.split('.')[0][:-3]
         if uuid in uuids:
             result.append(uuid)
