@@ -123,8 +123,7 @@ def from_json(config, file_name):
 
     result = []
     uuids = json.load(open(file_name))
-    for file_name in sorted(os.listdir(config['dir_store'])):
-        uuid = file_name.split('.')[0][:-3]
+    for uuid in sorted(os.listdir(config['dir_store'])):
         if uuid in uuids:
             result.append(uuid)
 
