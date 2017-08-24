@@ -59,7 +59,7 @@ def train_svd(svd, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir
     while decomposed < rows:
         print('Processing documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
         data = loader_tfidf.load_tfidf(rand_uuids[decomposed:][:mini_batch_size], core_num, cols, words, dir_store,
-                                       dense=True, ordered=False)
+                                       dense=False, ordered=False)
 
         decomposed += mini_batch_size
 
