@@ -102,7 +102,7 @@ def plot3d(base_labels, data):
     py.iplot(fig, filename='3d-scatter-colorscale')
 
 
-def plot_hdbs_against_2d(hdbs, num_clusters, has_tree=False):
+def plot_hdbs_against_2d(hdbs, num_clusters):
     """
     Plot the clustering result of HDBSCAN against a 2d projection of data.
 
@@ -133,14 +133,8 @@ def plot_hdbs_against_2d(hdbs, num_clusters, has_tree=False):
                       for x in hdbs.labels_]
     cluster_member_colors = [sns.desaturate(x, p) for x, p in
                              zip(cluster_colors, hdbs.probabilities_)]
-    plt.scatter(*data_red.T, s=50, linewidth=0, c=cluster_member_colors, alpha=0.25)
+    plt.scatter(*data_red.T, s=50, linewidth=0, c=cluster_member_colors, alpha=0.5)
     plt.show()
-
-    if has_tree:
-        hdbs.minimum_spanning_tree_.plot(edge_cmap='viridis', edge_alpha=0.6, node_size=80, edge_linewidth=2)
-        plt.show()
-        hdbs.single_linkage_tree_.plot(cmap='viridis', colorbar=True)
-        plt.show()
 
 
 def plot_classification(data_matrix, classification, base_labels):
