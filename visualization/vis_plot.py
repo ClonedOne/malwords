@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import plotly.graph_objs as go
+from utilities import utils
 import plotly.plotly as py
 import seaborn as sns
 import numpy as np
@@ -34,14 +35,28 @@ def plot2d(base_labels, data):
     :return: 
     """
 
+    sbl = sorted(set(base_labels))
+
     color_palette = sns.color_palette('deep', len(base_labels))
     cluster_colors = [color_palette[x] if x >= 0
                       else (0.5, 0.5, 0.5)
-                      for x in base_labels]
+                      for x in sbl]
 
     print('Number of colors:', len(cluster_colors))
 
-    plt.scatter(*data.T, s=50, linewidth=0, c=cluster_colors, alpha=0.25)
+    index_labels = utils.get_index_labels()
+    labels = [index_labels[i] if i >= 0 else 'noise' for i in sbl]
+
+    xs = {}
+    ys = {}
+    for i in range(len(base_labels)):
+        xs[base_labels[i]] = xs.get(base_labels[i], []) + [data.T[0][i], ]
+        ys[base_labels[i]] = ys.get(base_labels[i], []) + [data.T[1][i], ]
+
+    for i in range(len(sbl)):
+        plt.scatter(xs[sbl[i]], ys[sbl[i]], c=cluster_colors[i], alpha=0.5, label=labels[i])
+
+    plt.legend(loc=3)
     plt.show()
 
 
