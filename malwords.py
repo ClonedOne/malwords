@@ -204,13 +204,7 @@ def pre_process(config):
     """
 
     # Create results data directories if needed
-    if not os.path.exists(constants.dir_d):
-        os.makedirs(os.path.join(constants.dir_d, constants.dir_dc))
-        os.makedirs(os.path.join(constants.dir_d, constants.dir_dg))
-        os.makedirs(os.path.join(constants.dir_d, constants.dir_dm))
-        os.makedirs(os.path.join(constants.dir_d, constants.dir_dt))
-        os.makedirs(os.path.join(constants.dir_d, constants.dir_ds))
-        os.makedirs(os.path.join(constants.dir_d, constants.dir_dv))
+    utils.create_dirs()
 
     # Create AVClass input data if needed
     if not os.path.isfile(os.path.join(constants.dir_d, constants.file_labels)):
@@ -224,10 +218,9 @@ def pre_process(config):
     if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
         pp_idf.get_idf(config)
 
-    if interaction.ask_yes_no(constants.msg_memhist):
-        pp_word_probs.get_word_probabilities(config, 3)
-
     if len(os.listdir(config['dir_store'])) == 0:
+        if interaction.ask_yes_no(constants.msg_memhist):
+            pp_word_probs.get_word_probabilities(config, 3)
         pp_tfidf.get_tf_idf(config)
 
     # Select the data subset to operate upon

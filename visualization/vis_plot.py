@@ -37,7 +37,7 @@ def plot2d(base_labels, data):
 
     sbl = sorted(set(base_labels))
 
-    color_palette = sns.color_palette('deep', len(base_labels))
+    color_palette = sns.color_palette('bright', len(base_labels))
     cluster_colors = [color_palette[x] if x >= 0
                       else (0.5, 0.5, 0.5)
                       for x in sbl]
@@ -127,7 +127,7 @@ def plot_hdbs_against_2d(hdbs, num_clusters):
 
     data_red = np.loadtxt(matrix_file2d)
 
-    color_palette = sns.color_palette('deep', num_clusters)
+    color_palette = sns.color_palette('bright', num_clusters)
     cluster_colors = [color_palette[x] if x >= 0
                       else (0.5, 0.5, 0.5)
                       for x in hdbs.labels_]

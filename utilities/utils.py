@@ -1,5 +1,6 @@
 from collections import defaultdict
 from utilities import constants
+from pathlib import Path
 import numpy as np
 import json
 import os
@@ -125,3 +126,17 @@ def get_index_labels():
     index_label = {index: sorted_families[index] for index in range(len(sorted_families))}
 
     return index_label
+
+
+def create_dirs():
+    """
+    Creates the data directory structure if needed.
+
+    :return:
+    """
+    (Path(constants.dir_d) / Path(constants.dir_dc)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_dg)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_dm)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_dt)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_ds)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_dv)).mkdir(parents=True, exist_ok=True)
