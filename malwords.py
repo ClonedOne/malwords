@@ -231,7 +231,8 @@ def pre_process(config):
 
     print('\nAcquired {} samples belonging to {} different families'.format(len(uuids), len(set(base_labels))))
 
-    pp_js.get_js(config, uuids)
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)) and interaction.ask_yes_no(constants.msg_js):
+        pp_js.get_js(config, uuids)
 
     return uuids, base_labels
 

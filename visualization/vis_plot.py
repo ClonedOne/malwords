@@ -1,3 +1,4 @@
+from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import plotly.graph_objs as go
 from utilities import utils
@@ -156,4 +157,24 @@ def plot_classification(data_matrix, classification, base_labels):
     colors_classified = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in classification]
 
     plt.scatter(*data.T, s=60, linewidth=2, c=colors_base, edgecolors=colors_classified, alpha=0.8)
+    plt.show()
+
+
+def plot_confusion_matrix(base_labels, predicted_labels):
+    """
+    Generates and plots the confusion matrix for a given classification.
+
+    :param base_labels:
+    :param predicted_labels:
+    :param families:
+    :return:
+    """
+
+    index_labels = utils.get_index_labels()
+    families = [index_labels[label] for label in sorted(set(base_labels))]
+
+    cm = confusion_matrix(base_labels, predicted_labels)
+
+    sns.heatmap(cm, annot=True, xticklabels=families)
+
     plt.show()

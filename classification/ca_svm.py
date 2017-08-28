@@ -45,10 +45,12 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
 
     computed_labels = svc.predict(data_test)
 
-    test_score = f1_score(computed_labels, y_test, average='micro')
+    test_score = f1_score(y_test, computed_labels, average='micro')
     print('F1 score of test: {}'.format(test_score))
 
     output.out_classification(dict(zip(x_test, computed_labels.tolist())), 'linear', 'svm')
+
+    vis_plot.plot_confusion_matrix(y_test, computed_labels)
 
     data_matrix = interaction.ask_file(constants.msg_data_visualize_base)
     vis_plot.plot_classification(data_matrix, computed_labels, y_test)
