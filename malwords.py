@@ -1,3 +1,5 @@
+import uuid
+
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js, pp_word_probs
 from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch, ca_spectral, ca_dbscan
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
@@ -24,7 +26,7 @@ def main():
 
     cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config)
 
-    visualize(uuids, x_train, x_test, y_train, y_test, base_labels)
+    visualize(uuids, base_labels)
 
     keywords_extraction(config)
 
@@ -59,28 +61,35 @@ def keywords_extraction(config):
             kw = ''
 
 
-def visualize(uuids, x_train, x_test, y_train, y_test, base_labels):
+def visualize(uuids, subset_labels):
     """
     Perform visualization operations
 
-    :param y_test:
-    :param y_train:
-    :param x_train:
     :param uuids:
-    :param x_test:
-    :param base_labels:
+    :param subset_labels:
     :return:
     """
 
-    if interaction.ask_yes_no(constants.msg_visualization):
+    if interaction.ask_yes_no(constants.msg_vis_dataset):
         data_matrix = interaction.ask_file(constants.msg_data_visualize)
-        vis_plot.plot_data(data_matrix, base_labels)
+        vis_plot.plot_data(data_matrix, subset_labels)
 
-    if interaction.ask_yes_no(constants.msg_visualize_ca):
-        data = json.load(open(interaction.ask_file(constants.msg_results_ca), 'r'))
-        classification = [data[uuid] for uuid in x_test]
+    uuid_index = dict(zip(uuids, range(len(uuids))))
+    base_labels = utils.get_base_labels()
+
+    if interaction.ask_yes_no(constants.msg_visualize_cla):
+        data = json.load(open(interaction.ask_file(constants.msg_results_cla), 'r'))
+        y_true = [base_labels[uuid] for uuid in sorted(list(data.keys()))]
+        y_pred = [data[uuid] for uuid in sorted(list(data.keys()))]
+        uuid_pos = [uuid_index[uuid] for uuid in sorted(list(data.keys()))]
+
+        vis_plot.plot_confusion_matrix(y_true, y_pred)
+
         data_matrix = interaction.ask_file(constants.msg_data_visualize)
-        vis_plot.plot_classification(data_matrix, classification, y_test)
+        vis_plot.plot_classification(data_matrix, uuid_pos, y_pred, y_true)
+
+    if interaction.ask_yes_no(constants.msg_visualize_clu):
+        data = json.load(open(interaction.ask_file(constants.msg_results_clu), 'r'))
 
 
 def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config):

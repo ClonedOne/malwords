@@ -138,23 +138,25 @@ def plot_hdbs_against_2d(hdbs, num_clusters):
     plt.show()
 
 
-def plot_classification(data_matrix, classification, base_labels):
+def plot_classification(data_matrix, uuid_pos, y_pred, y_true):
     """
     Plots the result of classification against the base truth, over a dimensionality reduced space.
 
     :param data_matrix:
-    :param classification:
-    :param base_labels:
+    :param y_pred:
+    :param y_true:
     :return:
     """
 
     print('Plotting classification results')
 
     data = np.loadtxt(data_matrix)
-    color_palette = sns.color_palette('deep', max(base_labels) + 1)
+    data = np.array([data[pos] for pos in uuid_pos])
+    print (data.shape)
+    color_palette = sns.color_palette('deep', max(y_true) + 1)
 
-    colors_base = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in base_labels]
-    colors_classified = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in classification]
+    colors_base = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_true]
+    colors_classified = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_pred]
 
     plt.scatter(*data.T, s=60, linewidth=2, c=colors_base, edgecolors=colors_classified, alpha=0.8)
     plt.show()

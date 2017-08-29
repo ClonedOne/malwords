@@ -50,8 +50,3 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
 
     output.out_classification(dict(zip(x_test, computed_labels.tolist())), 'linear', 'svm')
 
-    vis_plot.plot_confusion_matrix(y_test, computed_labels)
-
-    data_matrix = interaction.ask_file(constants.msg_data_visualize_base)
-    vis_plot.plot_classification(data_matrix, computed_labels, y_test)
-
