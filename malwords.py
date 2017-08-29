@@ -1,5 +1,3 @@
-import uuid
-
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js, pp_word_probs
 from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch, ca_spectral, ca_dbscan
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
