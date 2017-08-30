@@ -25,7 +25,7 @@ json_graph = 'graph_{}.json'
 # Interface messages
 msg_data_train = 'training matrix file'
 msg_data_test = 'testing matrix file'
-msg_data_visualize = 'data matrix file to visualize'
+msg_vis_base = 'baseline data matrix file'
 msg_data_visualize_base = 'base data matrix file to visualize'
 msg_clusters = 'clusters'
 msg_components = 'components'

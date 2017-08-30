@@ -69,7 +69,7 @@ def visualize(uuids, subset_labels):
     """
 
     if interaction.ask_yes_no(constants.msg_vis_dataset):
-        data_matrix = interaction.ask_file(constants.msg_data_visualize)
+        data_matrix = interaction.ask_file(constants.msg_vis_base)
         vis_plot.plot_data(data_matrix, subset_labels)
 
     uuid_index = dict(zip(uuids, range(len(uuids))))
@@ -83,11 +83,16 @@ def visualize(uuids, subset_labels):
 
         vis_plot.plot_confusion_matrix(y_true, y_pred)
 
-        data_matrix = interaction.ask_file(constants.msg_data_visualize)
+        data_matrix = interaction.ask_file(constants.msg_vis_base)
         vis_plot.plot_classification(data_matrix, uuid_pos, y_pred, y_true)
 
     if interaction.ask_yes_no(constants.msg_visualize_clu):
         data = json.load(open(interaction.ask_file(constants.msg_results_clu), 'r'))
+        y_pred = [data[uuid] for uuid in sorted(list(data.keys()))]
+        uuid_pos = [uuid_index[uuid] for uuid in sorted(list(data.keys()))]
+
+        data_matrix = interaction.ask_file(constants.msg_vis_base)
+        vis_plot.plot_clustering(data_matrix, uuid_pos, y_pred)
 
 
 def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config):
@@ -238,7 +243,8 @@ def pre_process(config):
 
     print('\nAcquired {} samples belonging to {} different families'.format(len(uuids), len(set(base_labels))))
 
-    if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)) and interaction.ask_yes_no(constants.msg_js):
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)) and interaction.ask_yes_no(
+            constants.msg_js):
         pp_js.get_js(config, uuids)
 
     return uuids, base_labels

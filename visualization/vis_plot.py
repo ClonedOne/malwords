@@ -141,8 +141,10 @@ def plot_hdbs_against_2d(hdbs, num_clusters):
 def plot_classification(data_matrix, uuid_pos, y_pred, y_true):
     """
     Plots the result of classification against the base truth, over a dimensionality reduced space.
+    The base truth will be shown by the center color while the classification will be reflected by the edge color.
 
     :param data_matrix:
+    :param uuid_pos:
     :param y_pred:
     :param y_true:
     :return:
@@ -152,13 +154,37 @@ def plot_classification(data_matrix, uuid_pos, y_pred, y_true):
 
     data = np.loadtxt(data_matrix)
     data = np.array([data[pos] for pos in uuid_pos])
-    print (data.shape)
-    color_palette = sns.color_palette('deep', max(y_true) + 1)
 
-    colors_base = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_true]
-    colors_classified = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_pred]
+    color_palette = sns.color_palette('bright', max(y_true) + 1)
 
-    plt.scatter(*data.T, s=60, linewidth=2, c=colors_base, edgecolors=colors_classified, alpha=0.8)
+    c_true = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_true]
+    c_pred = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_pred]
+
+    plt.scatter(*data.T, s=100, linewidth=2, c=c_true, edgecolors=c_pred, alpha=0.8)
+    plt.show()
+
+
+def plot_clustering(data_matrix, uuid_pos, y_pred):
+    """
+    Plot the result of clustering over a dimensionality reduced space.
+
+    :param data_matrix:
+    :param uuid_pos:
+    :param y_pred:
+    :return:
+    """
+
+    print('Plotting clustering results')
+
+    data = np.loadtxt(data_matrix)
+    data = np.array([data[pos] for pos in uuid_pos])
+
+    num_clusters = len(set(y_pred)) - (1 if -1 in y_pred else 0)
+    color_palette = sns.color_palette('bright', num_clusters)
+
+    c_clu = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_pred]
+
+    plt.scatter(*data.T, s=60, c=c_clu, alpha=0.8)
     plt.show()
 
 
