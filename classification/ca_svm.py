@@ -1,7 +1,5 @@
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import f1_score
-from visualization import vis_plot
-from utilities import interaction
 from helpers import loader_tfidf
 from utilities import constants
 from utilities import output
@@ -49,4 +47,3 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
     print('F1 score of test: {}'.format(test_score))
 
     output.out_classification(dict(zip(x_test, computed_labels.tolist())), 'linear', 'svm')
-

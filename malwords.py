@@ -1,10 +1,12 @@
+import visualization.vis_classification
+import visualization.vis_cluster
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js, pp_word_probs
 from clustering import ca_hdbscan, ca_kmeans, ca_kmeans_minibatch, ca_spectral, ca_dbscan
 from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
 from sklearn.model_selection import train_test_split
 from classification import ca_svm, ca_mlp
 from keywords import kw_keyword_tfidf
-from visualization import vis_plot
+from visualization import vis_data
 from utilities import interaction
 from collections import Counter
 from utilities import constants
@@ -70,7 +72,7 @@ def visualize(uuids, subset_labels):
 
     if interaction.ask_yes_no(constants.msg_vis_dataset):
         data_matrix = interaction.ask_file(constants.msg_vis_base)
-        vis_plot.plot_data(data_matrix, subset_labels)
+        vis_data.plot_data(data_matrix, subset_labels)
 
     uuid_index = dict(zip(uuids, range(len(uuids))))
     base_labels = utils.get_base_labels()
@@ -81,10 +83,10 @@ def visualize(uuids, subset_labels):
         y_pred = [data[uuid] for uuid in sorted(list(data.keys()))]
         uuid_pos = [uuid_index[uuid] for uuid in sorted(list(data.keys()))]
 
-        vis_plot.plot_confusion_matrix(y_true, y_pred)
+        visualization.vis_classification.plot_confusion_matrix(y_true, y_pred)
 
         data_matrix = interaction.ask_file(constants.msg_vis_base)
-        vis_plot.plot_classification(data_matrix, uuid_pos, y_pred, y_true)
+        visualization.vis_classification.plot_classification(data_matrix, uuid_pos, y_pred, y_true)
 
     if interaction.ask_yes_no(constants.msg_visualize_clu):
         data = json.load(open(interaction.ask_file(constants.msg_results_clu), 'r'))
@@ -92,7 +94,7 @@ def visualize(uuids, subset_labels):
         uuid_pos = [uuid_index[uuid] for uuid in sorted(list(data.keys()))]
 
         data_matrix = interaction.ask_file(constants.msg_vis_base)
-        vis_plot.plot_clustering(data_matrix, uuid_pos, y_pred)
+        visualization.vis_cluster.plot_clustering(data_matrix, uuid_pos, y_pred)
 
 
 def cluster_classify(uuids, x_train, x_test, y_train, y_test, base_labels, config):

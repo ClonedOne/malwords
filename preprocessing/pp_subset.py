@@ -26,7 +26,7 @@ def subset(config):
 
         elif subset_type == 'f':
             family = input(constants.msg_family)
-            return get_family(config, family)
+            return get_family(family)
 
         elif subset_type == 's':
             return load_samples(config, small=True)
@@ -130,16 +130,15 @@ def from_json(config, file_name):
     return sorted(result)
 
 
-def get_family(config, family):
+def get_family(family):
     """
     Get all samples of a specified family.
     
-    :param config: 
-    :param family: 
+    :param family:
     :return: 
     """
 
-    inv_labels = json.load(open('data/inverted_labels.json'))
+    inv_labels = json.load(open(os.path.join(constants.dir_d, constants.json_inverted_labels)))
 
     if family not in inv_labels:
         print('Malware family not found')

@@ -1,13 +1,11 @@
-from collections import Counter, defaultdict
+from collections import defaultdict
 from gensim import corpora, models
 from wf_gensim import pp_gensim
 import json
 import sys
-import os
 
 
 def extract_topics():
-    config = json.load(open('config.json'))
     words = json.load(open('data/words.json', 'r'))
 
     if len(sys.argv) < 2:

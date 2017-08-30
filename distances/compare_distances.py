@@ -51,10 +51,7 @@ def compute_distances(config):
 
     metrics = ['cosine', 'euclidean', 'jaccard']
     for metric in metrics:
-        try:
-            file_name = os.path.join(constants.dir_d, 'distances.txt')
-            with open(file_name, "ab") as matrix_file:
-                distances = pairwise_distances(data, metric=metric, n_jobs=core_num)
-                np.savetxt(matrix_file, distances)
-        except:
-            print('Exception with ', metric)
+        file_name = os.path.join(constants.dir_d, 'distances.txt')
+        with open(file_name, "ab") as matrix_file:
+            distances = pairwise_distances(data, metric=metric, n_jobs=core_num)
+            np.savetxt(matrix_file, distances)

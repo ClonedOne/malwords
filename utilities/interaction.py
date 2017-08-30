@@ -20,7 +20,7 @@ def ask_clusters(num_clusters_max):
             num_clusters = int(num_clusters)
             if num_clusters > num_clusters_max or num_clusters < 2:
                 raise Exception
-        except:
+        except ValueError:
             num_clusters = 0
             print('Please insert a valid number of clusters\n')
 
@@ -47,7 +47,7 @@ def ask_number(request):
         try:
             number = int(number)
 
-        except:
+        except ValueError:
             print('Not a valid input\n')
             number = 0
 
