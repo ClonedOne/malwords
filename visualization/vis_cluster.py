@@ -1,8 +1,11 @@
 from matplotlib import pyplot as plt
+from collections import defaultdict
 from utilities import interaction
 from utilities import constants
 import seaborn as sns
 import numpy as np
+import json
+import os
 
 
 def plot_hdbs_against_2d(hdbs, num_clusters):
@@ -47,4 +50,45 @@ def plot_clustering(data_matrix, uuid_pos, y_pred):
     c_clu = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_pred]
 
     plt.scatter(*data.T, s=60, c=c_clu, alpha=0.8)
+    plt.show()
+
+
+def plot_cluster_features(config, clustering):
+    """
+    Plot the histograms of the features of the clusters.
+    For each cluster, order the features and plot the histograms, then move down.
+
+    :param config: application configuration dictionary
+    :param clustering: dictionary mapping uuids to cluster ids
+    :return:
+    """
+
+    dir_store = config['dir_store']
+    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
+    word_list = sorted(list(words.keys()))
+
+    print('Plotting clustering results')
+
+    reverse_clustering = defaultdict(list)
+    for uuid, cluster in clustering.items():
+        reverse_clustering[cluster].append(uuid)
+
+    n_clust = len(reverse_clustering)
+    i = 1
+
+    for cluster in sorted(reverse_clustering):
+        cluster_features = np.zeros(len(word_list))
+
+        uuids = reverse_clustering[cluster]
+        for uuid in uuids:
+            tfidfs = json.load(open(os.path.join(dir_store, uuid), 'r'))
+
+            for j in range(len(word_list)):
+                cluster_features[j] += tfidfs.get(word_list[j], 0)
+
+        plt.subplot(n_clust, 1, i)
+        plt.plot(cluster_features)
+
+        i += 1
+
     plt.show()
