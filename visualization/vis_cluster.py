@@ -2,6 +2,9 @@ from matplotlib import pyplot as plt
 from collections import defaultdict
 from utilities import interaction
 from utilities import constants
+import plotly.graph_objs as go
+import plotly.offline as oly
+from plotly import tools
 import seaborn as sns
 import numpy as np
 import json
@@ -67,14 +70,26 @@ def plot_cluster_features(config, clustering):
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     word_list = sorted(list(words.keys()))
 
-    print('Plotting clustering results')
+    print('Plotting clustering features')
 
     reverse_clustering = defaultdict(list)
     for uuid, cluster in clustering.items():
         reverse_clustering[cluster].append(uuid)
 
-    n_clust = len(reverse_clustering)
     i = 1
+    n_clust = len(reverse_clustering)
+    base = np.arange(len(word_list))
+
+    axis_dict = dict(
+        autorange=True,
+        showgrid=False,
+        zeroline=False,
+        showline=False,
+        autotick=True,
+        ticks='',
+        showticklabels=False
+    )
+    fig = tools.make_subplots(rows=n_clust, cols=1)
 
     for cluster in sorted(reverse_clustering):
         cluster_features = np.zeros(len(word_list))
@@ -86,9 +101,11 @@ def plot_cluster_features(config, clustering):
             for j in range(len(word_list)):
                 cluster_features[j] += tfidfs.get(word_list[j], 0)
 
-        plt.subplot(n_clust, 1, i)
-        plt.plot(cluster_features)
+        trace = go.Scatter(x=base, y=cluster_features)
+        fig.append_trace(trace, i, 1)
+        fig['layout']['xaxis{}'.format(i)].update(axis_dict)
+        fig['layout']['yaxis{}'.format(i)].update(axis_dict)
 
         i += 1
 
-    plt.show()
+    oly.plot(fig, filename='stacked-subplots')
