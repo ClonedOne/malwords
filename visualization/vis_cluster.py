@@ -1,35 +1,14 @@
 from matplotlib import pyplot as plt
 from collections import defaultdict
-from utilities import interaction
 from utilities import constants
 import plotly.graph_objs as go
 import plotly.offline as oly
+from utilities import utils
 from plotly import tools
 import seaborn as sns
 import numpy as np
 import json
 import os
-
-
-def plot_hdbs_against_2d(hdbs, num_clusters):
-    """
-    Plot the clustering result of HDBSCAN against a 2d projection of data.
-
-    :return:
-    """
-
-    matrix_file2d = interaction.ask_file(constants.msg_vis_base)
-
-    data_red = np.loadtxt(matrix_file2d)
-
-    color_palette = sns.color_palette('bright', num_clusters)
-    cluster_colors = [color_palette[x] if x >= 0
-                      else (0.5, 0.5, 0.5)
-                      for x in hdbs.labels_]
-    cluster_member_colors = [sns.desaturate(x, p) for x, p in
-                             zip(cluster_colors, hdbs.probabilities_)]
-    plt.scatter(*data_red.T, s=50, linewidth=0, c=cluster_member_colors, alpha=0.5)
-    plt.show()
 
 
 def plot_clustering(data_matrix, uuid_pos, y_pred):
@@ -56,13 +35,14 @@ def plot_clustering(data_matrix, uuid_pos, y_pred):
     plt.show()
 
 
-def plot_cluster_features(config, clustering):
+def plot_cluster_features(config, clustering, names=None):
     """
     Plot the histograms of the features of the clusters.
     For each cluster, order the features and plot the histograms, then move down.
 
     :param config: application configuration dictionary
     :param clustering: dictionary mapping uuids to cluster ids
+    :param names: family labels
     :return:
     """
 
@@ -101,7 +81,12 @@ def plot_cluster_features(config, clustering):
             for j in range(len(word_list)):
                 cluster_features[j] += tfidfs.get(word_list[j], 0)
 
-        trace = go.Scatter(x=base, y=cluster_features)
+        if names:
+            name = names[i - 1]
+        else:
+            name = str(i)
+
+        trace = go.Scatter(x=base, y=cluster_features, name=name)
         fig.append_trace(trace, i, 1)
         fig['layout']['xaxis{}'.format(i)].update(axis_dict)
         fig['layout']['yaxis{}'.format(i)].update(axis_dict)
@@ -109,3 +94,18 @@ def plot_cluster_features(config, clustering):
         i += 1
 
     oly.plot(fig, filename='stacked-subplots')
+
+
+def plot_av_features(config, uuids):
+    """
+    Uses the cluster feature plotting method to show the features of the clusters provided by AV labeling.
+
+    :return:
+    """
+
+    labels = utils.get_base_labels_uuids(uuids)
+    pseudo_clustering = dict(zip(uuids, labels))
+    families = utils.get_index_labels()
+    families = sorted(set([families[label] for label in labels]))
+
+    plot_cluster_features(config, pseudo_clustering, families)

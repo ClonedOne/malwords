@@ -79,6 +79,7 @@ msg_subset = 'Please choose the subset of data to workon on:\n' \
              'q to quit\n'
 
 msg_vis_dataset = '\nWould you like to visualize the dimensionality reduced data-set? [y/n]\n'
+msg_vis_features = '\nWould you like to visualize the feature distributions in base data? [y/n]\n'
 
 msg_visualize_cla = '\nWould you like to visualize the result of classification? [y/n]\n'
 msg_visualize_clu = '\nWould you like to visualize the result of clustering? [y/n]\n'
@@ -90,4 +91,3 @@ msg_kw = '\nPlease select a keywords extraction technique:\n' \
          'tfidf for the words with highest weighted tf-idf\n' \
          's to skip keywords extraction\n' \
          'q to quit\n'
-

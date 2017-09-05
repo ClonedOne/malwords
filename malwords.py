@@ -69,6 +69,9 @@ def visualize(config, uuids, subset_labels):
     :return:
     """
 
+    if interaction.ask_yes_no(constants.msg_vis_features):
+        vis_cluster.plot_av_features(config, uuids)
+
     if interaction.ask_yes_no(constants.msg_vis_dataset):
         data_matrix = interaction.ask_file(constants.msg_vis_base)
         vis_data.plot_data(data_matrix, subset_labels)

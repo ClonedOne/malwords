@@ -1,5 +1,4 @@
 from sklearn.metrics import pairwise_distances
-from visualization import vis_cluster
 from distances import jensen_shannon
 from utilities import interaction
 from helpers import loader_freqs
@@ -44,7 +43,6 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
 
     evaluation.evaluate_clustering(base_labels, computed_labels, data=data, metric=metric)
     output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
-    vis_cluster.plot_hdbs_against_2d(hdbs, num_clusters)
 
 
 def js(data, uuids, min_cluster_size, core_num, sparse):
