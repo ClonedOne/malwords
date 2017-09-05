@@ -43,8 +43,10 @@ def plot_confusion_matrix(base_labels, predicted_labels):
     index_labels = utils.get_index_labels()
     families = [index_labels[label] for label in sorted(set(base_labels))]
 
-    cm = confusion_matrix(base_labels, predicted_labels)
+    cm = confusion_matrix(base_labels, predicted_labels).astype(float)
+    for vec in cm:
+        vec /= np.sum(vec)
 
-    sns.heatmap(cm, annot=True, xticklabels=families)
+    sns.heatmap(cm, annot=True, xticklabels=families, yticklabels=families)
 
     plt.show()
