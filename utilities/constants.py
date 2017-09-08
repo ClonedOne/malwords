@@ -4,12 +4,11 @@ This module is a collection of constants values used by the different modules
 
 # Directories
 dir_d = 'data'
-dir_dc = 'data_cluster'
-dir_dg = 'data_gensim'
-dir_dm = 'data_matrix'
-dir_dt = 'data_tfidf'
-dir_ds = 'data_classification'
-dir_dv = 'data_visualize'
+dir_clu = 'd_clusterings'
+dir_kw = 'd_keywords'
+dir_mat = 'd_matrices'
+dir_cla = 'd_classifications'
+dir_vis = 'd_visualizations'
 
 # File names
 file_labels = 'labels.txt'
@@ -95,3 +94,7 @@ msg_kw = '\nPlease select a keywords extraction technique:\n' \
          'tfidf for the words with highest weighted tf-idf\n' \
          's to skip keywords extraction\n' \
          'q to quit\n'
+
+pd_columns = ['family', 'fam_num', 'selected', 'train', 'test']
+
+msg_invalid = 'Not a valid input'

@@ -2,6 +2,8 @@ from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp
 from sklearn.model_selection import train_test_split
 from utilities import constants, utils, interaction
 from collections import Counter
+from pathlib import Path
+import pandas
 import os
 
 
@@ -10,45 +12,54 @@ def pre_process(config):
     Perform pre-processing steps and returns a list of sample uuids and a list or related labels.
 
     :param config: configuration dictionary
-    :return: tuple of lists, uuids and malware families
+    :return: pandas DataFrame with:
+     * index: sorted list of all the uuids
+     * family: malware family associated with the uuid
+     * fam_num: numerical index of the malware family
+     * selected: list of bools stating if the uuid was selected by the user
+     * train: list of bools showing uuids in train set
+     * test: list of bools showing uuids in test set
     """
 
     # Create results data directories if needed
-    utils.create_dirs()
+    create_dirs()
 
     # Create AVClass input data if needed
-    if not os.path.isfile(os.path.join(constants.dir_d, constants.file_labels)):
-        pp_avclass.prepare_vt(config)
-        print('Please run the AVClass tool and relaunch')
-        exit()
+    check_avclass_files(config)
 
-    if not os.path.isfile(os.path.join(constants.dir_d, constants.json_labels)):
-        pp_labels.get_labels(config)
-
-    if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
-        pp_idf.get_idf(config)
-
-    if len(os.listdir(config['dir_store'])) == 0:
-        if interaction.ask_yes_no(constants.msg_memhist):
-            pp_word_probs.get_word_probabilities(config, 3)
-        pp_tfidf.get_tf_idf(config)
+    # Create features files if needed
+    check_features_files(config)
 
     # Select the data subset to operate upon
-    uuids = pp_subset.subset(config)
+    samples_data = pp_subset.subset(config)
 
     # Retrieve base labels
     base_labels = utils.get_base_labels_uuids(uuids)
 
     print('\nAcquired {} samples belonging to {} different families'.format(len(uuids), len(set(base_labels))))
 
-    if not os.path.isfile(os.path.join(constants.dir_d, constants.file_js)) and interaction.ask_yes_no(
-            constants.msg_js):
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.dir_mat, constants.file_js)) \
+            and interaction.ask_yes_no(constants.msg_js):
         pp_js.get_js(config, uuids)
 
-    return uuids, base_labels
+    return samples_data
 
 
 # Helper methods
+
+def create_dirs():
+    """
+    Helper method to create the data directory structure if needed.
+
+    :return:
+    """
+
+    (Path(constants.dir_d) / Path(constants.dir_clu)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_kw)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_mat)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_cla)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_vis)).mkdir(parents=True, exist_ok=True)
+
 
 def show_data(uuids, base_labels):
     """
@@ -74,3 +85,37 @@ def show_data(uuids, base_labels):
         print('Malware family: {} - Number of samples: {}'.format(index_label[family[0]], family[1]))
 
     return x_train, x_test, y_train, y_test
+
+
+def check_avclass_files(config):
+    """
+    Helper method to check for the existance of AVClass related files
+
+    :param config: configuration dictionary
+    :return:
+    """
+
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.file_labels)):
+        pp_avclass.prepare_vt(config)
+        print('Please run the AVClass tool and relaunch')
+        exit()
+
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.json_labels)):
+        pp_labels.get_labels(config)
+
+
+def check_features_files(config):
+    """
+    Helper method to check the features files
+
+    :param config: configuration dictionary
+    :return:
+    """
+
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.json_words)):
+        pp_idf.get_idf(config)
+
+    if len(os.listdir(config['dir_store'])) == 0:
+        if interaction.ask_yes_no(constants.msg_memhist):
+            pp_word_probs.get_word_probabilities(config, 3)
+        pp_tfidf.get_tf_idf(config)

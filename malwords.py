@@ -8,6 +8,11 @@ import json
 
 
 def main():
+    """
+    Main application lifecycle. Loads configuration file and asks user which actions to perform.
+
+    :return:
+    """
     config = json.load(open('config.json', 'r'))
 
     uuids, base_labels = pp_action.pre_process(config)

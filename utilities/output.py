@@ -17,7 +17,7 @@ def out_clustering(clustering_dict, distance, algo):
 
     out_file = 'clustering_{}_{}_{}.json'.format(algo, distance, n_samples)
 
-    json.dump(clustering_dict, open(os.path.join(constants.dir_d, constants.dir_dc, out_file), 'w'), indent=2)
+    json.dump(clustering_dict, open(os.path.join(constants.dir_d, constants.dir_clu, out_file), 'w'), indent=2)
 
 
 def out_classification(classification_dict, distance, algo):
@@ -34,7 +34,7 @@ def out_classification(classification_dict, distance, algo):
 
     out_file = 'classification_{}_{}_{}.json'.format(algo, distance, n_samples)
 
-    json.dump(classification_dict, open(os.path.join(constants.dir_d, constants.dir_ds, out_file), 'w'), indent=2)
+    json.dump(classification_dict, open(os.path.join(constants.dir_d, constants.dir_cla, out_file), 'w'), indent=2)
 
 
 def result_to_visualize(uuids, base_labels, computed_labels, num_clusters, alg=""):
@@ -63,5 +63,5 @@ def result_to_visualize(uuids, base_labels, computed_labels, num_clusters, alg="
 
         out_dict['children'].append(child_dict)
 
-    graph_path = os.path.join(constants.dir_d, constants.dir_dv, constants.json_graph.format(alg))
+    graph_path = os.path.join(constants.dir_d, constants.dir_vis, constants.json_graph.format(alg))
     json.dump(out_dict, open(graph_path, 'w'), indent=2)

@@ -143,7 +143,7 @@ int main(int argc, char *argv[]) {
     duration<double, std::milli> time_span1 = t2 - t1;
     std::cout << "JS computation: " << time_span1.count() << " milliseconds." << std::endl;
 
-    std::ofstream js_file("data/jensen_shannon.txt");
+    std::ofstream js_file("jensen_shannon.txt");
     if (js_file.is_open())
         js_file << js_distances;
     js_file.close();

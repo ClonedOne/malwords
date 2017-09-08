@@ -35,14 +35,14 @@ def reduce(config, train, test, components, objective):
 
     data = transform_vectors(i_pca, rows, cols, train, words, mini_batch_size, core_num, dir_store)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "pca_{}_{}.txt".format(components, objective))
+    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "pca_{}_{}.txt".format(components, objective))
     np.savetxt(open(matrix_file, "wb"), data)
 
     if test is not None:
         rows = len(test)
         data = transform_vectors(i_pca, rows, cols, test, words, mini_batch_size, core_num, dir_store)
 
-        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "pca_{}_{}.txt".format(components, 'test'))
+        matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "pca_{}_{}.txt".format(components, 'test'))
         np.savetxt(open(matrix_file, "wb"), data)
 
 

@@ -34,7 +34,7 @@ def reduce(config, train, test, components, objective):
     print('Explained Variance Ratio')
     print(sum(svd.explained_variance_ratio_))
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "svd_{}_{}.txt".format(components, objective))
+    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "svd_{}_{}.txt".format(components, objective))
     np.savetxt(open(matrix_file, "wb"), data)
 
     if test is not None:
@@ -43,7 +43,7 @@ def reduce(config, train, test, components, objective):
 
         data = transform_vectors(svd, rows, cols, test, words, mini_batch_size, core_num, dir_store)
 
-        matrix_file = os.path.join(constants.dir_d, constants.dir_dm, "svd_{}_{}.txt".format(components, 'test'))
+        matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "svd_{}_{}.txt".format(components, 'test'))
         np.savetxt(open(matrix_file, "wb"), data)
 
 

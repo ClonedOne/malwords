@@ -1,6 +1,5 @@
 from collections import defaultdict
 from utilities import constants
-from pathlib import Path
 import numpy as np
 import json
 import os
@@ -128,15 +127,15 @@ def get_index_labels():
     return index_label
 
 
-def create_dirs():
+def get_all_uuids(dir_malwords):
     """
-    Creates the data directory structure if needed.
+    Returns a sorted list of all the uuids in the malwords path.
 
-    :return:
+    :return: sorted list of uuids
     """
-    (Path(constants.dir_d) / Path(constants.dir_dc)).mkdir(parents=True, exist_ok=True)
-    (Path(constants.dir_d) / Path(constants.dir_dg)).mkdir(parents=True, exist_ok=True)
-    (Path(constants.dir_d) / Path(constants.dir_dm)).mkdir(parents=True, exist_ok=True)
-    (Path(constants.dir_d) / Path(constants.dir_dt)).mkdir(parents=True, exist_ok=True)
-    (Path(constants.dir_d) / Path(constants.dir_ds)).mkdir(parents=True, exist_ok=True)
-    (Path(constants.dir_d) / Path(constants.dir_dv)).mkdir(parents=True, exist_ok=True)
+
+    if not os.path.isdir(dir_malwords):
+        print('Could not find malwords directory')
+        exit()
+
+    return [uuid.strip().split('_')[0] for uuid in sorted(os.listdir(dir_malwords))]

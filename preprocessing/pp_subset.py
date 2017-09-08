@@ -1,6 +1,8 @@
 from utilities import interaction
 from utilities import constants
+from utilities import utils
 from shutil import copyfile
+import pandas
 import json
 import os
 
@@ -13,23 +15,29 @@ def subset(config):
     :return: 
     """
 
+    samples_data = pandas.DataFrame(columns=constants.pd_columns)
+    samples_data = samples_data.reindex(index=utils.get_all_uuids(config['dir_malwords']))
+    print(samples_data)
+
+    uuids = utils.get_all_uuids(config['dir_malwords'])
+    selected_subset = None
     subset_type = ""
 
     while subset_type == "":
         subset_type = input(constants.msg_subset)
 
         if subset_type == 'l':
-            return get_labeled(config)
+            selected_subset = get_labeled(config)
 
         elif subset_type == 'k':
-            return load_samples(config)
+            selected_subset = load_samples(config)
 
         elif subset_type == 'f':
             family = input(constants.msg_family)
-            return get_family(family)
+            selected_subset = get_family(family)
 
         elif subset_type == 's':
-            return load_samples(config, small=True)
+            selected_subset = load_samples(config, small=True)
 
         elif subset_type == 'j':
             json_file = interaction.ask_file(constants.msg_json)
@@ -38,14 +46,16 @@ def subset(config):
                 print('json file not found')
                 exit()
 
-            return from_json(config, json_file)
+            selected_subset = from_json(config, json_file)
 
         elif subset_type == 'q':
             exit()
 
         else:
             subset_type = ""
-            print(constants.msg_subset)
+            print(constants.msg_invalid)
+
+    return uuids, selected_subset
 
 
 def get_labeled(config):
