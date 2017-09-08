@@ -47,16 +47,20 @@ msg_dr = '\nPlease select a dimensionality reduction technique:\n' \
          's to skip dimensionality reduction\n' \
          'q to quit\n'
 
-msg_ca = '\nPlease select a clustering or classification technique:\n' \
-         'kmeans for standard KMeans on feature selected data-set\n' \
-         'mini_kmeans for mini batch KMeans\n' \
-         'hdbscan for HDBSCAN \n' \
-         'svm for linear SVM \n' \
-         'spectral for Spectral clustering using Jensen-Shannon metric\n' \
-         'dbscan for DBSCAN clustering using Jensen-Shannon metric\n' \
-         'mlp for multilayer Perceptron \n' \
-         's to skip clustering/classification\n' \
-         'q to quit\n'
+msg_cla = '\nPlease select a classification technique:\n' \
+          'svm for linear kernel SVM \n' \
+          'mlp for multilayer Perceptron \n' \
+          's to skip clustering/classification\n' \
+          'q to quit\n'
+
+msg_clu = '\nPlease select a clustering technique:\n' \
+          'kmeans for standard KMeans on feature selected data-set\n' \
+          'mini_kmeans for mini batch KMeans\n' \
+          'hdbscan for HDBSCAN \n' \
+          'spectral for Spectral clustering using Jensen-Shannon metric\n' \
+          'dbscan for DBSCAN clustering using Jensen-Shannon metric\n' \
+          's to skip clustering/classification\n' \
+          'q to quit\n'
 
 msg_metric = '\nPlease select the desired metric\n' \
              'e for euclidean\n' \
