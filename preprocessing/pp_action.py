@@ -3,7 +3,6 @@ from sklearn.model_selection import train_test_split
 from utilities import constants, utils, interaction
 from collections import Counter
 from pathlib import Path
-import pandas
 import os
 
 
@@ -33,13 +32,9 @@ def pre_process(config):
     # Select the data subset to operate upon
     samples_data = pp_subset.subset(config)
 
-    # Retrieve base labels
-    base_labels = utils.get_base_labels_uuids(uuids)
-
-    print('\nAcquired {} samples belonging to {} different families'.format(len(uuids), len(set(base_labels))))
-
     if not os.path.isfile(os.path.join(constants.dir_d, constants.dir_mat, constants.file_js)) \
             and interaction.ask_yes_no(constants.msg_js):
+        uuids = samples_data.index[samples_data['selected'] == 1].tolist()
         pp_js.get_js(config, uuids)
 
     return samples_data
