@@ -32,7 +32,8 @@ msg_results_cla = 'classification result file'
 msg_results_clu = 'clustering result file'
 msg_results_cluster = 'clustering result file'
 msg_json = 'json file'
-msg_family = 'malware family'
+
+msg_family = 'Please select the desired malware family\n'
 
 msg_argv = '\nPlease select a valid action:\n' \
            'compare-distance --> show various distance metrics applies to the samples\n' \
@@ -98,3 +99,14 @@ msg_kw = '\nPlease select a keywords extraction technique:\n' \
 pd_columns = ['family', 'fam_num', 'selected', 'train', 'test']
 
 msg_invalid = 'Not a valid input'
+
+small_subset = [
+    "761dd266-466c-41e3-8fab-a550adbe1a7c",
+    "22b4014f-422c-4447-bfd1-a925bf33181e",
+    "1c410f27-6b28-4ead-b2d1-53fcf3132394",
+    "1dc440ca-0f47-4daf-a45c-5c9c7111da31",
+    "859e3387-597c-4d0f-a539-7b74c5982a1c",
+    "b790995f-8429-4b2b-96ef-f94bf000c1e1",
+    "4905aa5a-9062-4d1d-9c72-96f1bd80bf3f",
+    "ecc1e3df-bdf2-43c6-962e-ad2bc2de971a"
+]
