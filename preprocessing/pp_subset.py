@@ -11,13 +11,12 @@ def subset(config):
     """
     Subset the data-set for analysis.
     
-    :param config: 
+    :param config: configuration dictionary
     :return: 
     """
 
-    samples_data = pandas.DataFrame(columns=constants.pd_columns)
-    samples_data = samples_data.reindex(index=utils.get_all_uuids(config['dir_malwords']))
-    print(samples_data)
+    samples_data = create_dataframe(config)
+    print(samples_data.describe())
 
     uuids = utils.get_all_uuids(config['dir_malwords'])
     selected_subset = None
@@ -178,3 +177,37 @@ def copy_files(config, uuids):
                 os.path.join(config['dir_malwords'], uuid + f_ext),
                 os.path.join(config['dir_mini'], uuid + f_ext)
             )
+
+
+def create_dataframe(config):
+    """
+    Helper method to initialize a new DataFrame with the samples data with uuids as indices and the related families
+
+    :param config: configuration dictionary
+    :return: initialized DataFrame
+    """
+
+    uuid_label = json.load(open(os.path.join(constants.dir_d, constants.json_labels)))
+    indices = set(utils.get_all_uuids(config['dir_malwords']))
+    families = dict(zip(
+        sorted(set(uuid_label.values())),
+        range(len(set(uuid_label.values())))
+    ))
+
+
+    # Remove uuids whose malware family is unkown
+    to_remove = set()
+    for uuid in indices:
+        if uuid not in uuid_label or uuid_label[uuid] == 'SINGLETON':
+            to_remove.add(uuid)
+    indices = sorted(indices - to_remove)
+
+    samples_data = pandas.DataFrame(index=indices, columns=constants.pd_columns)
+
+    for uuid, label in uuid_label.items():
+        if uuid in samples_data.index:
+            samples_data.set_value(uuid, 'family', label)
+            samples_data.set_value(uuid, 'fam_num', families[label])
+
+    print(sorted(set(samples_data['family'])))
+    return samples_data
