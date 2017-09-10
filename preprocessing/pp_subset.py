@@ -1,4 +1,4 @@
-from utilities import interaction
+from collections import Counter
 from utilities import constants
 from utilities import utils
 import numpy as np
@@ -22,21 +22,20 @@ def subset(config):
         subset_type = input(constants.msg_subset)
 
         if subset_type == 'l':
-            get_labeled(samples_data)
+            load_labeled(samples_data)
 
         elif subset_type == 'k':
             load_samples(samples_data)
 
         elif subset_type == 'f':
             family = input(constants.msg_family)
-            get_family(family, samples_data)
+            load_family(family, samples_data)
 
         elif subset_type == 's':
             load_small_set(samples_data)
 
-        elif subset_type == 'j':
-            json_file = interaction.ask_file(constants.msg_json)
-            from_json(json_file, samples_data)
+        elif subset_type == 'b':
+            load_balanced(samples_data, 50, 500)
 
         elif subset_type == 'q':
             exit()
@@ -45,11 +44,36 @@ def subset(config):
             subset_type = ""
             print(constants.msg_invalid)
 
-    print(samples_data.describe(include='all'))
     return samples_data
 
 
-def get_labeled(samples_data):
+def load_balanced(samples_data, threshold_low, threshold_high):
+    """
+    Load a balanced subset of the dataset.
+    Selects only those samples whose family appears more than a minim number of times.
+    Selects only a maximum number of samples for each family.
+
+    :param samples_data: DataFrame with samples information
+    :param threshold_low: minium number of samples of the same family
+    :param threshold_high: maximum number of samples per family
+    :return:
+    """
+
+    temp = samples_data['family'].value_counts()
+    families = set(temp[temp >= threshold_low].index)
+
+    fam_count = Counter()
+
+    for uuid in samples_data.index:
+        cur_fam = samples_data.loc[uuid, 'family']
+        if cur_fam in families and fam_count[cur_fam] < threshold_high:
+            samples_data.set_value(uuid, 'selected', 1)
+            fam_count[cur_fam] += 1
+        else:
+            samples_data.set_value(uuid, 'selected', 0)
+
+
+def load_labeled(samples_data):
     """
     Take only samples for which there is a known malware family label.
     
@@ -71,43 +95,28 @@ def load_small_set(samples_data):
     for uuid in constants.small_subset:
         if uuid in samples_data.index:
             samples_data.set_value(uuid, 'selected', 1)
+        else:
+            samples_data.set_value(uuid, 'selected', 0)
 
 
 def load_samples(samples_data):
     """
-    Take samples of 7 specific families or a very small subset for testing. 
+    Take samples of 7 specific families.
     
     :param samples_data: DataFrame with samples information
     :return:
     """
 
-    familes = {'mydoom', 'gepys', 'lamer', 'neshta', 'bladabindi', 'flystudio', 'eorezo'}
+    families = {'mydoom', 'gepys', 'lamer', 'neshta', 'bladabindi', 'flystudio', 'eorezo'}
 
     for uuid in samples_data.index:
-        if samples_data.loc[uuid, 'family'] in familes:
+        if samples_data.loc[uuid, 'family'] in families:
             samples_data.set_value(uuid, 'selected', 1)
+        else:
+            samples_data.set_value(uuid, 'selected', 0)
 
 
-def from_json(json_file, samples_data):
-    """
-    Get samples specified in a json file.
-    
-    :param json_file: json file path
-    :param samples_data: DataFrame with samples information
-    :return: 
-    """
-
-    if not os.path.isfile(json_file):
-        print('json file not found')
-        exit()
-
-    uuids = json.load(open(json_file))
-    for uuid in uuids:
-        if uuid in samples_data.index:
-            samples_data.set_value(uuid, 'selected', 1)
-
-
-def get_family(family_name, samples_data):
+def load_family(family_name, samples_data):
     """
     Get all samples of a specified family.
 
@@ -123,6 +132,8 @@ def get_family(family_name, samples_data):
     for uuid in samples_data.index:
         if samples_data.loc[uuid, 'family'] == family_name:
             samples_data.set_value(uuid, 'selected', 1)
+        else:
+            samples_data.set_value(uuid, 'selected', 0)
 
 
 def create_dataframe(config):

@@ -79,7 +79,7 @@ msg_subset = 'Please choose the subset of data to workon on:\n' \
              'k for samples of families mydoom, gepys, lamer, neshta, bladabindi, flystudio, eorezo\n' \
              's for 8 samples of families mydoom, gepys, bladabindi, flystudio\n' \
              'f for a single family\n' \
-             'j for json list of uuids\n' \
+             'b for a balanced subset of samples\n' \
              'q to quit\n'
 
 msg_vis_dataset = '\nWould you like to visualize the dimensionality reduced data-set? [y/n]\n'

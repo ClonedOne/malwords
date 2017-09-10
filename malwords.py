@@ -4,6 +4,7 @@ from visualization import vis_action
 from preprocessing import pp_action
 from clustering import clu_action
 from keywords import kw_action
+import numpy as np
 import json
 
 
@@ -15,7 +16,8 @@ def main():
     """
     config = json.load(open('config.json', 'r'))
 
-    uuids, base_labels = pp_action.pre_process(config)
+    samples_data = pp_action.pre_process(config)
+    print(samples_data.describe())
 
     x_train, x_test, y_train, y_test = pp_action.show_data(uuids, base_labels)
 
