@@ -1,6 +1,6 @@
 from preprocessing import pp_avclass, pp_subset, pp_labels, pp_idf, pp_tfidf, pp_js, pp_word_probs
 from sklearn.model_selection import train_test_split
-from utilities import constants, utils, interaction
+from utilities import constants, interaction
 from collections import Counter
 from pathlib import Path
 import os
@@ -56,32 +56,6 @@ def create_dirs():
     (Path(constants.dir_d) / Path(constants.dir_vis)).mkdir(parents=True, exist_ok=True)
 
 
-def show_data(uuids, base_labels):
-    """
-    Helper method to show the train and test data sets.
-
-    :param uuids: list of uuids composing the whole data set
-    :param base_labels: list of related malware family labels
-    :return:
-    """
-
-    index_label = utils.get_index_labels()
-
-    x_train, x_test, y_train, y_test = train_test_split(uuids, base_labels, test_size=0.2, random_state=30)
-
-    print('\n{} train samples belonging to {} malware families'.format(len(x_train), len(set(y_train))))
-    distribution = Counter(y_train)
-    for family in distribution.most_common():
-        print('Malware family: {} - Number of samples: {}'.format(index_label[family[0]], family[1]))
-
-    print('\n{} test samples belonging to {} malware families'.format(len(x_test), len(set(y_test))))
-    distribution = Counter(y_test)
-    for family in distribution.most_common():
-        print('Malware family: {} - Number of samples: {}'.format(index_label[family[0]], family[1]))
-
-    return x_train, x_test, y_train, y_test
-
-
 def check_avclass_files(config):
     """
     Helper method to check for the existance of AVClass related files
@@ -114,3 +88,34 @@ def check_features_files(config):
         if interaction.ask_yes_no(constants.msg_memhist):
             pp_word_probs.get_word_probabilities(config, 3)
         pp_tfidf.get_tf_idf(config)
+
+
+def split_show_data(samples_data):
+    """
+    Helper method to split and show the train and test data sets.
+
+    :param samples_data: DataFrame with samples information
+    :return:
+    """
+
+    uuids = samples_data.index[samples_data['selected'] == 1].tolist()
+
+    labels = samples_data.loc[uuids, 'family'].values
+
+    x_train, x_test, y_train, y_test = train_test_split(uuids, labels, test_size=0.2, random_state=42)
+
+    print('\n{} train samples belonging to {} malware families'.format(len(x_train), len(set(y_train))))
+    for family in Counter(y_train).most_common():
+        print('Malware family: {:^20} Number of samples: {:^6}'.format(family[0], family[1]))
+
+    print('\n{} test samples belonging to {} malware families'.format(len(x_test), len(set(y_test))))
+    for family in Counter(y_test).most_common():
+        print('Malware family: {:^20} Number of samples: {:^6}'.format(family[0], family[1]))
+
+    for uuid in x_train:
+        samples_data.set_value(uuid, 'train', 1)
+    for uuid in x_test:
+        samples_data.set_value(uuid, 'test', 1)
+
+    print('\n')
+    print(samples_data.describe(include='all'))

@@ -35,7 +35,7 @@ def subset(config):
             load_small_set(samples_data)
 
         elif subset_type == 'b':
-            load_balanced(samples_data, 50, 500)
+            load_balanced(samples_data, 100, 1000)
 
         elif subset_type == 'q':
             exit()
@@ -69,8 +69,6 @@ def load_balanced(samples_data, threshold_low, threshold_high):
         if cur_fam in families and fam_count[cur_fam] < threshold_high:
             samples_data.set_value(uuid, 'selected', 1)
             fam_count[cur_fam] += 1
-        else:
-            samples_data.set_value(uuid, 'selected', 0)
 
 
 def load_labeled(samples_data):
@@ -95,8 +93,6 @@ def load_small_set(samples_data):
     for uuid in constants.small_subset:
         if uuid in samples_data.index:
             samples_data.set_value(uuid, 'selected', 1)
-        else:
-            samples_data.set_value(uuid, 'selected', 0)
 
 
 def load_samples(samples_data):
@@ -112,8 +108,6 @@ def load_samples(samples_data):
     for uuid in samples_data.index:
         if samples_data.loc[uuid, 'family'] in families:
             samples_data.set_value(uuid, 'selected', 1)
-        else:
-            samples_data.set_value(uuid, 'selected', 0)
 
 
 def load_family(family_name, samples_data):
@@ -132,8 +126,6 @@ def load_family(family_name, samples_data):
     for uuid in samples_data.index:
         if samples_data.loc[uuid, 'family'] == family_name:
             samples_data.set_value(uuid, 'selected', 1)
-        else:
-            samples_data.set_value(uuid, 'selected', 0)
 
 
 def create_dataframe(config):
@@ -159,6 +151,8 @@ def create_dataframe(config):
     indices = sorted(indices - to_remove)
 
     samples_data = pandas.DataFrame(index=indices, columns=constants.pd_columns)
+    for col in constants.pd_columns[2:]:
+        samples_data[col] = samples_data[col].astype(float)
 
     for uuid, label in uuid_label.items():
         if uuid in samples_data.index:
