@@ -31,6 +31,3 @@ def get_js(config, uuids):
 
     proc = subprocess.Popen(['./js_dist', str(core_num), uuids_paths_file, str(zipped)])
     proc.wait()
-
-    # move the resulting file in the matrices folder
-    os.rename(constants.file_js, os.path.join(constants.dir_d, constants.dir_mat, constants.file_js))
