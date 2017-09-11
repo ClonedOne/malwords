@@ -2,13 +2,11 @@ from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
 from utilities import constants, interaction
 
 
-def dimensionality_reduction(uuids, x_train, x_test, config):
+def dimensionality_reduction(samples_data, config):
     """
     Perform a dimensionality reduction step (or skip).
 
-    :param uuids: list of selected uuids
-    :param x_train: subset of uuids for training
-    :param x_test: subset of uuids for testing
+    :param samples_data: DataFrame with samples information
     :param config: configuration dictionary
     :return:
     """
@@ -19,6 +17,10 @@ def dimensionality_reduction(uuids, x_train, x_test, config):
         'tsne': dr_tsne,
         'lda': dr_lda
     }
+
+    uuids = samples_data.index[samples_data['selected'] == 1].tolist()
+    x_train = samples_data.index[samples_data['train'] == 1].tolist()
+    x_test = samples_data.index[samples_data['test'] == 1].tolist()
 
     # Prompts the user to select an action
     dr = ''

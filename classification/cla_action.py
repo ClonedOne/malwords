@@ -2,17 +2,19 @@ from utilities import constants, interaction
 from classification import cla_svm, cla_mlp
 
 
-def classify(x_train, x_test, y_train, y_test, config):
+def classify(samples_data, config):
     """
     Perform a clustering or classification step.
 
-    :param x_train: list of train set uuids
-    :param x_test: list of test set uuids
-    :param y_train: list of train set labels
-    :param y_test: list of test set labels
+    :param samples_data: DataFrame with samples information
     :param config: configuration dictionary
     :return:
     """
+
+    x_train = samples_data.index[samples_data['train'] == 1].tolist()
+    x_test = samples_data.index[samples_data['test'] == 1].tolist()
+    y_train = samples_data.fam_num[samples_data['train'] == 1].tolist()
+    y_test = samples_data.fam_num[samples_data['test'] == 1].tolist()
 
     # Prompts the user to select an action
     cla = ''

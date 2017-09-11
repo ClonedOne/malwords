@@ -32,10 +32,10 @@ def pre_process(config):
     # Select the data subset to operate upon
     samples_data = pp_subset.subset(config)
 
-    # if not os.path.isfile(os.path.join(constants.dir_d, constants.dir_mat, constants.file_js)) \
-    #         and interaction.ask_yes_no(constants.msg_js):
-    #     uuids = samples_data.index[samples_data['selected'] == 1].tolist()
-    #     pp_js.get_js(config, uuids)
+    if not os.path.isfile(os.path.join(constants.dir_d, constants.dir_mat, constants.file_js)) \
+            and interaction.ask_yes_no(constants.msg_js):
+        uuids = samples_data.index[samples_data['selected'] == 1].tolist()
+        pp_js.get_js(config, uuids)
 
     return samples_data
 

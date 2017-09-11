@@ -10,7 +10,9 @@ def plot_data(data_matrix, base_labels):
     """
     Plot dimensionality reduced representations of data.
 
-    :return: 
+    :param data_matrix: 2d/3d data matrix file
+    :param base_labels: reference classification by AV
+    :return:
     """
 
     data = np.loadtxt(data_matrix)
@@ -29,7 +31,7 @@ def plot2d(base_labels, data):
     """
     Plot data in 2 dimensions.
     
-    :param base_labels: reference clustering by AV
+    :param base_labels: reference classification by AV
     :param data: 2d data matrix
     :return: 
     """
@@ -63,7 +65,7 @@ def plot3d(base_labels, data):
     """
     Plot data in 3 dimensions.
     
-    :param base_labels: reference clustering by AV
+    :param base_labels: reference classification by AV
     :param data: 3d data matrix
     :return: 
     """

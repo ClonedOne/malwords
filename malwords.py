@@ -19,13 +19,13 @@ def main():
 
     pp_action.split_show_data(samples_data)
 
-    dr_action.dimensionality_reduction(uuids, x_train, x_test, config)
+    dr_action.dimensionality_reduction(samples_data, config)
 
-    clu_action.cluster(uuids, base_labels, config)
+    clu_action.cluster(samples_data, config)
 
-    cla_action.classify(x_train, x_test, y_train, y_test, config)
+    cla_action.classify(samples_data, config)
 
-    vis_action.visualize(config, uuids, base_labels)
+    vis_action.visualize(samples_data, config)
 
     kw_action.keywords_extraction(config)
 

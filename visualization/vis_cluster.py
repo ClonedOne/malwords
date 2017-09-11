@@ -15,9 +15,9 @@ def plot_clustering(data_matrix, uuid_pos, y_pred):
     """
     Plot the result of clustering over a dimensionality reduced space.
 
-    :param data_matrix:
-    :param uuid_pos:
-    :param y_pred:
+    :param data_matrix: 2d data matrix file
+    :param uuid_pos: rows of the data matrix corresponding to clustered uuids
+    :param y_pred: labels resulting from clustering
     :return:
     """
 
@@ -96,10 +96,12 @@ def plot_cluster_features(config, clustering, names=None):
     oly.plot(fig, filename='stacked-subplots')
 
 
-def plot_av_features(config, uuids):
+def plot_av_features(uuids, config):
     """
     Uses the cluster feature plotting method to show the features of the clusters provided by AV labeling.
 
+    :param uuids: list of uuids
+    :param config: configuration dictionary
     :return:
     """
 

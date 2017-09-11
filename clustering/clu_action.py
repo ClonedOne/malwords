@@ -2,15 +2,17 @@ from clustering import clu_hdbscan, clu_kmeans, clu_kmeans_minibatch, clu_spectr
 from utilities import constants, interaction
 
 
-def cluster(uuids, base_labels, config):
+def cluster(samples_data, config):
     """
     Perform a clustering or classification step.
 
-    :param uuids: list of uuids
-    :param base_labels: list of malware families
+    :param samples_data: DataFrame with samples information
     :param config: configuration dictionary
     :return:
     """
+
+    uuids = samples_data.index[samples_data['selected'] == 1].tolist()
+    labels_num = samples_data.fam_num[samples_data['selected'] == 1].tolist()
 
     # Prompts the user to select an action
     clu = ''
@@ -24,23 +26,23 @@ def cluster(uuids, base_labels, config):
             else:
                 data_matrix = interaction.ask_file(constants.msg_data_train)
             clusters = interaction.ask_number(constants.msg_clusters)
-            clu_kmeans.cluster(config, data_matrix, clusters, uuids, base_labels, sparse=sparse)
+            clu_kmeans.cluster(config, data_matrix, clusters, uuids, labels_num, sparse=sparse)
 
         elif clu == 'mini_kmeans':
             clusters = interaction.ask_number(constants.msg_clusters)
-            clu_kmeans_minibatch.cluster(config, clusters, uuids, base_labels)
+            clu_kmeans_minibatch.cluster(config, clusters, uuids, labels_num)
 
         elif clu == 'spectral':
             clusters = interaction.ask_number(constants.msg_clusters)
-            clu_spectral.cluster(config, clusters, uuids, base_labels)
+            clu_spectral.cluster(config, clusters, uuids, labels_num)
 
         elif clu == 'dbscan':
-            clu_dbscan.cluster(config, uuids, base_labels)
+            clu_dbscan.cluster(config, uuids, labels_num)
 
         elif clu == 'hdbscan':
             distance = interaction.ask_metric()
             sparse = interaction.ask_yes_no(constants.msg_sparse)
-            clu_hdbscan.cluster(config, distance, uuids, base_labels, sparse=sparse)
+            clu_hdbscan.cluster(config, distance, uuids, labels_num, sparse=sparse)
 
         elif clu == 's':
             return
