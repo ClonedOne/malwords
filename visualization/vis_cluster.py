@@ -35,7 +35,7 @@ def plot_clustering(data_matrix, uuid_pos, y_pred):
     plt.show()
 
 
-def plot_cluster_features(config, clustering, names=None):
+def plot_cluster_features(config, clustering, names=None, av=False):
     """
     Plot the histograms of the features of the clusters.
     For each cluster, order the features and plot the histograms, then move down.
@@ -86,14 +86,16 @@ def plot_cluster_features(config, clustering, names=None):
         else:
             name = str(i)
 
-        trace = go.Scatter(x=base, y=cluster_features, name=name)
+        trace = go.Scatter(x=base, y=cluster_features, name=name, text=word_list)
         fig.append_trace(trace, i, 1)
         fig['layout']['xaxis{}'.format(i)].update(axis_dict)
         fig['layout']['yaxis{}'.format(i)].update(axis_dict)
 
         i += 1
 
-    oly.plot(fig, filename='stacked-subplots')
+    plot_name = os.path.join(constants.dir_d, constants.dir_vis, 'features_{}'.format(len(clustering)))
+    plot_name = plot_name + '_AV' if av else plot_name
+    oly.plot(fig, filename=plot_name)
 
 
 def plot_av_features(uuids, config):
