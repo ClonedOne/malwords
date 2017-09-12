@@ -1,4 +1,5 @@
 from collections import Counter, defaultdict
+from utilities import constants
 import json
 import os
 
@@ -14,7 +15,8 @@ def extract_keywords(config, result_file):
 
     print('Number of clusters:', len(set(reverse_clustering.keys())))
 
-    with open(result_file[:-5] + '_keywords_tfidf', 'w', encoding='utf-8', errors='replace') as out_file:
+    out_path = os.path.join(constants.dir_d, constants.dir_kw, result_file[:-5] + '_keywords_tfidf')
+    with open(out_path, 'w', encoding='utf-8', errors='replace') as out_file:
         for cluster in sorted(reverse_clustering):
             out_file.write('{}\t{}\n'.format('Cluster', cluster))
             highest_tfidf = Counter()
