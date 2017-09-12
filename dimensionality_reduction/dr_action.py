@@ -30,6 +30,8 @@ def dimensionality_reduction(samples_data, config):
         if dr in drs:
             components = interaction.ask_number(constants.msg_components)
             drs[dr].reduce(config, uuids, None, components, 'all')
+            if dr == 'tsne':
+                return 
             drs[dr].reduce(config, x_train, x_test, components, 'train')
 
         elif dr == 's':
