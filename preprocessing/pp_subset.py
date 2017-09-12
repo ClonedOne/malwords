@@ -137,7 +137,7 @@ def create_dataframe(config):
     """
 
     uuid_label = json.load(open(os.path.join(constants.dir_d, constants.json_labels)))
-    indices = set(utils.get_all_uuids(config['dir_malwords']))
+    indices = set(utils.get_all_uuids(config['dir_store']))
     families = dict(zip(
         sorted(set(uuid_label.values()) - {'SINGLETON'}),
         range(len(set(uuid_label.values())) - 1)

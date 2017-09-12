@@ -127,15 +127,16 @@ def get_index_labels():
     return index_label
 
 
-def get_all_uuids(dir_malwords):
+def get_all_uuids(file_dir):
     """
     Returns a sorted list of all the uuids in the malwords path.
 
+    :param file_dir: path where files are located
     :return: sorted list of uuids
     """
 
-    if not os.path.isdir(dir_malwords):
+    if not os.path.isdir(file_dir):
         print('Could not find malwords directory')
         exit()
 
-    return [uuid.strip().split('_')[0] for uuid in sorted(os.listdir(dir_malwords))]
+    return [uuid.strip().split('_')[0] for uuid in sorted(os.listdir(file_dir))]
