@@ -19,8 +19,6 @@ def dimensionality_reduction(samples_data, config):
     }
 
     uuids = samples_data.index[samples_data['selected'] == 1].tolist()
-    x_train = samples_data.index[samples_data['train'] == 1].tolist()
-    x_test = samples_data.index[samples_data['test'] == 1].tolist()
 
     # Prompts the user to select an action
     dr = ''
@@ -29,13 +27,19 @@ def dimensionality_reduction(samples_data, config):
 
         if dr in drs:
             components = interaction.ask_number(constants.msg_components)
-            drs[dr].reduce(config, uuids, None, components, 'all')
-            if dr == 'tsne':
-                return
-            drs[dr].reduce(config, x_train, x_test, components, 'train')
+            dim_red = drs[dr].reduce(config, uuids, components)
+
+            reduced = {}
+            i = 0
+
+            for uuid in uuids:
+                reduced[uuid] = dim_red[i]
+                i += 1
+
+            return reduced
 
         elif dr == 's':
-            return
+            return None
 
         elif dr == 'q':
             exit()

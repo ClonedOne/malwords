@@ -7,11 +7,14 @@ import json
 import os
 
 
-def reduce(config, train, test, components, objective):
+def reduce(config, uuids, components):
     """
     Apply Incremental Principal Components Analysis to the tf-idf vectors.
     
-    :return: 
+    :param config: configuration dictionary
+    :param uuids: list of selected uuids
+    :param components: number of desired components
+    :return:
     """
 
     print('Performing dimensionality reduction using PCA')
@@ -21,10 +24,10 @@ def reduce(config, train, test, components, objective):
     mini_batch_size = config['batch_size']
 
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    rand_train = random.sample(train, len(train))
+    rand_train = random.sample(uuids, len(uuids))
 
     cols = len(words)
-    rows = len(train)
+    rows = len(uuids)
 
     i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
 
@@ -33,17 +36,12 @@ def reduce(config, train, test, components, objective):
     print('Explained Variance Ratio')
     print(sum(i_pca.explained_variance_ratio_))
 
-    data = transform_vectors(i_pca, rows, cols, train, words, mini_batch_size, core_num, dir_store)
+    data = transform_vectors(i_pca, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "pca_{}_{}.txt".format(components, objective))
+    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "pca_{}_{}.txt".format(components, rows))
     np.savetxt(open(matrix_file, "wb"), data)
 
-    if test is not None:
-        rows = len(test)
-        data = transform_vectors(i_pca, rows, cols, test, words, mini_batch_size, core_num, dir_store)
-
-        matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "pca_{}_{}.txt".format(components, 'test'))
-        np.savetxt(open(matrix_file, "wb"), data)
+    return data
 
 
 def train_pca(i_pca, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store):

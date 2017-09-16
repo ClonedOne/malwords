@@ -6,10 +6,13 @@ import json
 import os
 
 
-def reduce(config, train, test, components, objective):
+def reduce(config, uuids, components):
     """
     Lower dimensionality of data vectors using SVD.
 
+    :param config: configuration dictionary
+    :param uuids: list of selected uuids
+    :param components: number of desired components
     :return: 
     """
 
@@ -21,30 +24,23 @@ def reduce(config, train, test, components, objective):
     svd = TruncatedSVD(n_components=components, n_iter=10)
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
 
-    # Force loading of full dataset in RAM (may result in MEMORY ERROR!)
-    mini_batch_size = len(train)
-
     cols = len(words)
-    rows = len(train)
+    rows = len(uuids)
 
-    train_svd(svd, rows, cols, train, words, mini_batch_size, core_num, dir_store)
+    # Force loading of full dataset in RAM (may result in MEMORY ERROR!)
+    mini_batch_size = rows
 
-    data = transform_vectors(svd, rows, cols, train, words, mini_batch_size, core_num, dir_store)
+    train_svd(svd, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
+
+    data = transform_vectors(svd, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
 
     print('Explained Variance Ratio')
     print(sum(svd.explained_variance_ratio_))
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "svd_{}_{}.txt".format(components, objective))
+    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "svd_{}_{}.txt".format(components, rows))
     np.savetxt(open(matrix_file, "wb"), data)
 
-    if test is not None:
-        rows = len(test)
-        mini_batch_size = len(test)
-
-        data = transform_vectors(svd, rows, cols, test, words, mini_batch_size, core_num, dir_store)
-
-        matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "svd_{}_{}.txt".format(components, 'test'))
-        np.savetxt(open(matrix_file, "wb"), data)
+    return data
 
 
 def train_svd(svd, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store):
