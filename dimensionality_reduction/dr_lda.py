@@ -39,7 +39,7 @@ def reduce(config, uuids, components, objective):
     matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "lda_{}_{}.txt".format(components, rows))
     np.savetxt(open(matrix_file, "wb"), data)
 
-    return data
+    return data, lda
 
 
 def train_lda(lda, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_malwords):

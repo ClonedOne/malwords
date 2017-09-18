@@ -27,16 +27,7 @@ def dimensionality_reduction(samples_data, config):
 
         if dr in drs:
             components = interaction.ask_number(constants.msg_components)
-            dim_red = drs[dr].reduce(config, uuids, components)
-
-            reduced = {}
-            i = 0
-
-            for uuid in uuids:
-                reduced[uuid] = dim_red[i]
-                i += 1
-
-            return reduced
+            return drs[dr].reduce(config, uuids, components)
 
         elif dr == 's':
             return None

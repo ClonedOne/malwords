@@ -39,7 +39,7 @@ def reduce(config, uuids, components):
     matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "tsne_{}_{}.txt".format(components, rows))
     np.savetxt(open(matrix_file, "wb"), data)
 
-    return data
+    return data, tsne
 
 
 def transform_vectors(tsne, rows, cols, uuids, words, mini_batch_size, core_num, dir_store):

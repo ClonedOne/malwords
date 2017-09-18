@@ -1,6 +1,7 @@
 from sklearn.decomposition import IncrementalPCA
 from helpers import loader_tfidf
 from utilities import constants
+import pandas as pd
 import numpy as np
 import random
 import json
@@ -41,7 +42,19 @@ def reduce(config, uuids, components):
     matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "pca_{}_{}.txt".format(components, rows))
     np.savetxt(open(matrix_file, "wb"), data)
 
-    return data
+    components_file = os.path.join(
+        constants.dir_d,
+        constants.dir_mat,
+        "components_pca_{}_{}.txt".format(components, rows)
+    )
+    to_inspect = pd.DataFrame(
+        np.absolute(i_pca.components_.T),
+        index=sorted(set(words.keys())),
+        columns=range(components)
+    )
+    to_inspect.idxmax(axis=0, skipna=True).to_csv(components_file)
+
+    return data, i_pca
 
 
 def train_pca(i_pca, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store):
