@@ -22,7 +22,7 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
     dir_malwords = config['dir_malwords']
     min_cluster_size = 30
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    hdbs, computed_labels, metric = None, None, None
+    hdbs, clustering_labels, metric = None, None, None
 
     if sparse:
         data = loader_freqs.load_freqs(uuids, core_num, len(words), words, dir_malwords, dense=False, ordered=True)
@@ -31,18 +31,20 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
         data = np.loadtxt(matrix_file)
 
     if distance == 'e':
-        hdbs, computed_labels, metric, data = euclidean(data, uuids, min_cluster_size, core_num)
+        hdbs, clustering_labels, metric, data = euclidean(data, uuids, min_cluster_size, core_num)
     elif distance == 'c':
-        hdbs, computed_labels, metric, data = cosine(data, uuids, min_cluster_size, core_num)
+        hdbs, clustering_labels, metric, data = cosine(data, uuids, min_cluster_size, core_num)
     elif distance == 'j':
-        hdbs, computed_labels, metric, data = js(data, uuids, min_cluster_size, core_num, sparse)
+        hdbs, clustering_labels, metric, data = js(data, uuids, min_cluster_size, core_num, sparse)
 
-    num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)
+    num_clusters = len(set(clustering_labels)) - (1 if -1 in clustering_labels else 0)
     if num_clusters == 1:
         data = None
 
-    evaluation.evaluate_clustering(base_labels, computed_labels, data=data, metric=metric)
-    output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    evaluation.evaluate_clustering(base_labels, clustering_labels, data=data, metric=metric)
+    output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters)
+
+    return clustering_labels, hdbscan
 
 
 def js(data, uuids, min_cluster_size, core_num, sparse):

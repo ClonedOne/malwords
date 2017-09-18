@@ -26,26 +26,26 @@ def cluster(samples_data, config):
             else:
                 data_matrix = interaction.ask_file(constants.msg_data_train)
             clusters = interaction.ask_number(constants.msg_clusters)
-            clu_kmeans.cluster(config, data_matrix, clusters, uuids, labels_num, sparse=sparse)
+            return clu_kmeans.cluster(config, data_matrix, clusters, uuids, labels_num, sparse=sparse)
 
         elif clu == 'mini_kmeans':
             clusters = interaction.ask_number(constants.msg_clusters)
-            clu_kmeans_minibatch.cluster(config, clusters, uuids, labels_num)
+            return clu_kmeans_minibatch.cluster(config, clusters, uuids, labels_num)
 
         elif clu == 'spectral':
             clusters = interaction.ask_number(constants.msg_clusters)
-            clu_spectral.cluster(config, clusters, uuids, labels_num)
+            return clu_spectral.cluster(config, clusters, uuids, labels_num)
 
         elif clu == 'dbscan':
-            clu_dbscan.cluster(config, uuids, labels_num)
+            return clu_dbscan.cluster(config, uuids, labels_num)
 
         elif clu == 'hdbscan':
             distance = interaction.ask_metric()
             sparse = interaction.ask_yes_no(constants.msg_sparse)
-            clu_hdbscan.cluster(config, distance, uuids, labels_num, sparse=sparse)
+            return clu_hdbscan.cluster(config, distance, uuids, labels_num, sparse=sparse)
 
         elif clu == 's':
-            return
+            return None, None
 
         elif clu == 'q':
             exit()

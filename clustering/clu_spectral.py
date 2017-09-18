@@ -25,10 +25,12 @@ def cluster(config, num_clusters, uuids, base_labels):
     print('Performing clustering')
     spectral = SpectralClustering(affinity='precomputed', n_clusters=num_clusters, n_jobs=core_num, n_init=20)
 
-    computed_labels = spectral.fit_predict(data)
+    clustering_labels = spectral.fit_predict(data)
 
-    utilities.evaluation.evaluate_clustering(base_labels, computed_labels, data=data, metric='precomputed')
+    utilities.evaluation.evaluate_clustering(base_labels, clustering_labels, data=data, metric='precomputed')
 
-    utilities.output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters, 'spectral_js')
+    utilities.output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters, 'spectral_js')
 
-    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'jensen_shannon', 'spectral')
+    output.out_clustering(dict(zip(uuids, clustering_labels.tolist())), 'jensen_shannon', 'spectral')
+
+    return clustering_labels, spectral

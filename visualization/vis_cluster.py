@@ -43,6 +43,7 @@ def plot_cluster_features(config, clustering, names=None, av=False):
     :param config: application configuration dictionary
     :param clustering: dictionary mapping uuids to cluster ids
     :param names: family labels
+    :param av: flag, if set the method is plotting AV labeling
     :return:
     """
 

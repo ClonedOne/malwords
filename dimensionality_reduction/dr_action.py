@@ -30,7 +30,7 @@ def dimensionality_reduction(samples_data, config):
             return drs[dr].reduce(config, uuids, components)
 
         elif dr == 's':
-            return None
+            return None, None
 
         elif dr == 'q':
             exit()

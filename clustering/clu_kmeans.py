@@ -34,13 +34,15 @@ def cluster(config, data_matrix, clusters, uuids, base_labels, sparse=False):
     num_clusters = interaction.ask_clusters(num_clusters_max)
 
     k_means = KMeans(n_clusters=num_clusters, n_jobs=core_num, max_iter=max_iter, verbose=1)
-    computed_labels = k_means.fit_predict(data)
+    clustering_labels = k_means.fit_predict(data)
 
-    evaluation.evaluate_clustering(base_labels, computed_labels, data=data)
+    evaluation.evaluate_clustering(base_labels, clustering_labels, data=data)
 
-    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'euclidean', 'kmeans')
+    output.out_clustering(dict(zip(uuids, clustering_labels.tolist())), 'euclidean', 'kmeans')
 
-    output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters)
+
+    return clustering_labels, k_means
 
 
 def test_kmeans_clusters(data, base_labels, num_clusters_max, core_num, max_iter):

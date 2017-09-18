@@ -33,11 +33,13 @@ def cluster(config, clusters, uuids, base_labels):
     train_k_means(k_means, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store)
 
     print('\nPredicting values')
-    computed_labels = apply_k_means(k_means, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
+    clustering_labels = apply_k_means(k_means, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
 
-    evaluation.evaluate_clustering(base_labels, computed_labels)
+    evaluation.evaluate_clustering(base_labels, clustering_labels)
 
-    output.result_to_visualize(uuids, base_labels, computed_labels, num_clusters)
+    output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters)
+
+    return clustering_labels, k_means
 
 
 def train_k_means(k_means, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store):

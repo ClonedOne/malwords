@@ -28,7 +28,7 @@ def classify(samples_data, config):
             else:
                 train = interaction.ask_file(constants.msg_data_train)
                 test = interaction.ask_file(constants.msg_data_test)
-            cla_svm.classify(config, train, test, x_train, x_test, y_train, y_test, sparse=sparse)
+            return cla_svm.classify(config, train, test, x_train, x_test, y_train, y_test, sparse=sparse)
 
         elif cla == 'mlp':
             sparse = interaction.ask_yes_no(constants.msg_sparse)
@@ -37,10 +37,10 @@ def classify(samples_data, config):
             else:
                 train = interaction.ask_file(constants.msg_data_train)
                 test = interaction.ask_file(constants.msg_data_test)
-            cla_mlp.classify(config, train, test, x_train, x_test, y_train, y_test, sparse=sparse)
+            return cla_mlp.classify(config, train, test, x_train, x_test, y_train, y_test, sparse=sparse)
 
         elif cla == 's':
-            return
+            return None, None
 
         elif cla == 'q':
             exit()

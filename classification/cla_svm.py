@@ -41,9 +41,11 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
     else:
         data_test = np.loadtxt(test)
 
-    computed_labels = svc.predict(data_test)
+    classification_labels = svc.predict(data_test)
 
-    test_score = f1_score(y_test, computed_labels, average='micro')
+    test_score = f1_score(y_test, classification_labels, average='micro')
     print('F1 score of test: {}'.format(test_score))
 
-    output.out_classification(dict(zip(x_test, computed_labels.tolist())), 'linear', 'svm')
+    output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'linear', 'svm')
+
+    return classification_labels, svc

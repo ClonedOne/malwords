@@ -7,7 +7,7 @@ import json
 import os
 
 
-def reduce(config, uuids, components, objective):
+def reduce(config, uuids, components):
     """
     Apply Latent Dirichlet Allocation to the bag of words data-set.
 
