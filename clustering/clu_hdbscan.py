@@ -44,7 +44,7 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
     evaluation.evaluate_clustering(base_labels, clustering_labels, data=data, metric=metric)
     output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters)
 
-    return clustering_labels, hdbscan
+    return clustering_labels, hdbs
 
 
 def js(data, uuids, min_cluster_size, core_num, sparse):
