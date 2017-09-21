@@ -13,14 +13,14 @@ def visualize(samples_data, config):
     """
 
     uuids = samples_data.index[samples_data['selected'] == 1].tolist()
-    labels_num = samples_data.fam_num[samples_data['selected'] == 1].tolist()
+    families = samples_data.family[samples_data['selected'] == 1].tolist()
 
     if interaction.ask_yes_no(constants.msg_vis_features):
         vis_cluster.plot_av_features(uuids, config)
 
     if interaction.ask_yes_no(constants.msg_vis_dataset):
         data_matrix = interaction.ask_file(constants.msg_vis_base)
-        vis_data.plot_data(data_matrix, labels_num)
+        vis_data.plot_data(data_matrix, families)
 
     uuid_index = dict(zip(uuids, range(len(uuids))))
     base_labels = utils.get_base_labels()

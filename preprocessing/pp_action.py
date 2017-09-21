@@ -54,6 +54,7 @@ def create_dirs():
     (Path(constants.dir_d) / Path(constants.dir_mat)).mkdir(parents=True, exist_ok=True)
     (Path(constants.dir_d) / Path(constants.dir_cla)).mkdir(parents=True, exist_ok=True)
     (Path(constants.dir_d) / Path(constants.dir_vis)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_mod)).mkdir(parents=True, exist_ok=True)
 
 
 def check_avclass_files(config):

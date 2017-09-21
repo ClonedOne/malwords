@@ -1,4 +1,5 @@
 from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.externals import joblib
 from helpers import loader_freqs
 from utilities import constants
 import numpy as np
@@ -36,8 +37,11 @@ def reduce(config, uuids, components):
 
     data = transform_vectors(lda, rows, cols, uuids, words, mini_batch_size, core_num, dir_malwords)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "lda_{}_{}.txt".format(components, rows))
-    np.savetxt(open(matrix_file, "wb"), data)
+    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, 'lda_{}_{}.txt'.format(components, rows))
+    np.savetxt(open(matrix_file, 'wb'), data)
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mat, 'lda_{}_{}.pkl'.format(components, rows))
+    joblib.dump(lda, model_file)
 
     return data, lda
 

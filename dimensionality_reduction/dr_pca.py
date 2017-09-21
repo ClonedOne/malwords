@@ -1,4 +1,5 @@
 from sklearn.decomposition import IncrementalPCA
+from sklearn.externals import joblib
 from helpers import loader_tfidf
 from utilities import constants
 import pandas as pd
@@ -39,12 +40,15 @@ def reduce(config, uuids, components):
 
     data = transform_vectors(i_pca, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "pca_{}_{}.txt".format(components, rows))
-    np.savetxt(open(matrix_file, "wb"), data)
+    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, 'pca_{}_{}.txt'.format(components, rows))
+    np.savetxt(open(matrix_file, 'wb'), data)
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mat, 'pca_{}_{}.pkl'.format(components, rows))
+    joblib.dump(i_pca, model_file)
 
     components_file = os.path.join(
         constants.dir_d,
-        constants.dir_mat,
+        constants.dir_mod,
         "components_pca_{}_{}.txt".format(components, rows)
     )
     to_inspect = pd.DataFrame(

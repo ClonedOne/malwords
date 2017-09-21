@@ -9,6 +9,7 @@ dir_kw = 'd_keywords'
 dir_mat = 'd_matrices'
 dir_cla = 'd_classifications'
 dir_vis = 'd_visualizations'
+dir_mod = 'd_models'
 
 # File names
 file_labels = 'labels.txt'

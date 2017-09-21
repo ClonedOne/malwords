@@ -1,4 +1,5 @@
 from sklearn.decomposition import TruncatedSVD
+from sklearn.externals import joblib
 from helpers import loader_tfidf
 from utilities import constants
 import numpy as np
@@ -37,8 +38,11 @@ def reduce(config, uuids, components):
     print('Explained Variance Ratio')
     print(sum(svd.explained_variance_ratio_))
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "svd_{}_{}.txt".format(components, rows))
-    np.savetxt(open(matrix_file, "wb"), data)
+    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, 'svd_{}_{}.txt'.format(components, rows))
+    np.savetxt(open(matrix_file, 'wb'), data)
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mat, 'svd_{}_{}.pkl'.format(components, rows))
+    joblib.dump(svd, model_file)
 
     return data, svd
 

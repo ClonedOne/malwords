@@ -1,8 +1,5 @@
-import matplotlib.pyplot as plt
-import plotly.graph_objs as go
-from utilities import utils
-import plotly.plotly as py
-import seaborn as sns
+from plotly.graph_objs import *
+import plotly.offline as ply
 import numpy as np
 
 
@@ -38,27 +35,30 @@ def plot2d(base_labels, data):
 
     sbl = sorted(set(base_labels))
 
-    color_palette = sns.color_palette('bright', len(base_labels))
-    cluster_colors = [color_palette[x] if x >= 0
-                      else (0.5, 0.5, 0.5)
-                      for x in sbl]
+    aggregate = {ind: ([], []) for ind in sbl}
 
-    print('Number of colors:', len(cluster_colors))
+    i = 0
+    for point in data:
+        ind = base_labels[i]
+        aggregate[ind][0].append(point[0])
+        aggregate[ind][1].append(point[1])
+        i += 1
 
-    index_labels = utils.get_index_labels()
-    labels = [index_labels[i] if i >= 0 else 'noise' for i in sbl]
+    traces = []
+    for ind, group in aggregate.items():
+        trace = Scatter(
+            x=group[0],
+            y=group[1],
+            name=ind,
+            mode='markers',
+            marker=Marker(
+                size=10,
+                opacity=0.8
+            )
+        )
+        traces.append(trace)
 
-    xs = {}
-    ys = {}
-    for i in range(len(base_labels)):
-        xs[base_labels[i]] = xs.get(base_labels[i], []) + [data.T[0][i], ]
-        ys[base_labels[i]] = ys.get(base_labels[i], []) + [data.T[1][i], ]
-
-    for i in range(len(sbl)):
-        plt.scatter(xs[sbl[i]], ys[sbl[i]], c=cluster_colors[i], alpha=0.5, label=labels[i])
-
-    plt.legend(loc=3)
-    plt.show()
+    ply.iplot(traces, filename='2dData')
 
 
 def plot3d(base_labels, data):
@@ -77,7 +77,7 @@ def plot3d(base_labels, data):
     z = dt[2]
     print(type(x), len(x), type(y), len(y), type(z), len(z))
 
-    trace1 = go.Scatter3d(
+    trace1 = Scatter3d(
         x=x,
         y=y,
         z=z,
@@ -91,7 +91,7 @@ def plot3d(base_labels, data):
     )
 
     data = [trace1]
-    layout = go.Layout(
+    layout = Layout(
         margin=dict(
             l=0,
             r=0,
@@ -99,5 +99,5 @@ def plot3d(base_labels, data):
             t=0
         )
     )
-    fig = go.Figure(data=data, layout=layout)
-    py.iplot(fig, filename='3d-scatter-colorscale')
+    fig = Figure(data=data, layout=layout)
+    ply.iplot(fig, filename='3dData')

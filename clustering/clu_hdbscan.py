@@ -20,7 +20,7 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
 
     core_num = config['core_num']
     dir_malwords = config['dir_malwords']
-    min_cluster_size = 30
+    min_cluster_size = 120
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     hdbs, clustering_labels, metric = None, None, None
 
@@ -117,7 +117,8 @@ def cosine(data, uuids, min_cluster_size, core_num):
     print(distance.shape)
 
     m = 'precomputed'
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric=m, core_dist_n_jobs=core_num)
+    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, min_samples=int(min_cluster_size / 2), metric=m,
+                           core_dist_n_jobs=core_num)
 
     hdbs.fit(distance)
     computed_labels = hdbs.labels_

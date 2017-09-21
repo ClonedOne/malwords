@@ -46,10 +46,6 @@ def get_data_matrix(data_pack):
         data[row] = cur_row
         row += 1
 
-    if dense:
-        print(data.nbytes)
-    else:
-        print(data.data.nbytes)
     return process_id, data
 
 

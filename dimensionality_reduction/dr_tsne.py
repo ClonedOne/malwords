@@ -1,3 +1,4 @@
+from sklearn.externals import joblib
 from sklearn.manifold import TSNE
 from helpers import loader_tfidf
 from utilities import constants
@@ -36,8 +37,11 @@ def reduce(config, uuids, components):
     print('Kullback-Leibler divergence')
     print(tsne.kl_divergence_)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, "tsne_{}_{}.txt".format(components, rows))
-    np.savetxt(open(matrix_file, "wb"), data)
+    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, 'tsne_{}_{}.txt'.format(components, rows))
+    np.savetxt(open(matrix_file, 'wb'), data)
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mat, 'tsne_{}_{}.pkl'.format(components, rows))
+    joblib.dump(tsne, model_file)
 
     return data, tsne
 
