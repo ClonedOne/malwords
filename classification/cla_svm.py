@@ -1,4 +1,5 @@
 from sklearn.model_selection import cross_val_score
+from sklearn.externals import joblib
 from sklearn.metrics import f1_score
 from helpers import loader_tfidf
 from utilities import constants
@@ -47,5 +48,8 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
     print('F1 score of test: {}'.format(test_score))
 
     output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'linear', 'svm')
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'svm_{}_{}.pkl'.format('linear', len(data_test)))
+    joblib.dump(svc, model_file)
 
     return classification_labels, svc

@@ -1,4 +1,5 @@
 from sklearn.metrics import pairwise_distances
+from sklearn.externals import joblib
 from distances import jensen_shannon
 from utilities import interaction
 from helpers import loader_freqs
@@ -43,6 +44,9 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
 
     evaluation.evaluate_clustering(base_labels, clustering_labels, data=data, metric=metric)
     output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters)
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'hdbscan_{}_{}.pkl'.format(distance, len(data)))
+    joblib.dump(hdbs, model_file)
 
     return clustering_labels, hdbs
 

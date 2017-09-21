@@ -1,3 +1,4 @@
+from sklearn.externals import joblib
 from sklearn.cluster import DBSCAN
 from utilities import evaluation
 from utilities import constants
@@ -30,5 +31,8 @@ def cluster(config, uuids, base_labels):
     output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters, 'dbscan_js')
 
     output.out_clustering(dict(zip(uuids, clustering_labels.tolist())), 'jensen_shannon', 'dbscan')
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'dbscan_{}_{}.pkl'.format('js', len(data)))
+    joblib.dump(dbscan, model_file)
 
     return clustering_labels, dbscan

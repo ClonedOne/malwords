@@ -1,6 +1,7 @@
 from sklearn.random_projection import SparseRandomProjection
 from sklearn.model_selection import cross_val_score
 from sklearn.neural_network import MLPClassifier
+from sklearn.externals import joblib
 from sklearn.metrics import f1_score
 from helpers import loader_tfidf
 from utilities import constants
@@ -69,5 +70,8 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
     print('F1 score of test: {}'.format(test_score))
 
     output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'gd', 'mlp')
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'mlp_{}_{}.pkl'.format(mlp.n_layers_, len(data_test)))
+    joblib.dump(mlp, model_file)
 
     return classification_labels, mlp

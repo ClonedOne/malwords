@@ -1,11 +1,14 @@
 from sklearn.cluster import MiniBatchKMeans
+from sklearn.externals import joblib
 from helpers import loader_tfidf
 from utilities import evaluation
+from utilities import constants
 from utilities import output
 from scipy.sparse import *
 import numpy as np
 import random
 import json
+import os
 
 
 def cluster(config, clusters, uuids, base_labels):
@@ -18,9 +21,8 @@ def cluster(config, clusters, uuids, base_labels):
     dir_store = config['dir_store']
     core_num = config['core_num']
     mini_batch_size = config['batch_size']
-    num_clusters = clusters
 
-    k_means = MiniBatchKMeans(n_clusters=num_clusters, batch_size=mini_batch_size)
+    k_means = MiniBatchKMeans(n_clusters=clusters, batch_size=mini_batch_size)
     words = json.load(open('data/words.json', 'r'))
     rand_uuids = random.sample(uuids, len(uuids))
 
@@ -37,7 +39,10 @@ def cluster(config, clusters, uuids, base_labels):
 
     evaluation.evaluate_clustering(base_labels, clustering_labels)
 
-    output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters)
+    output.result_to_visualize(uuids, base_labels, clustering_labels, clusters)
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'mb_kmeans_{}_{}.pkl'.format(clusters, rows))
+    joblib.dump(k_means, model_file)
 
     return clustering_labels, k_means
 

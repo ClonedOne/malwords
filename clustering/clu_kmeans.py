@@ -1,4 +1,5 @@
 from utilities import output, constants
+from sklearn.externals import joblib
 from sklearn.cluster import KMeans
 from utilities import interaction
 from utilities import evaluation
@@ -41,6 +42,9 @@ def cluster(config, data_matrix, clusters, uuids, base_labels, sparse=False):
     output.out_clustering(dict(zip(uuids, clustering_labels.tolist())), 'euclidean', 'kmeans')
 
     output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters)
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'kmeans_{}_{}.pkl'.format(num_clusters, len(data)))
+    joblib.dump(k_means, model_file)
 
     return clustering_labels, k_means
 

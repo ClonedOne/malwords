@@ -1,4 +1,5 @@
 from sklearn.cluster import SpectralClustering
+from sklearn.externals import joblib
 from utilities import constants
 from utilities import output
 import utilities.evaluation
@@ -32,5 +33,8 @@ def cluster(config, num_clusters, uuids, base_labels):
     utilities.output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters, 'spectral_js')
 
     output.out_clustering(dict(zip(uuids, clustering_labels.tolist())), 'jensen_shannon', 'spectral')
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'spectral_{}_{}.pkl'.format('js', len(data)))
+    joblib.dump(spectral, model_file)
 
     return clustering_labels, spectral
