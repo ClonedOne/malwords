@@ -1,38 +1,12 @@
-from matplotlib import pyplot as plt
 from collections import defaultdict
 from utilities import constants
 import plotly.graph_objs as go
-import plotly.offline as oly
+import plotly.offline as ply
 from utilities import utils
 from plotly import tools
-import seaborn as sns
 import numpy as np
 import json
 import os
-
-
-def plot_clustering(data_matrix, uuid_pos, y_pred):
-    """
-    Plot the result of clustering over a dimensionality reduced space.
-
-    :param data_matrix: 2d data matrix file
-    :param uuid_pos: rows of the data matrix corresponding to clustered uuids
-    :param y_pred: labels resulting from clustering
-    :return:
-    """
-
-    print('Plotting clustering results')
-
-    data = np.loadtxt(data_matrix)
-    data = np.array([data[pos] for pos in uuid_pos])
-
-    num_clusters = len(set(y_pred)) - (1 if -1 in y_pred else 0)
-    color_palette = sns.color_palette('bright', num_clusters)
-
-    c_clu = [color_palette[x] if x >= 0 else (0.5, 0.5, 0.5) for x in y_pred]
-
-    plt.scatter(*data.T, s=60, c=c_clu, alpha=0.8)
-    plt.show()
 
 
 def plot_cluster_features(config, clustering, names=None, av=False):
@@ -96,7 +70,7 @@ def plot_cluster_features(config, clustering, names=None, av=False):
 
     plot_name = os.path.join(constants.dir_d, constants.dir_vis, 'features_{}'.format(len(clustering)))
     plot_name = plot_name + '_AV' if av else plot_name
-    oly.plot(fig, filename=plot_name)
+    ply.plot(fig, filename=plot_name)
 
 
 def plot_av_features(uuids, config):

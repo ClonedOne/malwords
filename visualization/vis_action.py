@@ -39,9 +39,9 @@ def visualize(samples_data, config):
     if interaction.ask_yes_no(constants.msg_visualize_clu):
         data = json.load(open(interaction.ask_file(constants.msg_results_clu), 'r'))
         y_pred = [data[uuid] for uuid in sorted(list(data.keys()))]
-        uuid_pos = [uuid_index[uuid] for uuid in sorted(list(data.keys()))]
 
-        vis_cluster.plot_cluster_features(config, data)
+        if interaction.ask_yes_no(constants.msg_visualize_feature_clu):
+            vis_cluster.plot_cluster_features(config, data)
 
         data_matrix = interaction.ask_file(constants.msg_vis_base)
-        vis_cluster.plot_clustering(data_matrix, uuid_pos, y_pred)
+        vis_data.plot_data(data_matrix, y_pred)

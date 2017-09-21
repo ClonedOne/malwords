@@ -88,6 +88,7 @@ msg_vis_features = '\nWould you like to visualize the feature distributions in b
 
 msg_visualize_cla = '\nWould you like to visualize the result of classification? [y/n]\n'
 msg_visualize_clu = '\nWould you like to visualize the result of clustering? [y/n]\n'
+msg_visualize_feature_clu = '\nWould you like to visualize the feature distribution of clustering? [y/n]\n'
 
 msg_memhist = '\nWould you like to compute the tf-idf weights using memhist data? [y/n]\n' \
               'It may take very long.\n'
