@@ -70,34 +70,30 @@ def plot3d(base_labels, data):
     :return: 
     """
 
-    dt = data.T
-    print(dt.shape)
-    x = dt[0]
-    y = dt[1]
-    z = dt[2]
-    print(type(x), len(x), type(y), len(y), type(z), len(z))
+    sbl = sorted(set(base_labels))
 
-    trace1 = Scatter3d(
-        x=x,
-        y=y,
-        z=z,
-        mode='markers',
-        marker=dict(
-            size=5,
-            color=base_labels,  # set color to an array/list of desired values
-            colorscale='Viridis',  # choose a colorscale
-            opacity=0.8
-        )
-    )
+    aggregate = {ind: ([], [], []) for ind in sbl}
 
-    data = [trace1]
-    layout = Layout(
-        margin=dict(
-            l=0,
-            r=0,
-            b=0,
-            t=0
+    i = 0
+    for point in data:
+        ind = base_labels[i]
+        aggregate[ind][0].append(point[0])
+        aggregate[ind][1].append(point[1])
+        aggregate[ind][2].append(point[2])
+        i += 1
+
+    traces = []
+    for ind, group in aggregate.items():
+        trace = Scatter3d(
+            x=group[0],
+            y=group[1],
+            z=group[2],
+            name=ind,
+            mode='markers',
+            marker=Marker(
+                opacity=0.8
+            )
         )
-    )
-    fig = Figure(data=data, layout=layout)
-    ply.iplot(fig, filename='3dData')
+        traces.append(trace)
+
+    ply.iplot(traces, filename='3dData')
