@@ -40,7 +40,7 @@ def reduce(config, uuids, components):
     matrix_file = os.path.join(constants.dir_d, constants.dir_mat, 'lda_{}_{}.txt'.format(components, rows))
     np.savetxt(open(matrix_file, 'wb'), data)
 
-    model_file = os.path.join(constants.dir_d, constants.dir_mat, 'lda_{}_{}.pkl'.format(components, rows))
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'lda_{}_{}.pkl'.format(components, rows))
     joblib.dump(lda, model_file)
 
     return data, lda
