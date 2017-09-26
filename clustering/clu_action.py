@@ -24,7 +24,7 @@ def cluster(samples_data, config):
             if sparse:
                 data_matrix = None
             else:
-                data_matrix = interaction.ask_file(constants.msg_data_train)
+                data_matrix = interaction.ask_file(constants.msg_data_red)
             clusters = interaction.ask_number(constants.msg_clusters)
             return clu_kmeans.cluster(config, data_matrix, clusters, uuids, labels_num, sparse=sparse)
 

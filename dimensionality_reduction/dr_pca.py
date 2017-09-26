@@ -21,24 +21,21 @@ def reduce(config, uuids, components):
 
     print('Performing dimensionality reduction using PCA')
 
-    dir_store = config['dir_store']
-    core_num = config['core_num']
     mini_batch_size = config['batch_size']
 
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    rand_train = random.sample(uuids, len(uuids))
+    rand_uuids = random.sample(uuids, len(uuids))
 
-    cols = len(words)
     rows = len(uuids)
 
     i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
 
-    train_pca(i_pca, rows, cols, rand_train, words, mini_batch_size, core_num, dir_store)
+    train_pca(config, i_pca, rows, rand_uuids, mini_batch_size)
 
     print('Explained Variance Ratio')
     print(sum(i_pca.explained_variance_ratio_))
 
-    data = transform_vectors(i_pca, rows, cols, uuids, words, mini_batch_size, core_num, dir_store)
+    data = transform_vectors(config, i_pca, rows, uuids, mini_batch_size)
 
     matrix_file = os.path.join(constants.dir_d, constants.dir_mat, 'pca_{}_{}.txt'.format(components, rows))
     np.savetxt(open(matrix_file, 'wb'), data)
@@ -61,29 +58,39 @@ def reduce(config, uuids, components):
     return data, i_pca
 
 
-def train_pca(i_pca, rows, cols, rand_uuids, words, mini_batch_size, core_num, dir_store):
+def train_pca(config, i_pca, rows, rand_uuids, mini_batch_size):
     """
     Train the PCA algorithm incrementally using mini batches of data.    
-    
-    :return: 
+
+    :param config:global configuration dictionary
+    :param i_pca: IncrementalPCA object
+    :param rows: number of rows of the data set matrix
+    :param rand_uuids: list of documents in random order
+    :param mini_batch_size: size of each mini batch
+    :return:
     """
 
     decomposed = 0
 
     while decomposed < rows:
         print('Processing documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
-        data = loader_tfidf.load_tfidf(rand_uuids[decomposed:][:mini_batch_size], core_num, cols, words, dir_store,
-                                       dense=True, ordered=False)
+        data = loader_tfidf.load_tfidf(config, rand_uuids[decomposed:][:mini_batch_size], dense=True, ordered=False)
 
         decomposed += mini_batch_size
 
         i_pca.partial_fit(data)
 
 
-def transform_vectors(i_pca, rows, cols, uuids, words, mini_batch_size, core_num, dir_store):
+def transform_vectors(config, i_pca, rows, uuids, mini_batch_size):
     """
     Transorm the data vectors.
 
+    :param config:global configuration dictionary
+    :param i_pca: IncrementalPCA object
+    :param rows: number of rows of the data set matrix
+    :param uuids: list of documents in order
+    :param mini_batch_size: size of each mini batch
+    :return: reduced dataset matrix
     :return: 
     """
 
@@ -92,8 +99,7 @@ def transform_vectors(i_pca, rows, cols, uuids, words, mini_batch_size, core_num
 
     while decomposed < rows:
         print('Transforming documents from {} to {}'.format(decomposed, (decomposed + mini_batch_size - 1)))
-        data = loader_tfidf.load_tfidf(uuids[decomposed:][:mini_batch_size], core_num, cols, words, dir_store,
-                                       dense=True, ordered=True)
+        data = loader_tfidf.load_tfidf(config, uuids[decomposed:][:mini_batch_size], dense=True, ordered=True)
 
         decomposed += mini_batch_size
 

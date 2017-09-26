@@ -6,7 +6,6 @@ from utilities import evaluation
 from helpers import loader_tfidf
 from operator import itemgetter
 import numpy as np
-import json
 import os
 
 
@@ -19,15 +18,13 @@ def cluster(config, data_matrix, clusters, uuids, base_labels, sparse=False):
 
     max_iter = 3000
     core_num = config['core_num']
-    dir_store = config['dir_store']
-    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
 
     num_clusters_max = clusters
 
     if not sparse:
         data = np.loadtxt(data_matrix)
     else:
-        data = loader_tfidf.load_tfidf(uuids, core_num, len(words), words, dir_store, dense=False, ordered=True)
+        data = loader_tfidf.load_tfidf(config, uuids, dense=False, ordered=True)
 
     test_kmeans_clusters(data, base_labels, num_clusters_max, core_num, max_iter)
 

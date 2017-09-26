@@ -1,57 +1,47 @@
 from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
 from sklearn.metrics import f1_score
-from helpers import loader_tfidf
 from utilities import constants
 from utilities import output
 from sklearn.svm import SVC
-import numpy as np
-import json
 import os
 
 
-def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False):
+def classify(config, train, test, x_test, y_train, y_test):
     """
     Classify the documents using SVM and the AVClass labels as base truth.
 
-    :return: 
+    :param config: Global configuration dictionary
+    :param train: Training data matrix
+    :param test: Testing data matrix
+    :param x_test: List of test set uuids
+    :param y_train: List of train set labels
+    :param y_test: List of test set labels
+    :return: Classification label and trained model
     """
 
-    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    dir_store = config['dir_store']
     core_num = config['core_num']
-
-    print('Loading data')
-    if sparse:
-        data_train = loader_tfidf.load_tfidf(x_train, core_num, len(words), words, dir_store, dense=False, ordered=True)
-    else:
-        data_train = np.loadtxt(train)
 
     svc = SVC(kernel='linear')
 
     print('Training')
-    svc.fit(data_train, y_train)
+    svc.fit(train, y_train)
 
     print('10-fold cross validation')
-    scores = cross_val_score(svc, data_train, y_train, cv=10, n_jobs=core_num, scoring='f1_micro', verbose=True)
+    scores = cross_val_score(svc, train, y_train, cv=10, n_jobs=core_num, scoring='f1_micro', verbose=True)
 
     print('F1 scores of cross validation: {}'.format(scores))
     print('Average F1 score: {}'.format(sum(scores) / len(scores)))
 
-    if sparse:
-        data_test = loader_tfidf.load_tfidf(x_test, core_num, len(words), words, dir_store, dense=False, ordered=True)
-    else:
-        data_test = np.loadtxt(test)
-
     print('Prediction')
-    classification_labels = svc.predict(data_test)
+    classification_labels = svc.predict(test)
 
     test_score = f1_score(y_test, classification_labels, average='micro')
     print('F1 score of test: {}'.format(test_score))
 
     output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'linear', 'svm')
 
-    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'svm_{}_{}.pkl'.format('linear', len(data_test)))
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'svm_{}_{}.pkl'.format('linear', len(test)))
     joblib.dump(svc, model_file)
 
     return classification_labels, svc

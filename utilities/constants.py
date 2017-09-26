@@ -23,8 +23,7 @@ json_dfs = 'dfs.json'
 json_graph = 'graph_{}.json'
 
 # Interface messages
-msg_data_train = 'training matrix file'
-msg_data_test = 'testing matrix file'
+msg_data_red = 'dimensionality reduced dataset'
 msg_vis_base = 'baseline data matrix file'
 msg_data_visualize_base = 'base data matrix file to visualize'
 msg_clusters = 'clusters'

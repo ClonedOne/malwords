@@ -29,7 +29,7 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
     if sparse:
         data = loader_freqs.load_freqs(uuids, core_num, len(words), words, dir_malwords, dense=False, ordered=True)
     else:
-        matrix_file = interaction.ask_file(constants.msg_data_train)
+        matrix_file = interaction.ask_file(constants.msg_data_red)
         data = np.loadtxt(matrix_file)
 
     if distance == 'e':
@@ -54,24 +54,31 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
 
 def js(data, uuids, min_cluster_size, core_num, min_sample_param, sparse):
     """
-      Perform HDBSCAN with jensen-shannon distance
+    Perform HDBSCAN with jensen-shannon distance
 
-      :param data: data in distance matrix shape
-      :param uuids: list of uuids corresponding to data points
-      :param min_cluster_size: minimum number of points to generate cluster
-      :param core_num: number of available cpu cores
-      :param sparse: flag, if set the data matrix is sparse
-      :return:
-      """
+    :param data: data in distance matrix shape
+    :param uuids: list of uuids corresponding to data points
+    :param min_cluster_size: minimum number of points to generate cluster
+    :param core_num: number of available cpu cores
+    :param min_sample_param: influences the number of clusters generated
+    :param sparse: flag, if set the data matrix is sparse
+    :return:
+    """
 
     print('Perform clustering with jensen-shannon distance')
 
     if not sparse:
         m = 'precomputed'
-        hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric=m, core_dist_n_jobs=core_num)
+        hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
+                               metric=m,
+                               min_samples=min_sample_param,
+                               core_dist_n_jobs=core_num)
     else:
         m = jensen_shannon.jensen_shannon_dist
-        hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric=m, core_dist_n_jobs=core_num)
+        hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
+                               min_samples=min_sample_param,
+                               metric=m,
+                               core_dist_n_jobs=core_num)
 
     hdbs.fit(data)
     computed_labels = hdbs.labels_
@@ -89,13 +96,17 @@ def euclidean(data, uuids, min_cluster_size, core_num, min_sample_param):
     :param uuids: list of uuids corresponding to data points
     :param min_cluster_size: minimum number of points to generate cluster
     :param core_num: number of available cpu cores
+    :param min_sample_param: influences the number of clusters generated
     :return:
     """
 
     print('Perform clustering with euclidean distance')
     m = 'euclidean'
 
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric=m, gen_min_span_tree=True,
+    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
+                           min_samples=min_sample_param,
+                           metric=m,
+                           gen_min_span_tree=True,
                            core_dist_n_jobs=core_num)
     hdbs.fit(data)
     computed_labels = hdbs.labels_
@@ -113,6 +124,7 @@ def cosine(data, uuids, min_cluster_size, core_num, min_sample_param):
     :param uuids: list of uuids corresponding to data points
     :param min_cluster_size: minimum number of points to generate cluster
     :param core_num: number of available cpu cores
+    :param min_sample_param: influences the number of clusters generated
     :return:
     """
 

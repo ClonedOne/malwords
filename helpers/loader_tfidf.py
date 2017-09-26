@@ -1,23 +1,28 @@
 from workers import wk_read_tfidf
 from multiprocessing import Pool
 from scipy.sparse import vstack
+from utilities import constants
 from utilities import utils
 import numpy as np
+import json
+import os
 
 
-def load_tfidf(uuids, core_num, cols, words, dir_store, dense=False, ordered=False):
+def load_tfidf(config, uuids, dense=False, ordered=False):
     """
     Load tf-idf values relative to the specified uuids.
 
-    :param uuids:
-    :param core_num:
-    :param cols:
-    :param words:
-    :param dir_store:
-    :param dense:
-    :param ordered:
+    :param config: Global configuration dictionary
+    :param uuids: List of files to read
+    :param dense: Flag, if set return a dense matrix, else return a sparse matrix
+    :param ordered: Falg, if set return a matrix whose rows are ordered as the uuids list
     :return:
     """
+
+    core_num = config['core_num']
+    dir_store = config['dir_store']
+    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
+    cols = len(words)
 
     print('Loading Tf-Idf of {} documents'.format(len(uuids)))
 
@@ -45,8 +50,3 @@ def load_tfidf(uuids, core_num, cols, words, dir_store, dense=False, ordered=Fal
     print(data.shape)
 
     return data
-
-
-
-
-
