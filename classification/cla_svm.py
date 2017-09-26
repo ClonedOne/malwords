@@ -27,21 +27,23 @@ def classify(config, train, test, x_train, x_test, y_train, y_test, sparse=False
     else:
         data_train = np.loadtxt(train)
 
-    print('10-fold cross validation')
     svc = SVC(kernel='linear')
+
+    print('Training')
+    svc.fit(data_train, y_train)
+
+    print('10-fold cross validation')
     scores = cross_val_score(svc, data_train, y_train, cv=10, n_jobs=core_num, scoring='f1_micro', verbose=True)
 
     print('F1 scores of cross validation: {}'.format(scores))
     print('Average F1 score: {}'.format(sum(scores) / len(scores)))
-
-    print('Training and prediction')
-    svc.fit(data_train, y_train)
 
     if sparse:
         data_test = loader_tfidf.load_tfidf(x_test, core_num, len(words), words, dir_store, dense=False, ordered=True)
     else:
         data_test = np.loadtxt(test)
 
+    print('Prediction')
     classification_labels = svc.predict(data_test)
 
     test_score = f1_score(y_test, classification_labels, average='micro')

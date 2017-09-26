@@ -21,7 +21,8 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
 
     core_num = config['core_num']
     dir_malwords = config['dir_malwords']
-    min_cluster_size = 120
+    min_cluster_size = 60
+    min_sample_param = 15
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     hdbs, clustering_labels, metric = None, None, None
 
@@ -32,11 +33,11 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
         data = np.loadtxt(matrix_file)
 
     if distance == 'e':
-        hdbs, clustering_labels, metric, data = euclidean(data, uuids, min_cluster_size, core_num)
+        hdbs, clustering_labels, metric, data = euclidean(data, uuids, min_cluster_size, core_num, min_sample_param)
     elif distance == 'c':
-        hdbs, clustering_labels, metric, data = cosine(data, uuids, min_cluster_size, core_num)
+        hdbs, clustering_labels, metric, data = cosine(data, uuids, min_cluster_size, core_num, min_sample_param)
     elif distance == 'j':
-        hdbs, clustering_labels, metric, data = js(data, uuids, min_cluster_size, core_num, sparse)
+        hdbs, clustering_labels, metric, data = js(data, uuids, min_cluster_size, core_num, min_sample_param, sparse)
 
     num_clusters = len(set(clustering_labels)) - (1 if -1 in clustering_labels else 0)
     if num_clusters == 1:
@@ -51,7 +52,7 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
     return clustering_labels, hdbs
 
 
-def js(data, uuids, min_cluster_size, core_num, sparse):
+def js(data, uuids, min_cluster_size, core_num, min_sample_param, sparse):
     """
       Perform HDBSCAN with jensen-shannon distance
 
@@ -80,7 +81,7 @@ def js(data, uuids, min_cluster_size, core_num, sparse):
     return hdbs, computed_labels, m, data
 
 
-def euclidean(data, uuids, min_cluster_size, core_num):
+def euclidean(data, uuids, min_cluster_size, core_num, min_sample_param):
     """
     Perform HDBSCAN with euclidean distance
     
@@ -92,8 +93,8 @@ def euclidean(data, uuids, min_cluster_size, core_num):
     """
 
     print('Perform clustering with euclidean distance')
-
     m = 'euclidean'
+
     hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, metric=m, gen_min_span_tree=True,
                            core_dist_n_jobs=core_num)
     hdbs.fit(data)
@@ -104,7 +105,7 @@ def euclidean(data, uuids, min_cluster_size, core_num):
     return hdbs, computed_labels, m, data
 
 
-def cosine(data, uuids, min_cluster_size, core_num):
+def cosine(data, uuids, min_cluster_size, core_num, min_sample_param):
     """
     Perform HDBSCAN with cosine distance
 
@@ -116,12 +117,14 @@ def cosine(data, uuids, min_cluster_size, core_num):
     """
 
     print('Perform clustering with cosine distance')
+    m = 'precomputed'
 
     distance = pairwise_distances(data, metric='cosine')
     print(distance.shape)
 
-    m = 'precomputed'
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, min_samples=int(min_cluster_size / 2), metric=m,
+    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
+                           min_samples=min_sample_param,
+                           metric=m,
                            core_dist_n_jobs=core_num)
 
     hdbs.fit(distance)
