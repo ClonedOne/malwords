@@ -1,4 +1,3 @@
-from sklearn.model_selection import cross_val_score
 from sklearn.externals import joblib
 from sklearn.metrics import f1_score
 from utilities import constants
@@ -20,18 +19,10 @@ def classify(config, train, test, x_test, y_train, y_test):
     :return: Classification label and trained model
     """
 
-    core_num = config['core_num']
-
     svc = SVC(kernel='linear')
 
     print('Training')
     svc.fit(train, y_train)
-
-    print('10-fold cross validation')
-    scores = cross_val_score(svc, train, y_train, cv=10, n_jobs=core_num, scoring='f1_micro', verbose=True)
-
-    print('F1 scores of cross validation: {}'.format(scores))
-    print('Average F1 score: {}'.format(sum(scores) / len(scores)))
 
     print('Prediction')
     classification_labels = svc.predict(test)
