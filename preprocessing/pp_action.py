@@ -105,8 +105,14 @@ def split_show_data(samples_data):
 
     x_train, x_test, y_train, y_test = train_test_split(uuids, labels, test_size=0.2, random_state=42)
 
+    x_train, x_dev, y_train, y_dev = train_test_split(x_train, y_train, test_size=0.25, random_state=42)
+
     print('\n{} train samples belonging to {} malware families'.format(len(x_train), len(set(y_train))))
     for family in Counter(y_train).most_common():
+        print('Malware family: {:^20} Number of samples: {:^6}'.format(family[0], family[1]))
+
+    print('\n{} dev samples belonging to {} malware families'.format(len(x_dev), len(set(y_dev))))
+    for family in Counter(y_dev).most_common():
         print('Malware family: {:^20} Number of samples: {:^6}'.format(family[0], family[1]))
 
     print('\n{} test samples belonging to {} malware families'.format(len(x_test), len(set(y_test))))
@@ -115,6 +121,8 @@ def split_show_data(samples_data):
 
     for uuid in x_train:
         samples_data.set_value(uuid, 'train', 1)
+    for uuid in x_dev:
+        samples_data.set_value(uuid, 'dev', 1)
     for uuid in x_test:
         samples_data.set_value(uuid, 'test', 1)
 

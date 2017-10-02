@@ -32,7 +32,7 @@ def classify(config, train, test, x_test, y_train, y_test):
 
     output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'linear', 'svm')
 
-    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'svm_{}_{}.pkl'.format('linear', len(test)))
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'svm_{}_{}.pkl'.format('linear', test.shape[0]))
     joblib.dump(svc, model_file)
 
     return classification_labels, svc

@@ -97,7 +97,7 @@ msg_kw = '\nPlease select a keywords extraction technique:\n' \
          's to skip keywords extraction\n' \
          'q to quit\n'
 
-pd_columns = ['family', 'fam_num', 'selected', 'train', 'test']
+pd_columns = ['family', 'fam_num', 'selected', 'train', 'dev', 'test']
 
 msg_invalid = 'Not a valid input'
 
