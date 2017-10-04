@@ -35,7 +35,7 @@ def subset(config):
             load_small_set(samples_data)
 
         elif subset_type == 'b':
-            load_balanced(samples_data, 100, 200)
+            load_balanced(samples_data, 100, 1000)
 
         elif subset_type == 'q':
             exit()

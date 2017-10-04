@@ -103,9 +103,9 @@ def split_show_data(samples_data):
 
     labels = samples_data.loc[uuids, 'family'].values
 
-    x_train, x_test, y_train, y_test = train_test_split(uuids, labels, test_size=0.2, random_state=42)
+    x_train, x_test, y_train, y_test = train_test_split(uuids, labels, test_size=0.3, random_state=42)
 
-    x_train, x_dev, y_train, y_dev = train_test_split(x_train, y_train, test_size=0.25, random_state=42)
+    x_test, x_dev, y_test, y_dev = train_test_split(x_test, y_test, test_size=0.5, random_state=42)
 
     print('\n{} train samples belonging to {} malware families'.format(len(x_train), len(set(y_train))))
     for family in Counter(y_train).most_common():
