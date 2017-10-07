@@ -18,7 +18,7 @@ def reduce(config, uuids, components):
 
     print('Performing dimensionality reduction using TSNE')
 
-    tsne = TSNE(n_components=components, method='exact', early_exaggeration=6.0, n_iter=5000, metric='cosine',
+    tsne = TSNE(n_components=components, method='exact', early_exaggeration=6.0, n_iter=1000, metric='cosine',
                 n_iter_without_progress=100, learning_rate=1000, verbose=3)
 
     rows = len(uuids)
