@@ -15,7 +15,12 @@ def extract_keywords(config, result_file):
 
     print('Number of clusters:', len(set(reverse_clustering.keys())))
 
-    out_path = os.path.join(constants.dir_d, constants.dir_kw, result_file[:-5] + '_keywords_tfidf')
+    out_path = os.path.join(
+        constants.dir_d,
+        constants.dir_kw,
+        os.path.split(result_file[:-5])[1] + '_keywords_tfidf'
+    )
+
     with open(out_path, 'w', encoding='utf-8', errors='replace') as out_file:
         for cluster in sorted(reverse_clustering):
             out_file.write('{}\t{}\n'.format('Cluster', cluster))
