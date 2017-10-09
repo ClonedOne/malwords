@@ -31,7 +31,7 @@ def cluster(config, clusters, uuids, base_labels):
     # Forces the user to choose the desired number of clusters
     num_clusters = interaction.ask_clusters(clusters)
 
-    k_means = MiniBatchKMeans(n_clusters=num_clusters, batch_size=mini_batch_size)
+    k_means = MiniBatchKMeans(n_clusters=num_clusters, batch_size=mini_batch_size, random_state=42)
 
     train_k_means(config, k_means, rows, rand_uuids, mini_batch_size)
 
@@ -133,7 +133,7 @@ def test_kmeans_clusters(config, base_labels, num_clusters_max, mini_batch_size,
         cur_num_clusters = int(mult * num_clusters_max)
 
         if cur_num_clusters >= 2:
-            k_means = MiniBatchKMeans(n_clusters=cur_num_clusters, batch_size=mini_batch_size)
+            k_means = MiniBatchKMeans(n_clusters=cur_num_clusters, batch_size=mini_batch_size, random_state=42)
 
             train_k_means(config, k_means, rows, rand_uuids, mini_batch_size)
 
