@@ -35,7 +35,7 @@ def get_idf(config):
     json.dump(dfs, open(os.path.join(constants.dir_d, constants.json_dfs), 'w'), indent=2)
 
     print('Lowering features dimensionality')
-    remove_useless_words(dfs, total_documents, 0.5, 0.005, dir_base)
+    remove_useless_words(dfs, total_documents, 0.5, 0.001, dir_base)
 
 
 def remove_useless_words(dfs, total_documents, filter_high, filter_low, dir_base):
@@ -75,9 +75,9 @@ def remove_useless_words(dfs, total_documents, filter_high, filter_low, dir_base
             to_remove.add(word)
             digits += 1
 
-        elif len(word) != len(word.encode()):
-            to_remove.add(word)
-            non_ascii += 1
+        # elif len(word) != len(word.encode()):
+        #     to_remove.add(word)
+        #     non_ascii += 1
 
         elif dfs[word] == 1:
             to_remove.add(word)
