@@ -26,8 +26,7 @@ def classify(config, train, test, x_test, y_train, y_test):
         randf = RandomForestClassifier(
             criterion=criterion,
             n_jobs=n_jobs,
-            random_state=42,
-            max_features=None
+            random_state=42
         )
 
         print('Training')
