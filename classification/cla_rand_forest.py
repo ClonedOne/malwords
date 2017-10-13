@@ -19,28 +19,27 @@ def classify(config, train, test, x_test, y_train, y_test):
     :return: Classification label and trained model
     """
 
-    criteria = ['gini', 'entropy']
     n_jobs = config['core_num']
 
-    for criterion in criteria:
-        randf = RandomForestClassifier(
-            criterion=criterion,
-            n_jobs=n_jobs,
-            random_state=42
-        )
+    randf = RandomForestClassifier(
+        criterion='gini',
+        n_jobs=n_jobs,
+        random_state=42,
+        n_estimators=150
+    )
 
-        print('Training')
-        randf.fit(train, y_train)
+    print('Training')
+    randf.fit(train, y_train)
 
-        print('Prediction')
-        classification_labels = randf.predict(test)
+    print('Prediction')
+    classification_labels = randf.predict(test)
 
-        test_score = f1_score(y_test, classification_labels, average='micro')
-        print('F1 score of test: {}'.format(test_score))
+    test_score = f1_score(y_test, classification_labels, average='micro')
+    print('F1 score of test: {}'.format(test_score))
 
-    # output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'linear', 'svm')
+    output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'gini', 'rfc')
 
-    # model_file = os.path.join(constants.dir_d, constants.dir_mod, 'svm_{}_{}.pkl'.format('linear', test.shape[0]))
-    # joblib.dump(svc, model_file)
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'rfc_{}_{}.pkl'.format('gini', test.shape[0]))
+    joblib.dump(randf, model_file)
 
-    return None, None
+    return classification_labels, randf
