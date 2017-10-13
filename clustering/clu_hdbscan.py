@@ -21,7 +21,7 @@ def cluster(config, distance, uuids, base_labels, sparse=False):
 
     core_num = config['core_num']
     dir_malwords = config['dir_malwords']
-    min_cluster_size = 90
+    min_cluster_size = 40
     min_sample_param = None
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     hdbs, clustering_labels, metric = None, None, None

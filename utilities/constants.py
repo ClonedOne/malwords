@@ -50,6 +50,7 @@ msg_dr = '\nPlease select a dimensionality reduction technique:\n' \
 msg_cla = '\nPlease select a classification technique:\n' \
           'svm for linear kernel SVM \n' \
           'mlp for multilayer Perceptron \n' \
+          'rand for Random Forest Classifier \n' \
           's to skip clustering/classification\n' \
           'q to quit\n'
 

@@ -1,5 +1,5 @@
+from classification import cla_svm, cla_mlp, cla_rand_forest
 from utilities import constants, interaction
-from classification import cla_svm, cla_mlp
 from helpers import loader_tfidf
 import numpy as np
 
@@ -31,6 +31,10 @@ def classify(samples_data, config):
         elif cla == 'mlp':
             train, test, sparse = select_data(config, uuids, x_train, x_test)
             return cla_mlp.classify(config, train, test, x_test, y_train, y_test)
+
+        elif cla == 'rand':
+            train, test, sparse = select_data(config, uuids, x_train, x_test)
+            return cla_rand_forest.classify(config, train, test, x_test, y_train, y_test)
 
         elif cla == 's':
             return None, None
