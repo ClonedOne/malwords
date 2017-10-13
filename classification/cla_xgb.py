@@ -1,8 +1,10 @@
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
 from sklearn.metrics import f1_score
+from sklearn.tree.tests.test_tree import random_state
+
 from utilities import constants
 from utilities import output
+import xgboost as xgb
 import os
 
 
@@ -19,25 +21,20 @@ def classify(config, train, test, x_test, y_train, y_test):
     :return: Classification label and trained model
     """
 
-    criteria = ['gini', 'entropy']
-    n_jobs = config['core_num']
+    clas = xgb.XGBClassifier(
+        seed=42,
+        nthread=config['core_num'],
+        silent=False,
+    )
 
-    for criterion in criteria:
-        randf = RandomForestClassifier(
-            criterion=criterion,
-            n_jobs=n_jobs,
-            random_state=42,
-            max_features=None
-        )
+    print('Training')
+    clas.fit(train, y_train)
 
-        print('Training')
-        randf.fit(train, y_train)
+    print('Prediction')
+    classification_labels = clas.predict(test)
 
-        print('Prediction')
-        classification_labels = randf.predict(test)
-
-        test_score = f1_score(y_test, classification_labels, average='micro')
-        print('F1 score of test: {}'.format(test_score))
+    test_score = f1_score(y_test, classification_labels, average='micro')
+    print('F1 score of test: {}'.format(test_score))
 
     # output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'linear', 'svm')
 

@@ -1,4 +1,4 @@
-from classification import cla_svm, cla_mlp, cla_rand_forest
+from classification import cla_svm, cla_mlp, cla_rand_forest, cla_xgb
 from utilities import constants, interaction
 from helpers import loader_tfidf
 import numpy as np
@@ -13,6 +13,13 @@ def classify(samples_data, config):
     :return:
     """
 
+    clas = {
+        'svm': cla_svm,
+        'mlp': cla_mlp,
+        'rand': cla_rand_forest,
+        'xgb': cla_xgb
+    }
+
     uuids = samples_data.index[samples_data['selected'] == 1].tolist()
     x_train = samples_data.index[samples_data['train'] == 1].tolist()
     x_test = samples_data.index[samples_data['test'] == 1].tolist()
@@ -24,17 +31,9 @@ def classify(samples_data, config):
     while cla == '':
         cla = input(constants.msg_cla)
 
-        if cla == 'svm':
+        if cla in clas:
             train, test, sparse = select_data(config, uuids, x_train, x_test)
-            return cla_svm.classify(config, train, test, x_test, y_train, y_test)
-
-        elif cla == 'mlp':
-            train, test, sparse = select_data(config, uuids, x_train, x_test)
-            return cla_mlp.classify(config, train, test, x_test, y_train, y_test)
-
-        elif cla == 'rand':
-            train, test, sparse = select_data(config, uuids, x_train, x_test)
-            return cla_rand_forest.classify(config, train, test, x_test, y_train, y_test)
+            return clas[cla].classify(config, train, test, x_test, y_train, y_test)
 
         elif cla == 's':
             return None, None
