@@ -32,7 +32,7 @@ def subset(config):
             load_family(family, samples_data)
 
         elif subset_type == 's':
-            load_small_set(samples_data)
+            load_balanced(samples_data, 100, 50)
 
         elif subset_type == 'b':
             load_balanced(samples_data, 100, 1000)
@@ -49,7 +49,7 @@ def subset(config):
 
 def load_balanced(samples_data, threshold_low, threshold_high):
     """
-    Load a balanced subset of the dataset.
+    Load a balanced subset of the data.
     Selects only those samples whose family appears more than a minim number of times.
     Selects only a maximum number of samples for each family.
 

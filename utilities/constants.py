@@ -79,7 +79,7 @@ msg_sparse = '\nWould you like to use all the data as a sparse matrix? [y/n]\n' 
 msg_subset = 'Please choose the subset of data to workon on:\n' \
              'l for all labeled samples\n' \
              'k for samples of families mydoom, gepys, lamer, neshta, bladabindi, flystudio, eorezo\n' \
-             's for 8 samples of families mydoom, gepys, bladabindi, flystudio\n' \
+             's for a small balanced subset\n' \
              'f for a single family\n' \
              'b for a balanced subset of samples\n' \
              'q to quit\n'
