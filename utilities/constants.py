@@ -32,6 +32,9 @@ msg_results_cla = 'classification result file'
 msg_results_clu = 'clustering result file'
 msg_results_cluster = 'clustering result file'
 msg_json = 'json file'
+msg_data_train = 'train matrix'
+msg_data_dev = 'dev matrix'
+msg_data_test = 'test matrix'
 
 msg_family = 'Please select the desired malware family\n'
 

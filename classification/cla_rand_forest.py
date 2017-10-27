@@ -2,44 +2,53 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.externals import joblib
 from sklearn.metrics import f1_score
 from utilities import constants
-from utilities import output
 import os
 
 
-def classify(config, train, test, x_test, y_train, y_test):
+def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     """
     Classify the documents using a Random Forest Classifier and the AVClass labels as base truth.
 
-    :param config: Global configuration dictionary
-    :param train: Training data matrix
-    :param test: Testing data matrix
-    :param x_test: List of test set uuids
+    :param xm_train: Training data matrix
+    :param xm_dev: Development data matrix
+    :param xm_test: Testing data matrix
     :param y_train: List of train set labels
+    :param y_dev: List of dev set labels
     :param y_test: List of test set labels
-    :return: Classification label and trained model
+    :param config: Global configuration dictionary
+    :return: Predicted test labels and trained model
     """
 
+    modifier = 'gini'
     n_jobs = config['core_num']
 
     randf = RandomForestClassifier(
-        criterion='gini',
+        criterion=modifier,
         n_jobs=n_jobs,
         random_state=42,
         n_estimators=150
     )
 
     print('Training')
-    randf.fit(train, y_train)
+    randf.fit(xm_train, y_train)
 
     print('Prediction')
-    classification_labels = randf.predict(test)
+    train_predicted = randf.predict(xm_train)
+    dev_predicted = randf.predict(xm_dev)
 
-    test_score = f1_score(y_test, classification_labels, average='micro')
-    print('F1 score of test: {}'.format(test_score))
+    train_score = f1_score(y_train, train_predicted, average='micro')
+    dev_score = f1_score(y_dev, dev_predicted, average='micro')
+    print('F1 score on train set: {}'.format(train_score))
+    print('F1 score on dev set: {}'.format(dev_score))
 
-    output.out_classification(dict(zip(x_test, classification_labels.tolist())), 'gini', 'rfc')
-
-    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'rfc_{}_{}.pkl'.format('gini', test.shape[0]))
+    model_file = os.path.join(
+        constants.dir_d,
+        constants.dir_mod,
+        '{}_{}_{}.pkl'.format('randf', modifier, xm_train.shape[0])
+    )
     joblib.dump(randf, model_file)
 
-    return classification_labels, randf
+    test_predicted = randf.predict(xm_test)
+    print('F1 score on test set: {}'.format(f1_score(y_test, test_predicted, average='micro')))
+
+    return test_predicted, randf, modifier
