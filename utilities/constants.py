@@ -36,6 +36,8 @@ msg_data_train = 'train matrix'
 msg_data_dev = 'dev matrix'
 msg_data_test = 'test matrix'
 
+msg_cla_clu = 'Are you going to use the reduced data-set for classification? [y/n]\n'
+
 msg_family = 'Please select the desired malware family\n'
 
 msg_argv = '\nPlease select a valid action:\n' \

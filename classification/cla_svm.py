@@ -5,6 +5,7 @@ from sklearn.svm import SVC
 import os
 
 
+# noinspection PyUnusedLocal
 def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     """
     Classify the documents using SVM and the AVClass labels as base truth.

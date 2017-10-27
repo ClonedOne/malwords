@@ -280,6 +280,7 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
     return accuracy, tr_acc, dv_acc, x, y, keep_prob, y_pred
 
 
+# noinspection PyUnusedLocal
 def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     """
     Classify the documents using the deep averaging network and the AVClass labels as base truth.

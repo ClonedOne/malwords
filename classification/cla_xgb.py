@@ -23,7 +23,7 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
 
     clas = xgb.XGBClassifier(
         seed=42,
-        nthread=8,
+        nthread=config['core_num'],
         silent=False,
     )
 

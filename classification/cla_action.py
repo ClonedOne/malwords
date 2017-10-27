@@ -48,7 +48,7 @@ def classify(samples_data, config):
             return y_predicted, model, modifier
 
         elif cla == 's':
-            return None, None
+            return None, None, None
 
         elif cla == 'q':
             exit()

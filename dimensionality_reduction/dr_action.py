@@ -1,4 +1,4 @@
-from dimensionality_reduction import dr_pca, dr_svd, dr_lda, dr_tsne
+from dimensionality_reduction import dr_pca, dr_svd, dr_tsne
 from utilities import constants, interaction
 
 
@@ -14,11 +14,13 @@ def dimensionality_reduction(samples_data, config):
     drs = {
         'pca': dr_pca,
         'svd': dr_svd,
-        'tsne': dr_tsne,
-        'lda': dr_lda
+        'tsne': dr_tsne
     }
 
     uuids = samples_data.index[samples_data['selected'] == 1].tolist()
+    x_train = samples_data.index[samples_data['train'] == 1].tolist()
+    x_dev = samples_data.index[samples_data['dev'] == 1].tolist()
+    x_test = samples_data.index[samples_data['test'] == 1].tolist()
 
     # Prompts the user to select an action
     dr = ''
@@ -27,7 +29,13 @@ def dimensionality_reduction(samples_data, config):
 
         if dr in drs:
             components = interaction.ask_number(constants.msg_components)
-            return drs[dr].reduce(config, uuids, components)
+            to_cla = interaction.ask_yes_no(constants.msg_cla_clu)
+            if to_cla:
+                data, model = drs[dr].reduce(config, components, None, x_train, x_dev, x_test)
+            else:
+                data, model = drs[dr].reduce(config, components, uuids, None, None, None)
+
+            return data, model
 
         elif dr == 's':
             return None, None

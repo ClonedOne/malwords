@@ -9,36 +9,69 @@ import json
 import os
 
 
-def reduce(config, uuids, components):
+def reduce(config, components, uuids=None, x_train=None, x_dev=None, x_test=None):
     """
     Apply Incremental Principal Components Analysis to the tf-idf vectors.
     
     :param config: configuration dictionary
-    :param uuids: list of selected uuids
     :param components: number of desired components
+    :param uuids: list of selected uuids
+    :param x_train: List of train set uuids
+    :param x_dev: List of dev set uuids
+    :param x_test: List of test set uuids
     :return:
     """
 
     print('Performing dimensionality reduction using PCA')
 
     mini_batch_size = config['batch_size']
-
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
-    rand_uuids = random.sample(uuids, len(uuids))
-
-    rows = len(uuids)
 
     i_pca = IncrementalPCA(n_components=components, batch_size=mini_batch_size)
 
-    train_pca(config, i_pca, rows, rand_uuids, mini_batch_size)
+    if uuids:
+        rand_uuids = random.sample(uuids, len(uuids))
+        rows = len(uuids)
 
-    print('Explained Variance Ratio')
-    print(sum(i_pca.explained_variance_ratio_))
+    else:
+        rand_uuids = random.sample(x_train, len(x_train))
+        rows = len(x_train)
 
-    data = transform_vectors(config, i_pca, rows, uuids, mini_batch_size)
+    train_pca(config, i_pca, len(rand_uuids), rand_uuids, mini_batch_size)
 
-    matrix_file = os.path.join(constants.dir_d, constants.dir_mat, 'pca_{}_{}.txt'.format(components, rows))
-    np.savetxt(open(matrix_file, 'wb'), data)
+    print('Explained Variance Ratio {}:'.format(sum(i_pca.explained_variance_ratio_)))
+
+    if uuids:
+        data = transform_vectors(config, i_pca, len(uuids), uuids, mini_batch_size)
+        matrix_file = os.path.join(constants.dir_d, constants.dir_mat, 'pca_{}_{}.txt'.format(components, len(uuids)))
+        np.savetxt(open(matrix_file, 'wb'), data)
+
+    else:
+        t_train = transform_vectors(config, i_pca, len(x_train), x_train, mini_batch_size)
+        matrix_file = os.path.join(
+            constants.dir_d,
+            constants.dir_mat,
+            'pca_{}_{}_tr.txt'.format(components, len(t_train))
+        )
+        np.savetxt(open(matrix_file, 'wb'), t_train)
+
+        t_dev = transform_vectors(config, i_pca, len(x_dev), x_dev, mini_batch_size)
+        matrix_file = os.path.join(
+            constants.dir_d,
+            constants.dir_mat,
+            'pca_{}_{}_dv.txt'.format(components, len(t_dev))
+        )
+        np.savetxt(open(matrix_file, 'wb'), t_dev)
+
+        t_test = transform_vectors(config, i_pca, len(x_test), x_test, mini_batch_size)
+        matrix_file = os.path.join(
+            constants.dir_d,
+            constants.dir_mat,
+            'pca_{}_{}_te.txt'.format(components, len(t_test))
+        )
+        np.savetxt(open(matrix_file, 'wb'), t_test)
+
+        data = (t_train, t_dev, t_test)
 
     model_file = os.path.join(constants.dir_d, constants.dir_mod, 'pca_{}_{}.pkl'.format(components, rows))
     joblib.dump(i_pca, model_file)
