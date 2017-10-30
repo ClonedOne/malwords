@@ -297,6 +297,7 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
 
     xm_train, xm_dev, xm_test = pp_vectors(xm_train, xm_dev, xm_test)
     ym_train, ym_dev, ym_test = pp_labels(y_train, y_dev, y_test)
+    view_shapes(xm_train, xm_dev, xm_test, ym_train, ym_dev, ym_test)
 
     # Hyper-parameters
     costs = []
