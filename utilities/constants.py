@@ -40,6 +40,8 @@ msg_cla_clu = 'Are you going to use the reduced data-set for classification? [y/
 
 msg_family = 'Please select the desired malware family\n'
 
+msg_data_rfc = 'Please select the trained Random Forest Classifier model\n'
+
 msg_argv = '\nPlease select a valid action:\n' \
            'compare-distance --> show various distance metrics applies to the samples\n' \
            'q to quit\n'
@@ -48,7 +50,7 @@ msg_dr = '\nPlease select a dimensionality reduction technique:\n' \
          'pca\n' \
          'svd\n' \
          'tsne\n' \
-         'lda\n' \
+         'rfc\n' \
          's to skip dimensionality reduction\n' \
          'q to quit\n'
 
