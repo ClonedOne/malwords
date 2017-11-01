@@ -50,7 +50,7 @@ def create_dirs():
     """
 
     (Path(constants.dir_d) / Path(constants.dir_clu)).mkdir(parents=True, exist_ok=True)
-    (Path(constants.dir_d) / Path(constants.dir_kw)).mkdir(parents=True, exist_ok=True)
+    (Path(constants.dir_d) / Path(constants.dir_kwd)).mkdir(parents=True, exist_ok=True)
     (Path(constants.dir_d) / Path(constants.dir_mat)).mkdir(parents=True, exist_ok=True)
     (Path(constants.dir_d) / Path(constants.dir_cla)).mkdir(parents=True, exist_ok=True)
     (Path(constants.dir_d) / Path(constants.dir_vis)).mkdir(parents=True, exist_ok=True)

@@ -5,7 +5,7 @@ This module is a collection of constants values used by the different modules
 # Directories
 dir_d = 'data'
 dir_clu = 'd_clusterings'
-dir_kw = 'd_keywords'
+dir_kwd = 'd_keywords'
 dir_mat = 'd_matrices'
 dir_cla = 'd_classifications'
 dir_vis = 'd_visualizations'

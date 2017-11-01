@@ -17,7 +17,7 @@ def extract_keywords(config, result_file):
 
     out_path = os.path.join(
         constants.dir_d,
-        constants.dir_kw,
+        constants.dir_kwd,
         os.path.split(result_file[:-5])[1] + '_keywords_tfidf'
     )
 
