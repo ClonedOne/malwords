@@ -34,7 +34,7 @@ def classify(samples_data, config):
         cla = input(constants.msg_cla)
 
         if cla in clas:
-            xm_train, xm_dev, xm_test, sparse = select_data(config, x_train, x_dev, x_test)
+            xm_train, xm_dev, xm_test = select_data(config, x_train, x_dev, x_test)
             y_predicted, model, modifier = clas[cla].classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config)
 
             output.out_classification(dict(zip(x_test, y_predicted.tolist())), modifier, cla)
@@ -82,4 +82,4 @@ def select_data(config, x_train, x_dev, x_test):
         xm_dev = np.loadtxt(interaction.ask_file(constants.msg_data_dev))
         xm_test = np.loadtxt(interaction.ask_file(constants.msg_data_test))
 
-    return xm_train, xm_dev, xm_test, sparse
+    return xm_train, xm_dev, xm_test
