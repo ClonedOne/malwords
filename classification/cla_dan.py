@@ -45,7 +45,6 @@ def pp_labels(y_train, y_dev, y_test):
     ym_train = lb.fit_transform(y_train).T
     ym_dev = lb.fit_transform(y_dev).T
     ym_test = lb.fit_transform(y_test).T
-    print(ym_test)
 
     return ym_train, ym_dev, ym_test
 
