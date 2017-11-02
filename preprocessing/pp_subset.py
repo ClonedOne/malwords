@@ -67,7 +67,7 @@ def load_balanced(samples_data, threshold_low, threshold_high):
     for uuid in samples_data.index:
         cur_fam = samples_data.loc[uuid, 'family']
         if cur_fam in families and fam_count[cur_fam] < threshold_high:
-            samples_data.set_value(uuid, 'selected', 1)
+            samples_data.at[uuid, 'selected'] = 1
             fam_count[cur_fam] += 1
 
 
@@ -92,7 +92,7 @@ def load_small_set(samples_data):
 
     for uuid in constants.small_subset:
         if uuid in samples_data.index:
-            samples_data.set_value(uuid, 'selected', 1)
+            samples_data.at[uuid, 'selected'] = 1
 
 
 def load_samples(samples_data):
@@ -107,7 +107,7 @@ def load_samples(samples_data):
 
     for uuid in samples_data.index:
         if samples_data.loc[uuid, 'family'] in families:
-            samples_data.set_value(uuid, 'selected', 1)
+            samples_data.at[uuid, 'selected'] = 1
 
 
 def load_family(family_name, samples_data):
@@ -125,7 +125,7 @@ def load_family(family_name, samples_data):
 
     for uuid in samples_data.index:
         if samples_data.loc[uuid, 'family'] == family_name:
-            samples_data.set_value(uuid, 'selected', 1)
+            samples_data.at[uuid, 'selected'] = 1
 
 
 def create_dataframe(config):
@@ -156,7 +156,7 @@ def create_dataframe(config):
 
     for uuid, label in uuid_label.items():
         if uuid in samples_data.index:
-            samples_data.set_value(uuid, 'family', label)
-            samples_data.set_value(uuid, 'fam_num', families[label])
+            samples_data.at[uuid, 'family'] = label
+            samples_data.at[uuid, 'fam_num'] = families[label]
 
     return samples_data

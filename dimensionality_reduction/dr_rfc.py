@@ -18,7 +18,6 @@ def get_important_feats(feats_weights, max_feats, inv_words, n_uuid):
     :return:
     """
 
-    print('Selecting {} out of {} non zero features', format(max_feats, np.count_nonzero(feats_weights)))
     importance = defaultdict(list)
     selected_feats = []
     selected_words = {}

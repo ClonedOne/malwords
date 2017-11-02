@@ -119,12 +119,9 @@ def split_show_data(samples_data):
     for family in Counter(y_test).most_common():
         print('Malware family: {:^20} Number of samples: {:^6}'.format(family[0], family[1]))
 
-    for uuid in x_train:
-        samples_data.set_value(uuid, 'train', 1)
-    for uuid in x_dev:
-        samples_data.set_value(uuid, 'dev', 1)
-    for uuid in x_test:
-        samples_data.set_value(uuid, 'test', 1)
+    samples_data.loc[x_train, 'train'] = 1
+    samples_data.loc[x_dev, 'dev'] = 1
+    samples_data.loc[x_test, 'test'] = 1
 
     print('\n')
     print(samples_data.describe(include='all'))

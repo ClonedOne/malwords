@@ -40,7 +40,7 @@ msg_cla_clu = 'Are you going to use the reduced data-set for classification? [y/
 
 msg_family = 'Please select the desired malware family\n'
 
-msg_data_rfc = 'Please select the trained Random Forest Classifier model\n'
+msg_data_rfc = 'trained Random Forest Classifier model\n'
 
 msg_argv = '\nPlease select a valid action:\n' \
            'compare-distance --> show various distance metrics applies to the samples\n' \
@@ -56,10 +56,10 @@ msg_dr = '\nPlease select a dimensionality reduction technique:\n' \
 
 msg_cla = '\nPlease select a classification technique:\n' \
           'svm for linear kernel SVM \n' \
-          'mlp for multilayer Perceptron \n' \
+          'dan for Deep Averaging Network \n' \
           'xgb for XGBoost model \n' \
           'rand for Random Forest Classifier \n' \
-          's to skip clustering/classification\n' \
+          's to skip classification\n' \
           'q to quit\n'
 
 msg_clu = '\nPlease select a clustering technique:\n' \
@@ -68,7 +68,7 @@ msg_clu = '\nPlease select a clustering technique:\n' \
           'hdbscan for HDBSCAN \n' \
           'spectral for Spectral clustering using Jensen-Shannon metric\n' \
           'dbscan for DBSCAN clustering using Jensen-Shannon metric\n' \
-          's to skip clustering/classification\n' \
+          's to skip clustering\n' \
           'q to quit\n'
 
 msg_metric = '\nPlease select the desired metric\n' \

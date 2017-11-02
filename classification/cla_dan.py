@@ -48,6 +48,7 @@ def pp_labels(y_train, y_dev, y_test):
     ym_train = lb.fit_transform(y_train).T
     ym_dev = lb.fit_transform(y_dev).T
     ym_test = lb.fit_transform(y_test).T
+    print (ym_test)
 
     return ym_train, ym_dev, ym_test
 
@@ -277,7 +278,7 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
     print('Train Accuracy:', tr_acc)
     print('Dev Accuracy:', dv_acc)
 
-    return accuracy, tr_acc, dv_acc, x, y, keep_prob, y_pred
+    return accuracy, tr_acc, dv_acc, x, y, keep_prob, y_pred, y_true
 
 
 # noinspection PyUnusedLocal
@@ -285,7 +286,7 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     """
     Classify the documents using the deep averaging network and the AVClass labels as base truth.
 
-   :param xm_train: Training data matrix
+    :param xm_train: Training data matrix
     :param xm_dev: Development data matrix
     :param xm_test: Testing data matrix
     :param y_train: List of train set labels
@@ -302,8 +303,8 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     # Hyper-parameters
     costs = []
     learning_rate = 0.001
-    n_epochs = 384
-    mini_batch_size = 256
+    n_epochs = 512
+    mini_batch_size = 128
     n_h_layers = 3
     ls = [
         [256, xm_train.shape[0]], [256, 1],
@@ -317,9 +318,9 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
         tf.reset_default_graph()
         tf.set_random_seed(42)
 
-        sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+        sess = tf.Session()
 
-        accuracy, tr_acc, dv_acc, x, y, keep_prob, y_pred = dan(
+        accuracy, tr_acc, dv_acc, x, y, keep_prob, y_pred, y_true = dan(
             xm_train,
             ym_train,
             xm_dev,
@@ -335,17 +336,17 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
             sess
         )
 
-        ts_acc, y_predicted = sess.run(
-            [accuracy, y_pred],
+        ts_acc, y_predicted, y_true = sess.run(
+            [accuracy, y_pred, y_true],
             feed_dict={x: xm_test, y: ym_test, keep_prob: 1.0}
         )
 
-        evaluate_net(costs, tr_acc, dv_acc, ts_acc, y_predicted, y_test)
+        evaluate_net(costs, tr_acc, dv_acc, ts_acc, y_predicted, y_true)
 
-    return y_predicted, sess
+    return y_predicted, sess, str(n_h_layers)
 
 
-def evaluate_net(costs, tr_acc, dv_acc, ts_acc, y_predicted, y_test):
+def evaluate_net(costs, tr_acc, dv_acc, ts_acc, y_predicted, y_true):
     """
     Evaluate the neural network performance
 
@@ -354,7 +355,7 @@ def evaluate_net(costs, tr_acc, dv_acc, ts_acc, y_predicted, y_test):
     :param dv_acc: dev set accuracy
     :param ts_acc: test set accuracy
     :param y_predicted: predicted labels on test
-    :param y_test: true labels on test
+    :param y_true: true labels on test
     :return:
     """
 
@@ -364,10 +365,15 @@ def evaluate_net(costs, tr_acc, dv_acc, ts_acc, y_predicted, y_test):
     )
     ply.iplot([trace], filename='costs')
 
+    print('-'*80)
+    print(y_predicted)
+    print(y_true)
+    print('-'*80)
+
     print("Train Accuracy:", tr_acc)
     print("Dev Accuracy:", dv_acc)
     print("Test Accuracy:", ts_acc)
 
     print('F1 scores on test:')
-    print(f1_score(y_test, y_predicted, average=None))
-    print('Test F1 Average Score:', f1_score(y_test, y_predicted, average='micro'))
+    print(f1_score(y_true, y_predicted, average=None))
+    print('Test F1 Average Score:', f1_score(y_true, y_predicted, average='micro'))
