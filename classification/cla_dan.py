@@ -338,8 +338,10 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
             feed_dict={x: xm_test, y: ym_test, keep_prob: 1.0}
         )
 
-        print("Train Accuracy:", tr_acc)
-        print("Dev Accuracy:", dv_acc)
-        print("Test Accuracy:", ts_acc)
+        print('\nFinal accuracy values:\n')
+        print('Train Accuracy:', tr_acc)
+        print('Dev Accuracy:', dv_acc)
+        print('Test Accuracy:', ts_acc)
+        print('\n')
 
     return y_predicted, (y_true, costs), str(n_h_layers)
