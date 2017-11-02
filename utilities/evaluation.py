@@ -1,3 +1,5 @@
+from visualization import vis_classification
+from sklearn.metrics import f1_score
 from sklearn import metrics
 import bcubed
 
@@ -46,3 +48,43 @@ def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclide
 
     print('-' * 80)
     return ret
+
+
+def evaluate_classification(y_test, y_test_fam, y_predicted, dan_costs=None):
+    """
+    Show detailed information of the classification performance per single class
+
+    :param y_test: test labels
+    :param y_test_fam: test labels with mnemonic
+    :param y_predicted: predicted labels
+    :param dan_costs: list of dan epoch costs
+    :return:
+    """
+
+    f1s = f1_score(y_test, y_predicted, average=None)
+
+    print('F1 score on dev set:')
+    print(f1s)
+    print('Average f1 score: {}'.format(f1_score(y_test, y_predicted, average='micro')))
+
+    classes = sorted(set(y_test))
+    n_classes = len(classes)
+
+    classes_dict = dict(zip(classes, range(n_classes)))
+
+    class_fam = {}
+    for i in range(len(y_test_fam)):
+        class_fam[classes_dict[y_test[i]]] = y_test_fam[i]
+
+    fam_score = {}
+    for fam_num, fam in class_fam.items():
+        fam_score[fam] = f1s[fam_num]
+
+    for fam, score in sorted(fam_score.items()):
+        print('{:20} {:20}'.format(fam, score))
+
+    if dan_costs:
+        vis_classification.plot_net_costs(dan_costs)
+
+    vis_classification.plot_confusion_matrix(y_test, y_test_fam, y_predicted)
+

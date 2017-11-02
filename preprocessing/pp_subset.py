@@ -82,19 +82,6 @@ def load_labeled(samples_data):
     samples_data['selected'] = np.ones(len(samples_data.index))
 
 
-def load_small_set(samples_data):
-    """
-    Load a small predefined subset of uuids.
-
-    :param samples_data: DataFrame with samples information
-    :return:
-    """
-
-    for uuid in constants.small_subset:
-        if uuid in samples_data.index:
-            samples_data.at[uuid, 'selected'] = 1
-
-
 def load_samples(samples_data):
     """
     Take samples of 7 specific families.

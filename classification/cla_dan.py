@@ -1,7 +1,4 @@
 from sklearn.preprocessing import LabelBinarizer
-from sklearn.metrics import f1_score
-import plotly.graph_objs as go
-import plotly.offline as ply
 import tensorflow as tf
 import numpy as np
 
@@ -48,7 +45,7 @@ def pp_labels(y_train, y_dev, y_test):
     ym_train = lb.fit_transform(y_train).T
     ym_dev = lb.fit_transform(y_dev).T
     ym_test = lb.fit_transform(y_test).T
-    print (ym_test)
+    print(ym_test)
 
     return ym_train, ym_dev, ym_test
 
@@ -341,39 +338,8 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
             feed_dict={x: xm_test, y: ym_test, keep_prob: 1.0}
         )
 
-        evaluate_net(costs, tr_acc, dv_acc, ts_acc, y_predicted, y_true)
+        print("Train Accuracy:", tr_acc)
+        print("Dev Accuracy:", dv_acc)
+        print("Test Accuracy:", ts_acc)
 
-    return y_predicted, sess, str(n_h_layers)
-
-
-def evaluate_net(costs, tr_acc, dv_acc, ts_acc, y_predicted, y_true):
-    """
-    Evaluate the neural network performance
-
-    :param costs: list of computed costs
-    :param tr_acc: train set accuracy
-    :param dv_acc: dev set accuracy
-    :param ts_acc: test set accuracy
-    :param y_predicted: predicted labels on test
-    :param y_true: true labels on test
-    :return:
-    """
-
-    trace = go.Scatter(
-        x=np.arange(len(costs)),
-        y=costs
-    )
-    ply.iplot([trace], filename='costs')
-
-    print('-'*80)
-    print(y_predicted)
-    print(y_true)
-    print('-'*80)
-
-    print("Train Accuracy:", tr_acc)
-    print("Dev Accuracy:", dv_acc)
-    print("Test Accuracy:", ts_acc)
-
-    print('F1 scores on test:')
-    print(f1_score(y_true, y_predicted, average=None))
-    print('Test F1 Average Score:', f1_score(y_true, y_predicted, average='micro'))
+    return y_predicted, (y_true, costs), str(n_h_layers)

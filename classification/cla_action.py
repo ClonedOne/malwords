@@ -1,10 +1,6 @@
 from classification import cla_svm, cla_rand_forest, cla_xgb, cla_dan
-from utilities import constants, interaction, output
-from sklearn.metrics import confusion_matrix
-from sklearn.metrics import f1_score
+from utilities import constants, interaction, output, evaluation
 from helpers import loader_tfidf
-import plotly.graph_objs as go
-import plotly.offline as ply
 import numpy as np
 
 
@@ -30,7 +26,7 @@ def classify(samples_data, config):
     y_train = samples_data.fam_num[samples_data['train'] == 1].tolist()
     y_dev = samples_data.fam_num[samples_data['dev'] == 1].tolist()
     y_test = samples_data.fam_num[samples_data['test'] == 1].tolist()
-    y_test_fams = samples_data.family[samples_data['test'] == 1].tolist()
+    y_test_fam = samples_data.family[samples_data['test'] == 1].tolist()
 
     # Prompts the user to select an action
     cla = ''
@@ -43,7 +39,10 @@ def classify(samples_data, config):
 
             output.out_classification(dict(zip(x_test, y_predicted.tolist())), modifier, cla)
 
-            show_detailed_score(y_test, y_test_fams, y_predicted)
+            if cla is 'dan':
+                evaluation.evaluate_classification(model[0], y_test_fam, y_predicted, model[1])
+            else:
+                evaluation.evaluate_classification(y_test, y_test_fam, y_predicted, None)
 
             return y_predicted, model, modifier
 
@@ -84,45 +83,3 @@ def select_data(config, x_train, x_dev, x_test):
         xm_test = np.loadtxt(interaction.ask_file(constants.msg_data_test))
 
     return xm_train, xm_dev, xm_test, sparse
-
-
-def show_detailed_score(y_test, y_test_fams, y_predicted):
-    """
-    Show detailed information of the classification performance per single class
-
-    :param y_test: test labels
-    :param y_test_fams: test labels with mnemonic
-    :param y_predicted: predicted labels
-    :return:
-    """
-
-    classes = sorted(set(y_test))
-    n_classes = len(classes)
-
-    classes_dict = dict(zip(classes, range(n_classes)))
-
-    f1s = f1_score(y_test, y_predicted, average=None)
-
-    print('F1 score on dev set:')
-    print(f1s)
-    print('Average f1 score: {}'.format(f1_score(y_test, y_predicted, average='micro')))
-
-    class_fam = {}
-    for i in range(len(y_test_fams)):
-        class_fam[classes_dict[y_test[i]]] = y_test_fams[i]
-
-    fam_score = {}
-    for fam_num, fam in class_fam.items():
-        fam_score[fam] = f1s[fam_num]
-
-    for fam, score in sorted(fam_score.items()):
-        print('{:20} {:20}'.format(fam, score))
-
-    cm = confusion_matrix(y_test, y_predicted).astype(float)
-    for vec in cm:
-        vec /= np.sum(vec)
-
-    families = [class_fam[i] for i in sorted(class_fam.keys())]
-
-    trace = go.Heatmap(z=cm, x=families, y=families)
-    ply.iplot([trace], filename='conf_matrix_28k')
