@@ -61,10 +61,6 @@ def evaluate_classification(y_test, y_test_fam, y_predicted, dan_costs=None):
     :return:
     """
 
-    print(y_test)
-    print(y_predicted)
-
-
     f1s = f1_score(y_test, y_predicted, average=None)
 
     print('F1 score on dev set:')

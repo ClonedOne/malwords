@@ -39,7 +39,7 @@ def classify(samples_data, config):
 
             output.out_classification(dict(zip(x_test, y_predicted.tolist())), modifier, cla)
 
-            if cla is 'dan':
+            if cla == 'dan':
                 evaluation.evaluate_classification(model[0], y_test_fam, y_predicted, model[1])
             else:
                 evaluation.evaluate_classification(y_test, y_test_fam, y_predicted, None)
