@@ -43,4 +43,4 @@ def plot_confusion_matrix(y_test, y_test_fam, y_predicted):
     families = [class_fam[i] for i in sorted(class_fam.keys())]
 
     trace = go.Heatmap(z=cm, x=families, y=families)
-    ply.iplot([trace], filename='conf_matrix_28k')
+    ply.iplot([trace], filename='conf_matrix')

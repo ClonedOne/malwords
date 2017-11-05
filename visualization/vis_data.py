@@ -97,3 +97,26 @@ def plot3d(base_labels, data):
         traces.append(trace)
 
     ply.iplot(traces, filename='3dData')
+
+
+def take_malfie(tfidfs, words):
+    """
+    Generate a picture using the sample features as pixel data.
+
+    :param tfidfs: weighted tf-idf values for a sample
+    :param words: dictionary of words and the related id
+    :return:
+    """
+
+    mat_size = len(words)
+    mat = np.zeros(mat_size)
+
+    for word, pos in words.items():
+        mat[int(pos)] = float(tfidfs.get(word, 0))
+
+    mat = mat.reshape(-1, 500)
+
+    print(mat.shape)
+
+    trace = Heatmap(z=mat)
+    ply.iplot([trace], filename='malfie')

@@ -1,4 +1,4 @@
-from dimensionality_reduction import dr_pca, dr_svd, dr_tsne, dr_rfc
+from dimensionality_reduction import dr_pca, dr_tsne, dr_rfc
 from utilities import constants, interaction
 
 
@@ -13,7 +13,6 @@ def dimensionality_reduction(samples_data, config):
 
     drs = {
         'pca': dr_pca,
-        'svd': dr_svd,
         'tsne': dr_tsne,
         'rfc': dr_rfc
     }

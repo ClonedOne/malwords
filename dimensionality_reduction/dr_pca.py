@@ -22,7 +22,7 @@ def reduce(config, components, uuids=None, x_train=None, x_dev=None, x_test=None
     :return:
     """
 
-    print('Performing dimensionality reduction using PCA')
+    print('Performing feature extraction using PCA')
 
     mini_batch_size = config['batch_size']
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))

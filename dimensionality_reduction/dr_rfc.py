@@ -90,6 +90,8 @@ def reduce(config, components, uuids=None, x_train=None, x_dev=None, x_test=None
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     inv_words = {value: key for key, value in words.items()}
 
+    print('Performing feature selection using Random Forest Classifiers')
+
     rfc_file = interaction.ask_file(constants.msg_data_rfc)
     rfc = joblib.load(rfc_file)
 
