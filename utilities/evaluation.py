@@ -63,7 +63,7 @@ def evaluate_classification(y_test, y_test_fam, y_predicted, dan_costs=None):
 
     f1s = f1_score(y_test, y_predicted, average=None)
 
-    print('F1 score on dev set:')
+    print('F1 scores on test set:')
     print(f1s)
     print('Average f1 score: {}'.format(f1_score(y_test, y_predicted, average='micro')))
 
