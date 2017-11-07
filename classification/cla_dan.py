@@ -300,7 +300,7 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     costs = []
     learning_rate = 0.001
     n_epochs = 512
-    mini_batch_size = 128
+    mini_batch_size = 512
     n_h_layers = 3
     ls = [
         [256, xm_train.shape[0]], [256, 1],
