@@ -130,7 +130,7 @@ def create_dataframe(config):
         range(len(set(uuid_label.values())) - 1)
     ))
 
-    # Remove uuids whose malware family is unkown or unique
+    # Remove uuids whose malware family is unknown or unique
     to_remove = set()
     for uuid in indices:
         if uuid not in uuid_label or uuid_label[uuid] == 'SINGLETON':

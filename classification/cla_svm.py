@@ -6,7 +6,7 @@ import os
 
 
 # noinspection PyUnusedLocal
-def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
+def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config, params):
     """
     Classify the documents using SVM and the AVClass labels as base truth.
 
@@ -17,12 +17,25 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     :param y_dev: List of dev set labels
     :param y_test: List of test set labels
     :param config: Global configuration dictionary
+    :param params: Dictionary of parameters for the algorithm
     :return: Predicted test labels and trained model
     """
 
-    modifier = 'linear'
+    modifier = params.get('kernel', 'linear')
+    c = params.get('c', 1.0)
+    gam = params.get('gamma', 'auto')
+    verb = params.get('verbose', False)
+    iters = params.get('max_iter', -1)
+    seed = params.get('seed', 42)
 
-    svc = SVC(kernel=modifier)
+    svc = SVC(
+        kernel=modifier,
+        C=c,
+        gamma=gam,
+        verbose=verb,
+        max_iter=iters,
+        random_state=42
+    )
 
     print('Training')
     svc.fit(xm_train, y_train)

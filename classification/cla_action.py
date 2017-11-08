@@ -35,7 +35,16 @@ def classify(samples_data, config):
 
         if cla in clas:
             xm_train, xm_dev, xm_test = select_data(config, x_train, x_dev, x_test)
-            y_predicted, model, modifier = clas[cla].classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config)
+            y_predicted, model, modifier = clas[cla].classify(
+                xm_train,
+                xm_dev,
+                xm_test,
+                y_train,
+                y_dev,
+                y_test,
+                config,
+                {}
+            )
 
             output.out_classification(dict(zip(x_test, y_predicted.tolist())), modifier, cla)
 

@@ -5,7 +5,7 @@ from utilities import constants
 import os
 
 
-def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
+def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config, params):
     """
     Classify the documents using a Random Forest Classifier and the AVClass labels as base truth.
 
@@ -16,17 +16,25 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     :param y_dev: List of dev set labels
     :param y_test: List of test set labels
     :param config: Global configuration dictionary
+    :param params: Dictionary of parameters for the algorithm
     :return: Predicted test labels and trained model
     """
 
-    modifier = 'gini'
     n_jobs = config['core_num']
+
+    modifier = params.get('criterion', 'gini')
+    maxf = params.get('max_features', 'auto')
+    verb = params.get('verbose', False)
+    est = params.get('num_estimators', 150)
+    seed = params.get('seed', 42)
 
     randf = RandomForestClassifier(
         criterion=modifier,
+        max_features=maxf,
         n_jobs=n_jobs,
-        random_state=42,
-        n_estimators=150
+        random_state=seed,
+        n_estimators=est,
+        verbose=verb
     )
 
     print('Training')

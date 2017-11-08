@@ -278,7 +278,7 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
 
 
 # noinspection PyUnusedLocal
-def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
+def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config, params):
     """
     Classify the documents using the deep averaging network and the AVClass labels as base truth.
 
@@ -289,6 +289,7 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     :param y_dev: List of dev set labels
     :param y_test: List of test set labels
     :param config: Global configuration dictionary
+    :param params: Dictionary of parameters for the algorithm
     :return: Predicted test labels and trained model
     """
 
@@ -296,19 +297,21 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
     ym_train, ym_dev, ym_test = pp_labels(y_train, y_dev, y_test)
     view_shapes(xm_train, xm_dev, xm_test, ym_train, ym_dev, ym_test)
 
-    # Hyper-parameters
     costs = []
-    learning_rate = 0.001
-    n_epochs = 512
-    mini_batch_size = 512
-    n_h_layers = 3
+
+    # Hyper-parameters
+    learning_rate = params.get('learning_rate', 0.001)
+    n_epochs = params.get('num_epochs', 512)
+    mini_batch_size = params.get('batch_size', 512)
+    n_h_layers = params.get('num_layers', 3)
     ls = [
         [256, xm_train.shape[0]], [256, 1],
         [128, 256], [128, 1],
         [ym_train.shape[0], 128], [ym_train.shape[0], 1]
     ]
-    keep_prob = 0.9
-    reg = 0.0
+    layers = params.get('layers', ls)
+    keep_prob = params.get('keep_prob', 0.9)
+    reg = params.get('regularization', 0.0)
 
     with tf.device('/gpu:0'):
         tf.reset_default_graph()
@@ -325,7 +328,7 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config):
             n_epochs,
             mini_batch_size,
             n_h_layers,
-            ls,
+            layers,
             keep_prob,
             reg,
             costs,
