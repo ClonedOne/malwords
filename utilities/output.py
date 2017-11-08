@@ -37,25 +37,26 @@ def out_classification(classification_dict, distance, algo):
     json.dump(classification_dict, open(os.path.join(constants.dir_d, constants.dir_cla, out_file), 'w'), indent=2)
 
 
-def result_to_visualize(uuids, base_labels, computed_labels, num_clusters, alg=""):
+def result_to_visualize(uuids, base_labels, clustering_labels, alg=""):
     """
     Generate a json file structured so it can be used for visualization
 
     :param uuids: list of uuids
     :param base_labels: base truth labels
-    :param computed_labels: clustering results
-    :param num_clusters: number of clusters created
+    :param clustering_labels: clustering results
     :param alg: algorithm used
     :return:
     """
+
+    num_clusters = len(set(clustering_labels)) - (1 if -1 in clustering_labels else 0)
 
     out_dict = {'name': 'clustering', 'children': []}
 
     for i in range(num_clusters):
         child_dict = {'name': str(i), 'children': []}
 
-        for j in range(len(computed_labels)):
-            label = int(computed_labels[j])
+        for j in range(len(clustering_labels)):
+            label = int(clustering_labels[j])
             if label == i:
                 true_label = int(base_labels[j])
                 child_inner = {'name': uuids[j], 'color': true_label}

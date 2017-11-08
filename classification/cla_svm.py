@@ -18,7 +18,7 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config, params):
     :param y_test: List of test set labels
     :param config: Global configuration dictionary
     :param params: Dictionary of parameters for the algorithm
-    :return: Predicted test labels and trained model
+    :return: Predicted test labels, trained model and modifier characteristics
     """
 
     modifier = params.get('kernel', 'linear')

@@ -76,7 +76,7 @@ def select_data(config, x_train, x_dev, x_test):
     :param x_train: List of train set uuids
     :param x_dev: List of dev set uuids
     :param x_test: List of test set uuids
-    :return: data matrices and the sparse flag
+    :return: data matrices
     """
 
     sparse = interaction.ask_yes_no(constants.msg_sparse)

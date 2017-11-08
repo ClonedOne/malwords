@@ -4,40 +4,20 @@ import glob
 import os
 
 
-def ask_clusters(num_clusters_max):
-    """
-    Ask user for the desired number of clusters.
-
-    :param num_clusters_max: maximum number of clusters
-    :return: selected number of clusters
-    """
-
-    num_clusters = 0
-
-    while num_clusters == 0:
-        num_clusters = input('Please select the number of clusters\n')
-        try:
-            num_clusters = int(num_clusters)
-            if num_clusters > num_clusters_max or num_clusters < 2:
-                raise Exception
-        except ValueError:
-            num_clusters = 0
-            print('Please insert a valid number of clusters\n')
-
-    return num_clusters
-
-
-def ask_number(request):
+def ask_number(request, min_valid=None, max_valid=None):
     """
     Ask user for the number of requested items.
 
-    :return: 
+    :param request: request string
+    :param min_valid: optional minimum value
+    :param max_valid: optional maximum value
+    :return:
     """
 
     msg_request = 'Please select the desired number of {} (q to quit)\n'.format(request)
-    number = 0
+    number = None
 
-    while number == 0:
+    while number is None:
 
         number = input(msg_request)
 
@@ -47,9 +27,13 @@ def ask_number(request):
         try:
             number = int(number)
 
+            if (min_valid and number < min_valid) or (max_valid and number > max_valid):
+                print('Not a valid input\n')
+                number = None
+
         except ValueError:
             print('Not a valid input\n')
-            number = 0
+            number = None
 
     return number
 

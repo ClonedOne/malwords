@@ -42,6 +42,7 @@ msg_data_rfc = 'trained Random Forest Classifier model\n'
 
 # Yes/No choices
 msg_js = '\nWould you like to compute the Jensen-Shannon distance matrix for the chosen data? [y/n]\n'
+msg_mini = '\nWould you like to use all the data with incremental mini-batches? (only K-Means!) [y/n]\n'
 msg_sparse = '\nWould you like to use all the data as a sparse matrix? [y/n]\n'
 msg_memhist = '\nWould you like to compute the tf-idf weights using memhist data? [y/n]\n'
 msg_cla_clu = '\nAre you going to use the reduced data-set for classification? [y/n]\n'
