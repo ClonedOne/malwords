@@ -90,7 +90,6 @@ msg_metric = '\nPlease select the desired metric\n' \
 
 msg_clu = '\nPlease select a clustering technique:\n' \
           'kmeans\n' \
-          'mini_kmeans\n' \
           'hdbscan\n' \
           'spectral\n' \
           'dbscan\n' \
