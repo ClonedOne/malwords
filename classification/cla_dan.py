@@ -68,6 +68,7 @@ def view_shapes(xm_train, xm_dev, xm_test, ym_train, ym_dev, ym_test):
     print('Y_dev shape: ' + str(ym_dev.shape))
     print('X_test shape: ' + str(xm_test.shape))
     print('Y_test shape: ' + str(ym_test.shape))
+    print('\n')
 
 
 # Model definition
