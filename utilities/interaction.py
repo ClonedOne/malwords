@@ -73,7 +73,7 @@ def ask_metric():
     :return: 
     """
 
-    possible_metrics = ['e', 'c', 'j']
+    possible_metrics = ['e', 'c', 'c1', 'j', 'j1']
     metric = ''
 
     while metric == '':

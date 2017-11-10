@@ -82,8 +82,10 @@ msg_cla = '\nPlease select a classification technique:\n' \
 
 msg_metric = '\nPlease select the desired metric\n' \
              'e for euclidean\n' \
-             'c for cosine\n' \
-             'j for jensen-shannon' \
+             'c for cosine precomputed\n' \
+             'c1 for cosine approximation\n' \
+             'j for jensen-shannon precomputed\n' \
+             'j1 for jensen-shannon\n' \
              'q to quit\n'
 
 msg_clu = '\nPlease select a clustering technique:\n' \

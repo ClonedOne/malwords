@@ -11,12 +11,12 @@ import os
 
 def cluster(data, base_labels, config, params):
     """
-    Clusters the data matrix using K-Means algorithm.
+    Clusters the data matrix using the K-Means algorithm.
     :param data: either a data matrix or a list of document uuids
     :param base_labels: list of labels from a reference clustering
     :param config: configuration dictionary
     :param params: dictionary of parameters for the algorithm
-    :return: Clustering labels, trained model and modifier characteristics
+    :return: Clustering labels, trained model and modifiers
     """
 
     if isinstance(data, list):
@@ -43,7 +43,10 @@ def cluster(data, base_labels, config, params):
     )
     joblib.dump(k_means, model_file)
 
-    return clustering_labels, k_means, modifier
+    if modifier == 'mini':
+        data = None
+
+    return clustering_labels, k_means, modifier, data, 'euclidean'
 
 
 def test_kmeans_clusters(config, data, base_labels, modifier, params):

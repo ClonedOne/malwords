@@ -18,7 +18,6 @@ def cluster(config, uuids, base_labels):
 
     data = np.loadtxt(os.path.join(constants.dir_d, constants.file_js))
 
-    print('Perform clustering')
     dbscan = DBSCAN(eps=0.55, metric='precomputed', n_jobs=core_num, min_samples=25)
     clustering_labels = dbscan.fit_predict(data)
     num_clusters = len(set(clustering_labels)) - (1 if -1 in clustering_labels else 0)

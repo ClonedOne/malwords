@@ -31,30 +31,18 @@ def cluster(samples_data, config):
         if clu in clus:
             data = select_data(config, uuids)
 
-            clustering_labels, model, modifier = clus[clu].cluster(
+            clustering_labels, model, modifier, data, metric = clus[clu].cluster(
                 data,
                 numerical_labels,
                 config,
                 {}
             )
 
-            evaluation.evaluate_clustering(numerical_labels, clustering_labels)
+            evaluation.evaluate_clustering(numerical_labels, clustering_labels, data, metric)
 
             output.out_clustering(dict(zip(uuids, clustering_labels.tolist())), modifier, clu)
 
             output.result_to_visualize(uuids, numerical_labels, clustering_labels)
-
-        elif clu == 'spectral':
-            clusters = interaction.ask_number(constants.msg_clusters)
-            return clu_spectral.cluster(config, clusters, uuids, numerical_labels)
-
-        elif clu == 'dbscan':
-            return clu_dbscan.cluster(config, uuids, numerical_labels)
-
-        elif clu == 'hdbscan':
-            distance = interaction.ask_metric()
-            sparse = interaction.ask_yes_no(constants.msg_sparse)
-            return clu_hdbscan.cluster(config, distance, uuids, numerical_labels, sparse=sparse)
 
         elif clu == 's':
             return None, None

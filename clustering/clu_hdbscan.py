@@ -1,147 +1,67 @@
 from sklearn.metrics import pairwise_distances
+from sklearn.preprocessing import normalize
 from sklearn.externals import joblib
 from distances import jensen_shannon
 from utilities import interaction
-from helpers import loader_freqs
-from utilities import evaluation
 from utilities import constants
-from utilities import output
-import numpy as np
 import hdbscan
-import json
 import os
 
 
-def cluster(config, distance, uuids, base_labels, sparse=False):
+# noinspection PyUnusedLocal
+def cluster(data, base_labels, config, params):
     """
-    Cluster the documents using out of core Mini Batch KMeans. 
-
-    :return: 
+    Clusters the data matrix using the HDBSCAN algorithm.
+    :param data: either a data matrix or a list of document uuids
+    :param base_labels: list of labels from a reference clustering
+    :param config: configuration dictionary
+    :param params: dictionary of parameters for the algorithm
+    :return: Clustering labels, trained model and modifiers
     """
 
+    modifier = ''
     core_num = config['core_num']
-    dir_malwords = config['dir_malwords']
-    min_cluster_size = 40
-    min_sample_param = None
-    words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
+
+    min_cluster_size = params.get('min_cluster_size', 40)
+    min_sample_param = params.get('min_sample', None)
+
+    distance = interaction.ask_metric()
     hdbs, clustering_labels, metric = None, None, None
 
-    if sparse:
-        data = loader_freqs.load_freqs(uuids, core_num, len(words), words, dir_malwords, dense=False, ordered=True)
-    else:
-        matrix_file = interaction.ask_file(constants.msg_data_red)
-        data = np.loadtxt(matrix_file)
-
     if distance == 'e':
-        hdbs, clustering_labels, metric, data = euclidean(data, uuids, min_cluster_size, core_num, min_sample_param)
+        modifier = 'euclidean'
+        metric = 'euclidean'
+
     elif distance == 'c':
-        hdbs, clustering_labels, metric, data = cosine(data, uuids, min_cluster_size, core_num, min_sample_param)
+        modifier = 'cosine'
+        metric = 'precomputed'
+        data = pairwise_distances(data, metric=modifier)
+        print(data.shape)
+
+    elif distance == 'c1':
+        modifier = 'cosine1'
+        norm_data = normalize(data, norm='l2')
+        metric = 'euclidean'
+
     elif distance == 'j':
-        hdbs, clustering_labels, metric, data = js(data, uuids, min_cluster_size, core_num, min_sample_param, sparse)
+        modifier = 'jensen_shannon'
+        metric = 'precomputed'
 
-    num_clusters = len(set(clustering_labels)) - (1 if -1 in clustering_labels else 0)
-    if num_clusters == 1:
-        data = None
+    elif distance == 'j1':
+        modifier = 'jensen_shannon1'
+        metric = jensen_shannon.jensen_shannon_dist
 
-    evaluation.evaluate_clustering(base_labels, clustering_labels, data=data, metric=metric)
-    output.result_to_visualize(uuids, base_labels, clustering_labels, num_clusters)
+    hdbs = hdbscan.HDBSCAN(
+        min_cluster_size=min_cluster_size,
+        min_samples=min_sample_param,
+        metric=metric,
+        core_dist_n_jobs=core_num
+    )
 
-    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'hdbscan_{}_{}.pkl'.format(distance, len(data)))
+    hdbs.fit(data)
+    clustering_labels = hdbs.labels_
+
+    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'hdbscan_{}_{}.pkl'.format(modifier, len(data)))
     joblib.dump(hdbs, model_file)
 
-    return clustering_labels, hdbs
-
-
-def js(data, uuids, min_cluster_size, core_num, min_sample_param, sparse):
-    """
-    Perform HDBSCAN with jensen-shannon distance
-
-    :param data: data in distance matrix shape
-    :param uuids: list of uuids corresponding to data points
-    :param min_cluster_size: minimum number of points to generate cluster
-    :param core_num: number of available cpu cores
-    :param min_sample_param: influences the number of clusters generated
-    :param sparse: flag, if set the data matrix is sparse
-    :return:
-    """
-
-    print('Perform clustering with jensen-shannon distance')
-
-    if not sparse:
-        m = 'precomputed'
-        hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
-                               metric=m,
-                               min_samples=min_sample_param,
-                               core_dist_n_jobs=core_num)
-    else:
-        m = jensen_shannon.jensen_shannon_dist
-        hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
-                               min_samples=min_sample_param,
-                               metric=m,
-                               core_dist_n_jobs=core_num)
-
-    hdbs.fit(data)
-    computed_labels = hdbs.labels_
-
-    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'jensen_shannon', 'hdbscan')
-
-    return hdbs, computed_labels, m, data
-
-
-def euclidean(data, uuids, min_cluster_size, core_num, min_sample_param):
-    """
-    Perform HDBSCAN with euclidean distance
-    
-    :param data: data to cluster
-    :param uuids: list of uuids corresponding to data points
-    :param min_cluster_size: minimum number of points to generate cluster
-    :param core_num: number of available cpu cores
-    :param min_sample_param: influences the number of clusters generated
-    :return:
-    """
-
-    print('Perform clustering with euclidean distance')
-    m = 'euclidean'
-
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
-                           min_samples=min_sample_param,
-                           metric=m,
-                           gen_min_span_tree=True,
-                           core_dist_n_jobs=core_num)
-    hdbs.fit(data)
-    computed_labels = hdbs.labels_
-
-    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'euclidean', 'hdbscan')
-
-    return hdbs, computed_labels, m, data
-
-
-def cosine(data, uuids, min_cluster_size, core_num, min_sample_param):
-    """
-    Perform HDBSCAN with cosine distance
-
-    :param data: data to cluster
-    :param uuids: list of uuids corresponding to data points
-    :param min_cluster_size: minimum number of points to generate cluster
-    :param core_num: number of available cpu cores
-    :param min_sample_param: influences the number of clusters generated
-    :return:
-    """
-
-    print('Perform clustering with cosine distance')
-    m = 'precomputed'
-
-    distance = pairwise_distances(data, metric='cosine')
-    print(distance.shape)
-
-    hdbs = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size,
-                           min_samples=min_sample_param,
-                           metric=m,
-                           core_dist_n_jobs=core_num)
-
-    hdbs.fit(distance)
-    computed_labels = hdbs.labels_
-
-    output.out_clustering(dict(zip(uuids, computed_labels.tolist())), 'cosine', 'hdbscan')
-
-    return hdbs, computed_labels, m, distance
+    return clustering_labels, hdbs, modifier, data, metric

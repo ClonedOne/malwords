@@ -6,9 +6,13 @@ import bcubed
 
 def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclidean'):
     """
-    Print evaluation values for the clustering results
+    Print evaluation metrics for the clustering results
     
-    :return: 
+    :param base_labels: labels from a reference clustering
+    :param computed_labels: lables assigned by the clustering
+    :param data: the data matrix or a list of uuids
+    :param metric: metric to use for the silhouette method
+    :return:
     """
 
     # Converts labels list to dictionaries for the BCubed library
@@ -40,7 +44,7 @@ def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclide
     print('BCubed FScore:', fs)
 
     if data is not None:
-        sh = metrics.silhouette_score(data, computed_labels, metric=metric)
+        sh = metrics.silhouette_score(data, computed_labels, metric=metric, random_state=42)
         print('Silhouette', sh)
         ret = (ars, ami, fm, h, c, p, r, fs, sh)
     else:
