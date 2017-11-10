@@ -22,10 +22,13 @@ def cluster(data, base_labels, config, params):
     modifier = ''
     core_num = config['core_num']
 
-    min_cluster_size = params.get('min_cluster_size', 40)
-    min_sample_param = params.get('min_sample', None)
+    min_cluster_size = params.get('min_cluster_size', 60)
+    min_sample_param = params.get('min_sample', 15)
+    distance = params.get('distance', None)
 
-    distance = interaction.ask_metric()
+    if not distance:
+        distance = interaction.ask_metric()
+
     hdbs, clustering_labels, metric = None, None, None
 
     if distance == 'e':
@@ -36,7 +39,6 @@ def cluster(data, base_labels, config, params):
         modifier = 'cosine'
         metric = 'precomputed'
         data = pairwise_distances(data, metric=modifier)
-        print(data.shape)
 
     elif distance == 'c1':
         modifier = 'cosine1'
