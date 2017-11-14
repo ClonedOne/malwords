@@ -4,7 +4,7 @@ from sklearn import metrics
 import bcubed
 
 
-def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclidean'):
+def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclidean', silent=False):
     """
     Print evaluation metrics for the clustering results
     
@@ -12,6 +12,7 @@ def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclide
     :param computed_labels: lables assigned by the clustering
     :param data: the data matrix or a list of uuids
     :param metric: metric to use for the silhouette method
+    :param silent: flag, if true avoid printing
     :return:
     """
 
@@ -19,8 +20,6 @@ def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclide
     base_dict = {k: {v} for k, v in dict(enumerate(base_labels)).items()}
     computed_dict = {k: {v} for k, v in dict(enumerate(computed_labels)).items()}
     num_clusters = len(set(computed_labels)) - (1 if -1 in computed_labels else 0)
-
-    print('-' * 80)
 
     ars = metrics.adjusted_rand_score(base_labels, computed_labels)
     ami = metrics.adjusted_mutual_info_score(base_labels, computed_labels)
@@ -31,26 +30,31 @@ def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclide
     r = bcubed.recall(base_dict, computed_dict)
     fs = bcubed.fscore(p, r)
 
-    print('Clustering evaluation')
-    print('Number of clusters', num_clusters)
-    print('Number of distinct families', len(set(base_labels)))
-    print('Adjusted Rand index:', ars)
-    print('Adjusted Mutual Information:', ami)
-    print('Fowlkes-Mallows:', fm)
-    print('Homogeneity:', h)
-    print('Completeness:', c)
-    print('BCubed Precision:', p)
-    print('BCubed Recall:', r)
-    print('BCubed FScore:', fs)
+    if not silent:
+        print('-' * 80)
+        print('Clustering evaluation')
+        print('Number of clusters', num_clusters)
+        print('Number of distinct families', len(set(base_labels)))
+        print('Adjusted Rand index:', ars)
+        print('Adjusted Mutual Information:', ami)
+        print('Fowlkes-Mallows:', fm)
+        print('Homogeneity:', h)
+        print('Completeness:', c)
+        print('BCubed Precision:', p)
+        print('BCubed Recall:', r)
+        print('BCubed FScore:', fs)
 
     if data is not None:
         sh = metrics.silhouette_score(data, computed_labels, metric=metric, random_state=42)
-        print('Silhouette', sh)
+
+        if not silent:
+            print('Silhouette', sh)
+
         ret = (ars, ami, fm, h, c, p, r, fs, sh)
+
     else:
         ret = (ars, ami, fm, h, c, p, r, fs)
 
-    print('-' * 80)
     return ret
 
 
