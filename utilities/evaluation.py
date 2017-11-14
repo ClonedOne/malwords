@@ -66,10 +66,11 @@ def evaluate_classification(y_test, y_test_fam, y_predicted, dan_costs=None):
     """
 
     f1s = f1_score(y_test, y_predicted, average=None)
+    avg_f1 = f1_score(y_test, y_predicted, average='micro')
 
     print('F1 scores on test set:')
     print(f1s)
-    print('Average f1 score: {}'.format(f1_score(y_test, y_predicted, average='micro')))
+    print('Average f1 score: {}'.format(avg_f1))
 
     classes = sorted(set(y_test))
     n_classes = len(classes)
@@ -92,3 +93,4 @@ def evaluate_classification(y_test, y_test_fam, y_predicted, dan_costs=None):
 
     vis_classification.plot_confusion_matrix(y_test, y_test_fam, y_predicted)
 
+    return avg_f1, f1s
