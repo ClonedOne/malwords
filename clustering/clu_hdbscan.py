@@ -63,7 +63,12 @@ def cluster(data, base_labels, config, params):
     hdbs.fit(data)
     clustering_labels = hdbs.labels_
 
-    model_file = os.path.join(constants.dir_d, constants.dir_mod, 'hdbscan_{}_{}.pkl'.format(modifier, len(data)))
+    model_file = os.path.join(
+        constants.dir_d,
+        constants.dir_mod,
+        'hdbscan_{}_{}.pkl'.format(modifier, len(data))
+    )
+    
     joblib.dump(hdbs, model_file)
 
     return clustering_labels, hdbs, modifier, data, metric
