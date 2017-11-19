@@ -64,7 +64,7 @@ def test_kmeans_clusters(config, data, base_labels, modifier, params):
 
     tested_models = {}
 
-    max_iter = params.get('num_iters', 3000)
+    max_iter = params.get('num_iters', 300)
     num_clusters_max = params.get('num_clusters', len(set(base_labels)))
     seed = params.get('seed', 42)
 
