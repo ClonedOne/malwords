@@ -1,4 +1,4 @@
-from clustering import clu_hdbscan, clu_kmeans, clu_spectral, clu_dbscan
+from clustering import clu_hdbscan, clu_kmeans, clu_spectral, clu_dbscan, clu_birch
 from utilities import constants, interaction, output, evaluation
 from helpers import loader_tfidf
 import numpy as np
@@ -17,7 +17,8 @@ def cluster(samples_data, config):
         'kmeans': clu_kmeans,
         'spectral': clu_spectral,
         'dbscan': clu_dbscan,
-        'hdbscan': clu_hdbscan
+        'hdbscan': clu_hdbscan,
+        'birch': clu_birch
     }
 
     uuids = samples_data.index[samples_data['selected'] == 1].tolist()

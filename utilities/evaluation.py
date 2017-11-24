@@ -1,6 +1,8 @@
 from visualization import vis_classification
 from sklearn.metrics import f1_score
+from collections import defaultdict
 from sklearn import metrics
+import numpy as np
 import bcubed
 
 
@@ -98,3 +100,57 @@ def evaluate_classification(y_test, y_test_fam, y_predicted, dan_costs=None):
     vis_classification.plot_confusion_matrix(y_test, y_test_fam, y_predicted)
 
     return avg_f1, f1s
+
+
+def cluster_metrics(reference, computed):
+    """
+    Compute the clustering precision, recall, quality, with respect to a reference clustering.
+    (See: Scalable, Behavior-Based Malware Clustering)
+
+    :param reference: reference clustering
+    :param computed: computed clustering
+    :return: precision, recall, quality
+    """
+
+    n_points = len(reference)
+    clusters_r = sorted(set(reference))
+    clusters_c = sorted(set(computed))
+    n_clusters_r = len(set(reference))
+    n_clusters_c = len(set(computed))
+
+    print(clusters_r)
+    print(clusters_c)
+    print(n_clusters_r)
+    print(n_clusters_c)
+
+    precisions = np.zeros(n_clusters_c)
+    recalls = np.zeros(n_clusters_r)
+
+    # Transform both computed and reference label lists into inverted indices of clusters
+    i_reference = defaultdict(set)
+    i_computed = defaultdict(set)
+
+    for i in range(len(reference)):
+        i_reference[reference[i]].add(i)
+        i_computed[computed[i]].add(i)
+
+    print(i_reference)
+    print(i_computed)
+
+    for i in clusters_c:
+        print(i_computed[i])
+        precisions[i] = max([len(i_computed[i] & i_reference[j]) for j in clusters_r])
+
+    print(precisions)
+
+    for i in clusters_r:
+        print(i_reference[i])
+        recalls[i] = max([len(i_computed[j] & i_reference[i]) for j in clusters_c])
+
+    print(recalls)
+
+    precision = np.sum(precisions) / n_points
+    recall = np.sum(recalls) / n_points
+    quality = precision * recall
+
+    return precision, recall, quality

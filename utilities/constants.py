@@ -93,6 +93,7 @@ msg_clu = '\nPlease select a clustering technique:\n' \
           'hdbscan\n' \
           'spectral\n' \
           'dbscan\n' \
+          'birch\n' \
           's to skip\n' \
           'q to quit\n'
 
