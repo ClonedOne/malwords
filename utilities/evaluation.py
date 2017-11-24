@@ -112,45 +112,34 @@ def cluster_metrics(reference, computed):
     :return: precision, recall, quality
     """
 
+    if len(reference) != len(computed):
+        print('Number of points not equal')
+        return None, None, None
+
     n_points = len(reference)
-    clusters_r = sorted(set(reference))
-    clusters_c = sorted(set(computed))
-    n_clusters_r = len(set(reference))
-    n_clusters_c = len(set(computed))
 
-    print(clusters_r)
-    print(clusters_c)
-    print(n_clusters_r)
-    print(n_clusters_c)
+    r_clusters = sorted(set(reference))
+    c_clusters = sorted(set(computed))
 
-    precisions = np.zeros(n_clusters_c)
-    recalls = np.zeros(n_clusters_r)
+    precisions = []
+    recalls = []
 
     # Transform both computed and reference label lists into inverted indices of clusters
     i_reference = defaultdict(set)
     i_computed = defaultdict(set)
 
-    for i in range(len(reference)):
+    for i in range(n_points):
         i_reference[reference[i]].add(i)
         i_computed[computed[i]].add(i)
 
-    print(i_reference)
-    print(i_computed)
+    for i in c_clusters:
+        precisions.append(max([len(i_computed[i] & i_reference[j]) for j in r_clusters]))
 
-    for i in clusters_c:
-        print(i_computed[i])
-        precisions[i] = max([len(i_computed[i] & i_reference[j]) for j in clusters_r])
+    for i in r_clusters:
+        recalls.append(max([len(i_computed[j] & i_reference[i]) for j in c_clusters]))
 
-    print(precisions)
-
-    for i in clusters_r:
-        print(i_reference[i])
-        recalls[i] = max([len(i_computed[j] & i_reference[i]) for j in clusters_c])
-
-    print(recalls)
-
-    precision = np.sum(precisions) / n_points
-    recall = np.sum(recalls) / n_points
+    precision = np.sum(np.array(precisions)) / n_points
+    recall = np.sum(np.array(recalls)) / n_points
     quality = precision * recall
 
     return precision, recall, quality
