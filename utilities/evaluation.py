@@ -31,6 +31,7 @@ def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclide
     p = bcubed.precision(base_dict, computed_dict)
     r = bcubed.recall(base_dict, computed_dict)
     fs = bcubed.fscore(p, r)
+    p_p, p_r, p_q = cluster_metrics(base_labels, computed_labels)
 
     if not silent:
         print('-' * 80)
@@ -45,6 +46,9 @@ def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclide
         print('BCubed Precision:', p)
         print('BCubed Recall:', r)
         print('BCubed FScore:', fs)
+        print('Paper Precision:', p_p)
+        print('Paper Recall:', p_r)
+        print('Paper Quality:', p_q)
 
     if data is not None:
         sh = metrics.silhouette_score(data, computed_labels, metric=metric, random_state=42)
@@ -52,10 +56,10 @@ def evaluate_clustering(base_labels, computed_labels, data=None, metric='euclide
         if not silent:
             print('Silhouette', sh)
 
-        ret = (ars, ami, fm, h, c, p, r, fs, sh)
+        ret = (ars, ami, fm, h, c, p, r, fs, p_p, p_r, p_q, sh)
 
     else:
-        ret = (ars, ami, fm, h, c, p, r, fs)
+        ret = (ars, ami, fm, h, c, p, r, fs, p_p, p_r, p_q)
 
     return ret
 
