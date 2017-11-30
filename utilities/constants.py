@@ -69,6 +69,7 @@ msg_dr = '\nPlease select a dimensionality reduction technique:\n' \
          'svd\n' \
          'tsne\n' \
          'rfc\n' \
+         'irfc\n' \
          's to skip dimensionality reduction\n' \
          'q to quit\n'
 

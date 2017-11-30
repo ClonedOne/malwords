@@ -1,4 +1,4 @@
-from dimensionality_reduction import dr_pca, dr_tsne, dr_rfc
+from dimensionality_reduction import dr_pca, dr_tsne, dr_rfc, dr_irfc
 from utilities import constants, interaction
 
 
@@ -14,7 +14,8 @@ def dimensionality_reduction(samples_data, config):
     drs = {
         'pca': dr_pca,
         'tsne': dr_tsne,
-        'rfc': dr_rfc
+        'rfc': dr_rfc,
+        'irfc': dr_irfc
     }
 
     uuids = samples_data.index[samples_data['selected'] == 1].tolist()

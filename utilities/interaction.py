@@ -14,7 +14,7 @@ def ask_number(msg, min_valid=None, max_valid=None):
     :return:
     """
 
-    msg_request = 'Please select the desired number of {} (q to quit)\n'.format(msg)
+    msg_request = '\nPlease select the desired number of {} (q to quit)\n'.format(msg)
     number = None
 
     while number is None:
@@ -46,7 +46,7 @@ def ask_file(msg):
     :return: 
     """
 
-    msg_request = 'Please select the desired {} (q to quit)\n'.format(msg)
+    msg_request = '\nPlease select the desired {} (q to quit)\n'.format(msg)
     file_path = ""
 
     while file_path == "":
