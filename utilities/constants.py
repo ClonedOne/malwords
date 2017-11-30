@@ -76,7 +76,7 @@ msg_cla = '\nPlease select a classification technique:\n' \
           'svm\n' \
           'dan\n' \
           'xgb\n' \
-          'rand\n' \
+          'rfc\n' \
           's to skip\n' \
           'q to quit\n'
 

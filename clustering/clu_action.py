@@ -25,35 +25,24 @@ def cluster(samples_data, config):
     numerical_labels = samples_data.fam_num[samples_data['selected'] == 1].tolist()
 
     # Prompts the user to select an action
-    clu = ''
-    while clu == '':
-        clu = input(constants.msg_clu)
+    clu = interaction.ask_action(constants.msg_clu, set(clus.keys()))
+    if clu == 's':
+        return None, None
 
-        if clu in clus:
-            data = select_data(config, uuids)
+    data = select_data(config, uuids)
 
-            clustering_labels, model, modifier, data, metric = clus[clu].cluster(
-                data,
-                numerical_labels,
-                config,
-                {}
-            )
+    clustering_labels, model, modifier, data, metric = clus[clu].cluster(
+        data,
+        numerical_labels,
+        config,
+        {}
+    )
 
-            evaluation.evaluate_clustering(numerical_labels, clustering_labels, data, metric)
+    evaluation.evaluate_clustering(numerical_labels, clustering_labels, data, metric)
 
-            output.out_clustering(dict(zip(uuids, clustering_labels.tolist())), modifier, clu)
+    output.out_clustering(dict(zip(uuids, clustering_labels.tolist())), modifier, clu)
 
-            output.result_to_visualize(uuids, numerical_labels, clustering_labels)
-
-        elif clu == 's':
-            return None, None
-
-        elif clu == 'q':
-            exit()
-
-        else:
-            print('Not a valid input\n')
-            clu = ''
+    output.result_to_visualize(uuids, numerical_labels, clustering_labels)
 
 
 def select_data(config, uuids):

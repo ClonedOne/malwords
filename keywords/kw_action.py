@@ -10,21 +10,14 @@ def keywords_extraction(config):
     :return:
     """
 
+    kws = {
+        'tfidf': kw_keyword_tfidf
+    }
+
     # Prompts the user to select an action
-    kw = ''
-    while kw == '':
-        kw = input(constants.msg_kw)
+    kw = interaction.ask_action(constants.msg_kw, set(kws.keys()))
+    if kw == 's':
+        return
 
-        if kw == 'tfidf':
-            result_file = interaction.ask_file(constants.msg_results_cluster)
-            kw_keyword_tfidf.extract_keywords(config, result_file)
-
-        elif kw == 's':
-            return
-
-        elif kw == 'q':
-            exit()
-
-        else:
-            print('Not a valid input\n')
-            kw = ''
+    result_file = interaction.ask_file(constants.msg_results_cluster)
+    kw.extract_keywords(config, result_file)
