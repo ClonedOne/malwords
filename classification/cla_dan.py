@@ -1,6 +1,8 @@
 from sklearn.preprocessing import LabelBinarizer
-import tensorflow as tf
 import numpy as np
+np.random.seed(42)
+import tensorflow as tf
+tf.set_random_seed(42)
 
 
 # Pre-Processing
@@ -16,19 +18,23 @@ def pp_vectors(xm_train, xm_dev, xm_test):
     :return:
     """
 
+    train = np.empty_like(xm_train)
+    dev = np.empty_like(xm_dev)
+    test = np.empty_like(xm_test)
+
     for i in range(xm_train.shape[0]):
-        xm_train[i] = xm_train[i] / xm_train.shape[1]
-    xm_train = xm_train.T
+        train[i] = xm_train[i] / xm_train.shape[1]
+    train = train.T
 
     for i in range(xm_dev.shape[0]):
-        xm_dev[i] = xm_dev[i] / xm_dev.shape[1]
-    xm_dev = xm_dev.T
+        dev[i] = xm_dev[i] / xm_dev.shape[1]
+    dev = dev.T
 
     for i in range(xm_test.shape[0]):
-        xm_test[i] = xm_test[i] / xm_test.shape[1]
-    xm_test = xm_test.T
+        test[i] = xm_test[i] / xm_test.shape[1]
+    test = test.T
 
-    return xm_train, xm_dev, xm_test
+    return train, dev, test
 
 
 def pp_labels(y_train, y_dev, y_test):
@@ -107,7 +113,7 @@ def init_weights(n_layers, layer_sizes):
         params[wn] = tf.get_variable(
             wn,
             layer_sizes[i * 2],
-            initializer=tf.contrib.layers.xavier_initializer(seed=1)
+            initializer=tf.contrib.layers.xavier_initializer(seed=42)
         )
 
         params[bn] = tf.get_variable(
@@ -212,7 +218,7 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
 
     global_step = tf.Variable(0, trainable=False)
 
-    learning_rate = tf.train.exponential_decay(l_rate, global_step, 5000, 0.96)
+    learning_rate = tf.train.exponential_decay(l_rate, global_step, 5000, 0.90)
 
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost, global_step=global_step)
 
@@ -302,49 +308,50 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config, params):
 
     # Hyper-parameters
     learning_rate = params.get('learning_rate', 0.001)
-    n_epochs = params.get('num_epochs', 512)
-    mini_batch_size = params.get('batch_size', 512)
-    n_h_layers = params.get('num_layers', 3)
+    n_epochs = params.get('num_epochs', 1000)
+    mini_batch_size = params.get('batch_size', 256)
+    # n_h_layers = params.get('num_layers', 6)
+    n_h_layers = params.get('num_layers', 5)
     ls = [
-        [256, xm_train.shape[0]], [256, 1],
-        [128, 256], [128, 1],
-        [ym_train.shape[0], 128], [ym_train.shape[0], 1]
+        [2048, xm_train.shape[0]], [2048, 1],
+        # [2048, 2048], [2048, 1],
+        [1024, 2048], [1024, 1],
+        [512, 1024], [512, 1],
+        [256, 512], [256, 1],
+        [ym_train.shape[0], 256], [ym_train.shape[0], 1]
     ]
     layers = params.get('layers', ls)
     keep_prob = params.get('keep_prob', 0.9)
     reg = params.get('regularization', 0.0)
 
-    with tf.device('/gpu:0'):
-        tf.reset_default_graph()
-        tf.set_random_seed(42)
+    tf.reset_default_graph()
+    sess = tf.Session()
 
-        sess = tf.Session()
+    accuracy, tr_acc, dv_acc, x, y, keep_prob, y_pred, y_true = dan(
+        xm_train,
+        ym_train,
+        xm_dev,
+        ym_dev,
+        learning_rate,
+        n_epochs,
+        mini_batch_size,
+        n_h_layers,
+        layers,
+        keep_prob,
+        reg,
+        costs,
+        sess
+    )
 
-        accuracy, tr_acc, dv_acc, x, y, keep_prob, y_pred, y_true = dan(
-            xm_train,
-            ym_train,
-            xm_dev,
-            ym_dev,
-            learning_rate,
-            n_epochs,
-            mini_batch_size,
-            n_h_layers,
-            layers,
-            keep_prob,
-            reg,
-            costs,
-            sess
-        )
+    ts_acc, y_predicted, y_true = sess.run(
+        [accuracy, y_pred, y_true],
+        feed_dict={x: xm_test, y: ym_test, keep_prob: 1.0}
+    )
 
-        ts_acc, y_predicted, y_true = sess.run(
-            [accuracy, y_pred, y_true],
-            feed_dict={x: xm_test, y: ym_test, keep_prob: 1.0}
-        )
-
-        print('\nFinal accuracy values:\n')
-        print('Train Accuracy:', tr_acc)
-        print('Dev Accuracy:', dv_acc)
-        print('Test Accuracy:', ts_acc)
-        print('\n')
+    print('\nFinal accuracy values:\n')
+    print('Train Accuracy:', tr_acc)
+    print('Dev Accuracy:', dv_acc)
+    print('Test Accuracy:', ts_acc)
+    print('\n')
 
     return y_predicted, (y_true, costs), str(n_h_layers)
