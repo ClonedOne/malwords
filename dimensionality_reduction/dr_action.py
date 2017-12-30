@@ -1,4 +1,4 @@
-from dimensionality_reduction import dr_pca, dr_tsne, dr_rfc
+from dimensionality_reduction import dr_pca, dr_tsne, dr_rfc, dr_irfc
 from utilities import constants, interaction
 
 
@@ -14,7 +14,8 @@ def dimensionality_reduction(samples_data, config):
     drs = {
         'pca': dr_pca,
         'tsne': dr_tsne,
-        'rfc': dr_rfc
+        'rfc': dr_rfc,
+        'irfc': dr_irfc
     }
 
     uuids = samples_data.index[samples_data['selected'] == 1].tolist()
@@ -23,26 +24,17 @@ def dimensionality_reduction(samples_data, config):
     x_test = samples_data.index[samples_data['test'] == 1].tolist()
 
     # Prompts the user to select an action
-    dr = ''
-    while dr == '':
-        dr = input(constants.msg_dr)
+    dr = interaction.ask_action(constants.msg_dr, set(drs.keys()))
+    if dr == 's':
+        return None, None
 
-        if dr in drs:
-            components = interaction.ask_number(constants.msg_components)
-            to_cla = interaction.ask_yes_no(constants.msg_cla_clu)
-            if to_cla:
-                data, model = drs[dr].reduce(config, components, None, x_train, x_dev, x_test)
-            else:
-                data, model = drs[dr].reduce(config, components, uuids, None, None, None)
+    components = interaction.ask_number(constants.msg_components)
+    to_cla = interaction.ask_yes_no(constants.msg_cla_clu)
 
-            return data, model
+    if to_cla:
+        data, model = drs[dr].reduce(config, components, None, x_train, x_dev, x_test)
 
-        elif dr == 's':
-            return None, None
+    else:
+        data, model = drs[dr].reduce(config, components, uuids, None, None, None)
 
-        elif dr == 'q':
-            exit()
-
-        else:
-            print('Not a valid input\n')
-            dr = ''
+    return data, model

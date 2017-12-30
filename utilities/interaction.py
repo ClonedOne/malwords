@@ -4,17 +4,17 @@ import glob
 import os
 
 
-def ask_number(request, min_valid=None, max_valid=None):
+def ask_number(msg, min_valid=None, max_valid=None):
     """
     Ask user for the number of requested items.
 
-    :param request: request string
+    :param msg: message to be displayed
     :param min_valid: optional minimum value
     :param max_valid: optional maximum value
     :return:
     """
 
-    msg_request = 'Please select the desired number of {} (q to quit)\n'.format(request)
+    msg_request = '\nPlease select the desired number of {} (q to quit)\n'.format(msg)
     number = None
 
     while number is None:
@@ -38,14 +38,15 @@ def ask_number(request, min_valid=None, max_valid=None):
     return number
 
 
-def ask_file(request):
+def ask_file(msg):
     """
     Ask user for the file path of requested items.
 
+    :param msg: message to be displayed
     :return: 
     """
 
-    msg_request = 'Please select the desired {} (q to quit)\n'.format(request)
+    msg_request = '\nPlease select the desired {} (q to quit)\n'.format(msg)
     file_path = ""
 
     while file_path == "":
@@ -97,7 +98,7 @@ def ask_yes_no(msg):
     """
     Ask user for a yes/no answer.
 
-    :param msg:
+    :param msg: message to be displayed
     :return:
     """
 
@@ -113,6 +114,30 @@ def ask_yes_no(msg):
 
         else:
             print('Not a valid input\n')
+
+
+def ask_action(msg, possibilities):
+    """
+    Asks the user to chose one of a set of possible actions.
+
+    :param msg: message to be displayed
+    :param possibilities: set of possible inputs
+    :return:
+    """
+
+    chosen = None
+    while not chosen:
+        chosen = input(msg)
+
+        if chosen in possibilities or chosen == 's':
+            return chosen
+
+        elif chosen == 'q':
+            exit()
+
+        else:
+            print('Not a valid input\n')
+            chosen = None
 
 
 def complete(text, state):

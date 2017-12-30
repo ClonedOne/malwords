@@ -143,4 +143,5 @@ config.json
 data/
 /js_dist
 
+.DS_Store
 tags

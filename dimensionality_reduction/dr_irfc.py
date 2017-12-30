@@ -7,9 +7,9 @@ import json
 import os
 
 
-def get_most_important_feats(feats_weights, max_feats, inv_words, n_uuid):
+def get_least_important_feats(feats_weights, max_feats, inv_words, n_uuid):
     """
-    Returns a list of indices of the `max_feats` most important features given feature weights.
+    Returns a list of indices of the `max_feats` least important features given feature weights.
 
     :param feats_weights: list of feature weights
     :param max_feats: maximum number of desired features
@@ -28,7 +28,7 @@ def get_most_important_feats(feats_weights, max_feats, inv_words, n_uuid):
         importance[imp].append(i)
         i += 1
 
-    for imp in sorted(list(importance.keys()), reverse=True):
+    for imp in sorted(list(importance.keys())):
         imp_feats = importance[imp]
         to_add = len(imp_feats)
 
@@ -90,7 +90,7 @@ def reduce(config, components, uuids=None, x_train=None, x_dev=None, x_test=None
     words = json.load(open(os.path.join(constants.dir_d, constants.json_words), 'r'))
     inv_words = {value: key for key, value in words.items()}
 
-    print('Performing feature selection using Random Forest Classifiers')
+    print('Performing feature deletion using Random Forest Classifiers')
 
     rfc_file = interaction.ask_file(constants.msg_data_rfc)
     rfc = joblib.load(rfc_file)
@@ -100,14 +100,14 @@ def reduce(config, components, uuids=None, x_train=None, x_dev=None, x_test=None
     else:
         n_uuid = len(x_train)
 
-    selected_feats = get_most_important_feats(rfc.feature_importances_, components, inv_words, n_uuid)
+    selected_feats = get_least_important_feats(rfc.feature_importances_, components, inv_words, n_uuid)
 
     if uuids:
         data = load_selected_feats(config, uuids, selected_feats)
         matrix_file = os.path.join(
             constants.dir_d,
             constants.dir_mat,
-            'rfc_{}_{}.txt'.format(components, len(uuids))
+            'irfc_{}_{}.txt'.format(components, len(uuids))
         )
         np.savetxt(open(matrix_file, 'wb'), data)
 
@@ -116,7 +116,7 @@ def reduce(config, components, uuids=None, x_train=None, x_dev=None, x_test=None
         matrix_file = os.path.join(
             constants.dir_d,
             constants.dir_mat,
-            'rfc_{}_{}_tr.txt'.format(components, len(t_train))
+            'irfc_{}_{}_tr.txt'.format(components, len(t_train))
         )
         np.savetxt(open(matrix_file, 'wb'), t_train)
 
@@ -124,7 +124,7 @@ def reduce(config, components, uuids=None, x_train=None, x_dev=None, x_test=None
         matrix_file = os.path.join(
             constants.dir_d,
             constants.dir_mat,
-            'rfc_{}_{}_dv.txt'.format(components, len(t_dev))
+            'irfc_{}_{}_dv.txt'.format(components, len(t_dev))
         )
         np.savetxt(open(matrix_file, 'wb'), t_dev)
 
@@ -132,7 +132,7 @@ def reduce(config, components, uuids=None, x_train=None, x_dev=None, x_test=None
         matrix_file = os.path.join(
             constants.dir_d,
             constants.dir_mat,
-            'rfc_{}_{}_te.txt'.format(components, len(t_test))
+            'irfc_{}_{}_te.txt'.format(components, len(t_test))
         )
         np.savetxt(open(matrix_file, 'wb'), t_test)
 

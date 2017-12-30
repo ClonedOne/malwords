@@ -1,4 +1,4 @@
-from classification import cla_svm, cla_rand_forest, cla_xgb, cla_dan
+from classification import cla_svm, cla_rfc, cla_xgb, cla_dan
 from utilities import constants, interaction, output, evaluation
 from helpers import loader_tfidf
 import numpy as np
@@ -16,7 +16,7 @@ def classify(samples_data, config):
     clas = {
         'svm': cla_svm,
         'dan': cla_dan,
-        'rand': cla_rand_forest,
+        'rfc': cla_rfc,
         'xgb': cla_xgb
     }
 
@@ -29,41 +29,28 @@ def classify(samples_data, config):
     y_test_fam = samples_data.family[samples_data['test'] == 1].tolist()
 
     # Prompts the user to select an action
-    cla = ''
-    while cla == '':
-        cla = input(constants.msg_cla)
+    cla = interaction.ask_action(constants.msg_cla, set(clas.keys()))
+    if cla == 's':
+        return None, None, None
 
-        if cla in clas:
-            xm_train, xm_dev, xm_test = select_data(config, x_train, x_dev, x_test)
-            y_predicted, model, modifier = clas[cla].classify(
-                xm_train,
-                xm_dev,
-                xm_test,
-                y_train,
-                y_dev,
-                y_test,
-                config,
-                {}
-            )
+    xm_train, xm_dev, xm_test = select_data(config, x_train, x_dev, x_test)
+    y_predicted, model, modifier = clas[cla].classify(
+        xm_train,
+        xm_dev,
+        xm_test,
+        y_train,
+        y_dev,
+        y_test,
+        config,
+        {}
+    )
 
-            output.out_classification(dict(zip(x_test, y_predicted.tolist())), modifier, cla)
+    output.out_classification(dict(zip(x_test, y_predicted.tolist())), modifier, cla)
 
-            if cla == 'dan':
-                evaluation.evaluate_classification(model[0], y_test_fam, y_predicted, model[1])
-            else:
-                evaluation.evaluate_classification(y_test, y_test_fam, y_predicted, None)
-
-            return y_predicted, model, modifier
-
-        elif cla == 's':
-            return None, None, None
-
-        elif cla == 'q':
-            exit()
-
-        else:
-            print('Not a valid input\n')
-            cla = ''
+    if cla == 'dan':
+        evaluation.evaluate_classification(model[0], y_test_fam, y_predicted, model[1])
+    else:
+        evaluation.evaluate_classification(y_test, y_test_fam, y_predicted, None)
 
 
 def select_data(config, x_train, x_dev, x_test):
