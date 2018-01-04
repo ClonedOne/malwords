@@ -139,7 +139,8 @@ def fwd(x, params, keep_prob, n_h_layers):
     zn = None
     epsilon = 1e-4
 
-    an = tf.nn.dropout(x, keep_prob)
+    #  an = tf.nn.dropout(x, keep_prob)
+    an = x
 
     for i in range(n_h_layers):
         wn = 'W{}'.format(i)
@@ -218,7 +219,7 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
 
     global_step = tf.Variable(0, trainable=False)
 
-    learning_rate = tf.train.exponential_decay(l_rate, global_step, 5000, 0.90)
+    learning_rate = tf.train.exponential_decay(l_rate, global_step, 1000, 0.96)
 
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost, global_step=global_step)
 
@@ -307,7 +308,7 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config, params):
     costs = []
 
     # Hyper-parameters
-    learning_rate = params.get('learning_rate', 0.001)
+    learning_rate = params.get('learning_rate', 0.01)
     n_epochs = params.get('num_epochs', 1000)
     mini_batch_size = params.get('batch_size', 256)
     # n_h_layers = params.get('num_layers', 6)
