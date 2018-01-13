@@ -1,4 +1,4 @@
-from sklearn.preprocessing import LabelBinarizer
+from sklearn.preprocessing import LabelBinarizer, normalize
 import numpy as np
 np.random.seed(42)
 import tensorflow as tf
@@ -18,21 +18,14 @@ def pp_vectors(xm_train, xm_dev, xm_test):
     :return:
     """
 
-    train = np.empty_like(xm_train)
-    dev = np.empty_like(xm_dev)
-    test = np.empty_like(xm_test)
+    train = normalize(xm_train).T
+    # train = train.T
 
-    for i in range(xm_train.shape[0]):
-        train[i] = xm_train[i] / xm_train.shape[1]
-    train = train.T
+    dev = normalize(xm_dev).T
+    # dev = dev.T
 
-    for i in range(xm_dev.shape[0]):
-        dev[i] = xm_dev[i] / xm_dev.shape[1]
-    dev = dev.T
-
-    for i in range(xm_test.shape[0]):
-        test[i] = xm_test[i] / xm_test.shape[1]
-    test = test.T
+    test = normalize(xm_test).T
+    # test = test.T
 
     return train, dev, test
 
@@ -139,8 +132,8 @@ def fwd(x, params, keep_prob, n_h_layers):
     zn = None
     epsilon = 1e-4
 
-    #  an = tf.nn.dropout(x, keep_prob)
-    an = x
+    an = tf.nn.dropout(x, keep_prob)
+    # an = x
 
     for i in range(n_h_layers):
         wn = 'W{}'.format(i)
@@ -219,7 +212,7 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
 
     global_step = tf.Variable(0, trainable=False)
 
-    learning_rate = tf.train.exponential_decay(l_rate, global_step, 1000, 0.96)
+    learning_rate = tf.train.exponential_decay(l_rate, global_step, 5000, 0.90)
 
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost, global_step=global_step)
 
@@ -248,6 +241,9 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
                 minibatch_idxs[i * m_b_size: (i + 1) * m_b_size],
                 axis=1
             )
+
+            # minibatch_x *= np.random.binomial([np.ones(minibatch_x.shape)],  k_prob)[0] * (1.0 / k_prob)
+
             minibatch_y = np.take(
                 ym_train,
                 minibatch_idxs[i * m_b_size: (i + 1) * m_b_size],
