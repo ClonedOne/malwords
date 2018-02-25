@@ -1,4 +1,4 @@
-from sklearn.preprocessing import LabelBinarizer, normalize
+from sklearn.preprocessing import LabelBinarizer, normalize, StandardScaler
 import numpy as np
 np.random.seed(42)
 import tensorflow as tf
@@ -18,14 +18,13 @@ def pp_vectors(xm_train, xm_dev, xm_test):
     :return:
     """
 
-    train = normalize(xm_train).T
-    # train = train.T
+    scaler = StandardScaler().fit(xm_train)
 
-    dev = normalize(xm_dev).T
-    # dev = dev.T
+    train = scaler.transform(xm_train).T
 
-    test = normalize(xm_test).T
-    # test = test.T
+    dev = scaler.transform(xm_dev).T
+
+    test = scaler.transform(xm_test).T
 
     return train, dev, test
 
@@ -151,7 +150,8 @@ def fwd(x, params, keep_prob, n_h_layers):
             variance_epsilon=epsilon
         )
 
-        an = tf.nn.dropout(tf.nn.relu(b_n), keep_prob)
+        # an = tf.nn.dropout(tf.nn.relu(b_n), keep_prob)
+        an = tf.nn.dropout(tf.nn.leaky_relu(b_n), keep_prob)
 
     return zn
 
@@ -212,7 +212,7 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
 
     global_step = tf.Variable(0, trainable=False)
 
-    learning_rate = tf.train.exponential_decay(l_rate, global_step, 5000, 0.90)
+    learning_rate = tf.train.exponential_decay(l_rate, global_step, 1000, 0.90)
 
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost, global_step=global_step)
 
@@ -311,11 +311,14 @@ def classify(xm_train, xm_dev, xm_test, y_train, y_dev, y_test, config, params):
     n_h_layers = params.get('num_layers', 5)
     ls = [
         [2048, xm_train.shape[0]], [2048, 1],
-        # [2048, 2048], [2048, 1],
-        [1024, 2048], [1024, 1],
-        [512, 1024], [512, 1],
-        [256, 512], [256, 1],
-        [ym_train.shape[0], 256], [ym_train.shape[0], 1]
+        [2048, 2048], [2048, 1],
+        [2048, 2048], [2048, 1],
+        [2048, 2048], [2048, 1],
+        # [1024, 2048], [1024, 1],
+        # [512, 1024], [512, 1],
+        # [256, 512], [256, 1],
+        # [ym_train.shape[0], 256], [ym_train.shape[0], 1]
+        [ym_train.shape[0], 2048], [ym_train.shape[0], 1]
     ]
     layers = params.get('layers', ls)
     keep_prob = params.get('keep_prob', 0.9)
