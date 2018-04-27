@@ -80,9 +80,9 @@ def init_ph(n_feats, n_classes):
     :return:
     """
 
-    x = tf.placeholder(dtype=tf.float32, shape=(n_feats, None))
-    y = tf.placeholder(dtype=tf.float32, shape=(n_classes, None))
-    keep_prob = tf.placeholder(tf.float32)
+    x = tf.placeholder(dtype=tf.float32, shape=(n_feats, None), name='x')
+    y = tf.placeholder(dtype=tf.float32, shape=(n_classes, None), name='y')
+    keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
     return x, y, keep_prob
 
@@ -103,14 +103,14 @@ def init_weights(n_layers, layer_sizes):
         bn = 'b{}'.format(i)
 
         params[wn] = tf.get_variable(
-            wn,
-            layer_sizes[i * 2],
+            name=wn,
+            shape=layer_sizes[i * 2],
             initializer=tf.contrib.layers.xavier_initializer(seed=42)
         )
 
         params[bn] = tf.get_variable(
-            bn,
-            layer_sizes[(i * 2) + 1],
+            name=bn,
+            shape=layer_sizes[(i * 2) + 1],
             initializer=tf.zeros_initializer()
         )
 
@@ -216,13 +216,13 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
 
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost, global_step=global_step)
 
-    y_pred = tf.argmax(z)
+    y_pred = tf.argmax(z, name='y_pred')
 
-    y_true = tf.argmax(y)
+    y_true = tf.argmax(y, name='y_true')
 
     correct_prediction = tf.equal(y_pred, y_true)
 
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"), name='accuracy')
 
     init = tf.global_variables_initializer()
 
@@ -277,6 +277,11 @@ def dan(xm_train, ym_train, xm_dev, ym_dev, l_rate, n_epochs, m_b_size, n_h_laye
     print('Final epoch')
     print('Train Accuracy:', tr_acc)
     print('Dev Accuracy:', dv_acc)
+
+    # Save the model
+    saver = tf.train.Saver()
+    save_path = saver.save(sess, "./trained/model.ckpt")
+    print("Model saved in path: %s" % save_path)
 
     return accuracy, tr_acc, dv_acc, x, y, keep_prob, y_pred, y_true
 
